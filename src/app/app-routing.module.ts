@@ -1,10 +1,30 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 
-const routes: Routes = [];
+// Components
+import { LoginComponent } from './components/auth/login/login.component';
+import { RegisterComponent } from './components/auth/register/register.component';
+import { ProductListComponent } from './components/product/product-list/product-list.component';
+import { ProductDetailComponent } from './components/product/product-detail/product-detail.component';
+import { BasketComponent } from './components/basket/basket.component';
+
+const routes: Routes = [
+  { path: '', component: ProductListComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'products', component: ProductListComponent },
+  { path: 'products/:id', component: ProductDetailComponent },
+  { path: 'search', component: ProductListComponent },
+  { path: 'basket', component: BasketComponent, canActivate: [AuthGuard] },
+  { path: 'orders', loadChildren: () => import('./modules/orders/orders.module').then(m => m.OrdersModule), canActivate: [AuthGuard] },
+  { path: 'stores', loadChildren: () => import('./modules/stores/stores.module').then(m => m.StoresModule), canActivate: [AuthGuard] },
+  { path: 'profile', loadChildren: () => import('./modules/profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard] },
+  { path: '**', redirectTo: '' }
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
