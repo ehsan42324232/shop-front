@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    ports:
+      - "4200:80"
+    environment:
+      - API_URL=http://localhost:8000/api/
+    depends_on:
+      - backend
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+
+  backend:
+    build: ../shop-back
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=sqlite:///db.sqlite3
+    volumes:
+      - ../shop-back:/app
+
+networks:
+  default:
+    name: shop-platform
