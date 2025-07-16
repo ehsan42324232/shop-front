@@ -1,247 +1,219 @@
-# Shop Platform Frontend
+# ShopPlatform - Multi-Tenant E-commerce Frontend
 
-Angular-based frontend for a multi-store e-commerce platform.
+A modern, multi-tenant e-commerce platform built with Angular and Tailwind CSS.
 
-## Features
+## 🚀 Features
 
-- **Modern UI/UX**: Clean, responsive design with Tailwind CSS
-- **Authentication**: User registration, login, and secure token management
-- **Product Catalog**: Browse products with search, filtering, and pagination
-- **Shopping Cart**: Add to cart, quantity management, and checkout
-- **Product Reviews**: Rating and commenting system
-- **Multi-store Support**: Browse products from different stores
-- **Order Management**: Order history and tracking
-- **Responsive Design**: Mobile-first approach
+### 🏪 Multi-Store Architecture
+- **Domain-based store separation** - Each store has its own domain
+- **Store-specific branding** - Custom themes, logos, and styling per store
+- **Independent product catalogs** - Each store manages its own inventory
 
-## Tech Stack
+### 👑 Admin Panels
 
-- **Framework**: Angular 16
-- **Styling**: Tailwind CSS
-- **State Management**: Services with RxJS
-- **HTTP Client**: Angular HttpClient with interceptors
-- **Authentication**: Token-based with guards
-- **Build Tool**: Angular CLI
+#### Super Admin Panel (`/admin`)
+- ✅ **Store Management** - Create, edit, and manage multiple stores
+- ✅ **Bulk Store Creation** - CSV upload for creating multiple stores
+- ✅ **Platform Analytics** - Cross-store performance metrics
+- ✅ **User Management** - Manage store owners and administrators
 
-## Quick Start
+#### Store Admin Panel (`/store-admin`)
+- ✅ **Multi-level Categories** - Hierarchical category management
+- ✅ **Dynamic Product Attributes** - Custom fields defined per store
+- ✅ **Bulk Product Import** - Excel/CSV upload with auto-category creation
+- ✅ **Inventory Management** - Stock tracking and updates
+- ✅ **Order Management** - Process and fulfill customer orders
+- ✅ **Store Settings** - Shipping, payment, and business configuration
+
+### 🛍️ Customer Experience
+- ✅ **Product Browsing** - Advanced search and filtering
+- ✅ **Shopping Cart** - Add, update, remove items
+- ✅ **Checkout Process** - Complete order flow with delivery options
+- ✅ **Delivery Scheduling** - Choose delivery date and time slots
+- ✅ **Multiple Payment Methods** - Support for various payment gateways
+- ✅ **Responsive Design** - Mobile-first, modern UI
+
+### 📊 Advanced Features
+- ✅ **Real-time Search** - Fast product search with suggestions
+- ✅ **Category Hierarchy** - Multi-level category navigation
+- ✅ **Product Variants** - Size, color, and custom attribute variations
+- ✅ **Review System** - Customer ratings and reviews
+- ✅ **Address Management** - Save and manage delivery addresses
+- ✅ **Order Tracking** - Real-time order status updates
+
+## 🏗️ Architecture
+
+### Frontend Structure
+```
+src/app/
+├── components/           # Shared components
+│   ├── auth/            # Login, register
+│   ├── basket/          # Shopping cart
+│   ├── checkout/        # Order process
+│   ├── home/            # Landing page
+│   ├── product/         # Product list/detail
+│   └── shared/          # Header, loading, etc.
+├── modules/             # Feature modules
+│   ├── admin/           # Super admin panel
+│   ├── store-admin/     # Store owner panel
+│   └── account/         # User account management
+├── services/            # API services
+│   ├── store.service.ts
+│   ├── category.service.ts
+│   ├── product.service.ts
+│   ├── attribute.service.ts
+│   ├── bulk-import.service.ts
+│   └── checkout.service.ts
+├── models/              # TypeScript interfaces
+│   ├── store.models.ts
+│   ├── category.models.ts
+│   ├── product.models.ts
+│   └── order.models.ts
+└── guards/              # Route protection
+```
+
+### Key Models
+
+#### Store Model
+```typescript
+interface Store {
+  id: number;
+  name: string;
+  domain: string;
+  theme_settings: StoreTheme;
+  owner: StoreOwner;
+  settings: StoreSettings;
+  stats: StoreStats;
+}
+```
+
+#### Product Model
+```typescript
+interface Product {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  stock: number;
+  category_path: Category[];
+  attributes: ProductAttribute[];
+  media: ProductMedia[];
+  variants?: ProductVariant[];
+}
+```
+
+#### Category Model
+```typescript
+interface Category {
+  id: number;
+  name: string;
+  parent_id?: number;
+  level: number;
+  path: string; // "Electronics > Phones > Smartphones"
+  children?: Category[];
+}
+```
+
+## 🛠️ Setup & Installation
 
 ### Prerequisites
-
-- Node.js (v16 or higher)
+- Node.js 16+
+- Angular CLI 15+
 - npm or yarn
-- Angular CLI
 
 ### Installation
-
-1. Clone the repository:
 ```bash
+# Clone the repository
 git clone https://github.com/ehsan42324232/shop-front.git
 cd shop-front
-```
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
+
+# Install Tailwind CSS
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init
+
+# Start development server
+npm start
 ```
 
-3. Update environment configuration:
-```bash
-# Edit src/environments/environment.ts
-# Set apiUrl to your backend URL (default: http://localhost:8000/api/)
-```
+### Environment Setup
+1. **Configure API endpoints** in `src/environments/`
+2. **Set up domain routing** for multi-tenant architecture
+3. **Configure payment gateways** in store settings
 
-4. Start development server:
-```bash
-ng serve
-```
+## 🎨 Design System
 
-5. Open browser to `http://localhost:4200`
+### Modern UI Features
+- **Gradient backgrounds** and glass morphism effects
+- **Smooth animations** and micro-interactions
+- **Responsive grid layouts** with Tailwind CSS
+- **Custom color schemes** per store
+- **Professional typography** and spacing
 
-## Environment Configuration
+### Components
+- **Reusable UI components** for consistency
+- **Form components** with validation
+- **Data tables** with sorting and filtering
+- **Modal dialogs** for actions
+- **Toast notifications** for feedback
 
-### Development
-```typescript
-// src/environments/environment.ts
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:8000/api/'
-};
-```
+## 📱 Responsive Design
 
-### Production
-```typescript
-// src/environments/environment.prod.ts
-export const environment = {
-  production: true,
-  apiUrl: 'https://your-api-domain.com/api/'
-};
-```
+- **Mobile-first approach** - Optimized for all screen sizes
+- **Touch-friendly interfaces** - Large buttons and easy navigation
+- **Progressive Web App** features for mobile experience
 
-## Available Scripts
+## 🔒 Security Features
 
-- `ng serve` - Start development server
-- `ng build` - Build for production
-- `ng test` - Run unit tests
-- `ng lint` - Run linting
-- `ng e2e` - Run end-to-end tests
+- **JWT Authentication** with refresh tokens
+- **Role-based access control** (Super Admin, Store Owner, Customer)
+- **Route guards** for protected areas
+- **Input validation** and sanitization
+- **HTTPS enforcement** for secure transactions
 
-## Project Structure
+## 🚀 Performance
 
-```
-src/
-├── app/
-│   ├── components/          # UI Components
-│   │   ├── auth/           # Authentication components
-│   │   ├── product/        # Product-related components
-│   │   ├── basket/         # Shopping cart component
-│   │   └── shared/         # Shared components
-│   ├── services/           # Application services
-│   ├── guards/             # Route guards
-│   ├── interceptors/       # HTTP interceptors
-│   ├── models/             # TypeScript interfaces
-│   └── modules/            # Feature modules
-├── environments/           # Environment configurations
-└── assets/                # Static assets
-```
+- **Lazy loading** for feature modules
+- **OnPush change detection** for optimal performance
+- **Image optimization** with responsive images
+- **Code splitting** for faster initial load
+- **Service workers** for caching
 
-## Key Features
+## 📋 TODO
 
-### Authentication
-- User registration and login
-- Token-based authentication
-- Route protection with guards
-- Automatic token refresh
+### High Priority
+- [ ] Create admin panel components
+- [ ] Implement store-admin components
+- [ ] Add bulk import UI
+- [ ] Complete checkout flow
+- [ ] Add payment gateway integration
 
-### Product Management
-- Product listing with pagination
-- Advanced search and filtering
-- Product detail views
-- Image galleries
-- Reviews and ratings
+### Medium Priority
+- [ ] Add user account module
+- [ ] Implement order tracking
+- [ ] Add review system
+- [ ] Create analytics dashboard
 
-### Shopping Experience
-- Add to cart functionality
-- Quantity management
-- Cart persistence
-- Checkout process
-- Order tracking
+### Low Priority
+- [ ] Add multi-language support
+- [ ] Implement PWA features
+- [ ] Add dark mode
+- [ ] Create mobile app
 
-### Responsive Design
-- Mobile-first approach
-- Tailwind CSS utility classes
-- Responsive grid layouts
-- Touch-friendly interfaces
-
-## API Integration
-
-The frontend integrates with the Django REST API backend:
-
-### Authentication Endpoints
-- `POST /api/auth/login/` - User login
-- `POST /api/auth/register/` - User registration
-- `POST /api/auth/logout/` - User logout
-
-### Product Endpoints
-- `GET /api/products/` - List products
-- `GET /api/products/{id}/` - Get product details
-- `POST /api/products/{id}/add_comment/` - Add comment
-- `POST /api/products/{id}/add_rating/` - Add rating
-
-### Cart Endpoints
-- `GET /api/basket/` - Get cart items
-- `POST /api/basket/` - Add to cart
-- `PUT /api/basket/{id}/` - Update cart item
-- `DELETE /api/basket/{id}/` - Remove from cart
-
-### Order Endpoints
-- `GET /api/orders/` - List orders
-- `POST /api/orders/` - Create order
-- `GET /api/orders/{id}/` - Get order details
-
-## Deployment
-
-### Build for Production
-```bash
-ng build --configuration production
-```
-
-### Docker Deployment
-```dockerfile
-FROM node:16-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build:prod
-
-FROM nginx:alpine
-COPY --from=builder /app/dist/shop-frontend /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-### Environment Variables
-- `API_URL` - Backend API URL
-- `PRODUCTION` - Production flag
-
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
-5. Run linting and tests
-6. Submit a pull request
+4. Add tests
+5. Submit a pull request
 
-### Code Style
+## 📄 License
 
-This project follows Angular style guidelines:
-- Use TypeScript strict mode
-- Follow Angular naming conventions
-- Use reactive forms
-- Implement proper error handling
-- Write unit tests for components and services
+This project is licensed under the MIT License.
 
-### Testing
+## 📞 Support
 
-```bash
-# Unit tests
-ng test
-
-# E2E tests
-ng e2e
-
-# Test coverage
-ng test --code-coverage
-```
-
-## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## Performance
-
-- Lazy loading for feature modules
-- OnPush change detection strategy
-- Image optimization
-- Bundle splitting
-- Service worker for caching
-
-## Security
-
-- XSS protection
-- CSRF protection
-- Secure token storage
-- Input validation
-- Route guards
-
-## License
-
-MIT License
-
-## Support
-
-For support, please open an issue in the GitHub repository.
+For support and questions, please open an issue on GitHub.
