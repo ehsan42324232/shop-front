@@ -17,9 +17,10 @@ const routes: Routes = [
   { path: 'products/:id', component: ProductDetailComponent },
   { path: 'search', component: ProductListComponent },
   { path: 'basket', component: BasketComponent, canActivate: [AuthGuard] },
-  { path: 'orders', loadChildren: () => import('./modules/orders/orders.module').then(m => m.OrdersModule), canActivate: [AuthGuard] },
-  { path: 'stores', loadChildren: () => import('./modules/stores/stores.module').then(m => m.StoresModule), canActivate: [AuthGuard] },
-  { path: 'profile', loadChildren: () => import('./modules/profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard] },
+  // Temporarily removed lazy loaded modules until they are created
+  // { path: 'orders', loadChildren: () => import('./modules/orders/orders.module').then(m => m.OrdersModule), canActivate: [AuthGuard] },
+  // { path: 'stores', loadChildren: () => import('./modules/stores/stores.module').then(m => m.StoresModule), canActivate: [AuthGuard] },
+  // { path: 'profile', loadChildren: () => import('./modules/profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' }
 ];
 
