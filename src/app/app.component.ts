@@ -4,12 +4,13 @@ import { AuthService } from './services/auth.service';
 @Component({
   selector: 'app-root',
   template: `
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <app-header></app-header>
-      <main>
+      <main class="relative">
         <router-outlet></router-outlet>
       </main>
-      <app-loading></app-loading>
+      <!-- Temporarily comment out loading to test -->
+      <!-- <app-loading></app-loading> -->
     </div>
   `
 })
