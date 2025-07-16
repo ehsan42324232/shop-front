@@ -16,6 +16,7 @@ import { RegisterComponent } from './components/auth/register/register.component
 import { ProductListComponent } from './components/product/product-list/product-list.component';
 import { ProductDetailComponent } from './components/product/product-detail/product-detail.component';
 import { BasketComponent } from './components/basket/basket.component';
+import { HomeComponent } from './components/home/home.component';
 
 // Interceptors
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -33,7 +34,8 @@ import { AuthGuard } from './guards/auth.guard';
     RegisterComponent,
     ProductListComponent,
     ProductDetailComponent,
-    BasketComponent
+    BasketComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
