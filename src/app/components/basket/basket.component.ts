@@ -40,7 +40,7 @@ import { Observable } from 'rxjs';
                   {{ item.product.title }}
                 </h3>
                 <p class="text-gray-600 text-sm">{{ item.product.description | slice:0:100 }}...</p>
-                <p class="text-blue-600 font-semibold mt-2">${{ item.product.price }}</p>
+                <p class="text-blue-600 font-semibold mt-2">\${{ item.product.price }}</p>
               </div>
               
               <!-- Quantity Controls -->
@@ -60,7 +60,7 @@ import { Observable } from 'rxjs';
               
               <!-- Item Total -->
               <div class="text-right">
-                <p class="text-lg font-semibold text-gray-900">${{ item.total_price.toFixed(2) }}</p>
+                <p class="text-lg font-semibold text-gray-900">\${{ item.total_price.toFixed(2) }}</p>
                 <button class="text-red-500 hover:text-red-700 text-sm mt-1" 
                         (click)="removeItem(item)">
                   Remove
@@ -94,7 +94,7 @@ import { Observable } from 'rxjs';
             <div class="space-y-2 mb-4">
               <div class="flex justify-between">
                 <span>Subtotal ({{ getTotalItems() }} items)</span>
-                <span>${{ getSubtotal().toFixed(2) }}</span>
+                <span>\${{ getSubtotal().toFixed(2) }}</span>
               </div>
               <div class="flex justify-between">
                 <span>Shipping</span>
@@ -102,12 +102,12 @@ import { Observable } from 'rxjs';
               </div>
               <div class="flex justify-between">
                 <span>Tax</span>
-                <span>${{ getTax().toFixed(2) }}</span>
+                <span>\${{ getTax().toFixed(2) }}</span>
               </div>
               <hr class="my-2">
               <div class="flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span>${{ getTotal().toFixed(2) }}</span>
+                <span>\${{ getTotal().toFixed(2) }}</span>
               </div>
             </div>
             
