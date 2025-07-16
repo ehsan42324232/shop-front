@@ -87,7 +87,7 @@ import { Observable } from 'rxjs';
             <!-- Price and Actions -->
             <div class="flex items-center justify-between">
               <span class="text-xl font-bold text-blue-600">
-                ${{ product.price }}
+                \${{ product.price }}
               </span>
               
               <button 
