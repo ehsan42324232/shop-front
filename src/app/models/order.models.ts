@@ -1,4 +1,5 @@
 // Enhanced Order models with delivery and payment
+import { User, Store, Product } from './index';
 
 export interface Order {
   id: number;
@@ -36,6 +37,30 @@ export interface OrderItem {
   unit_price: number;
   total_price: number;
   attributes: { [key: string]: any };
+}
+
+export interface ProductVariant {
+  id: number;
+  name: string;
+  sku: string;
+  price: number;
+  stock: number;
+  attributes: { [key: string]: any };
+}
+
+export interface ShippingMethod {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  estimated_days: number;
+}
+
+export interface PaymentMethod {
+  id: number;
+  name: string;
+  type: 'card' | 'paypal' | 'bank_transfer' | 'cash_on_delivery';
+  is_default: boolean;
 }
 
 export interface Address {
