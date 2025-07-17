@@ -65,7 +65,7 @@ import { Observable } from 'rxjs';
 
           <!-- Price -->
           <div class="text-3xl font-bold text-blue-600">
-            \${{ product.price }}
+            \\${{ product.price }}
           </div>
 
           <!-- Stock Status -->
@@ -201,7 +201,7 @@ export class ProductDetailComponent implements OnInit {
   }
 
   loadProduct(id: number): void {
-    this.productService.getProduct(id).subscribe({
+    this.productService.getProduct(id.toString()).subscribe({
       next: (product) => {
         this.product = product;
         this.selectedImage = product.media && product.media.length > 0 ? product.media[0].file : '';
@@ -243,7 +243,7 @@ export class ProductDetailComponent implements OnInit {
 
   submitRating(): void {
     if (this.product && this.userRating > 0) {
-      this.productService.addRating(this.product.id, this.userRating).subscribe({
+      this.productService.addRating(this.product.id.toString(), this.userRating).subscribe({
         next: () => {
           this.loadProduct(this.product!.id);
           this.userRating = 0;
@@ -258,7 +258,7 @@ export class ProductDetailComponent implements OnInit {
   submitComment(): void {
     if (this.product && this.commentForm.valid) {
       const text = this.commentForm.get('text')?.value;
-      this.productService.addComment(this.product.id, text).subscribe({
+      this.productService.addComment(this.product.id.toString(), text).subscribe({
         next: () => {
           this.loadProduct(this.product!.id);
           this.commentForm.reset();
