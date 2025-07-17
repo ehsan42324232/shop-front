@@ -1,5 +1,33 @@
 // Enhanced Order models with delivery and payment
 
+// Local type definitions to avoid circular imports
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface Store {
+  id: number;
+  name: string;
+  description: string;
+  domain: string;
+  created_at: string;
+  owner: User;
+  products_count: number;
+}
+
+interface Product {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  stock: number;
+  created_at: string;
+}
+
 export interface Order {
   id: number;
   order_number: string;
@@ -130,32 +158,4 @@ export interface CheckoutRequest {
   delivery_time_slot?: string;
   notes?: string;
   coupon_code?: string;
-}
-
-// Local definitions to avoid circular imports
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-}
-
-interface Store {
-  id: number;
-  name: string;
-  description: string;
-  domain: string;
-  created_at: string;
-  owner: User;
-  products_count: number;
-}
-
-interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  stock: number;
-  created_at: string;
 }
