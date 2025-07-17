@@ -65,7 +65,7 @@ import { Observable } from 'rxjs';
 
           <!-- Price -->
           <div class="text-3xl font-bold text-blue-600">
-            \\${{ product.price }}
+            ${{ product.price }}
           </div>
 
           <!-- Stock Status -->
