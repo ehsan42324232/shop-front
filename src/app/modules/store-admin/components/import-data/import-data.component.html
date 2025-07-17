@@ -1,0 +1,176 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Bulk Import Products</h5>
+        </div>
+        
+        <div class="card-body">
+          <form (ngSubmit)="importProducts()">
+            <div class="mb-4">
+              <label for="importFile" class="form-label">Select CSV/Excel File *</label>
+              <input type="file" class="form-control" id="importFile" 
+                     (change)="onFileSelected($event)" 
+                     accept=".csv,.xlsx,.xls"
+                     required>
+              <div class="form-text">
+                Supported formats: CSV, Excel (.xlsx, .xls)
+              </div>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="updateExisting"
+                         [(ngModel)]="importForm.updateExisting" name="updateExisting">
+                  <label class="form-check-label" for="updateExisting">
+                    Update existing products
+                  </label>
+                  <div class="form-text">
+                    Update products that already exist (matched by SKU)
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="createCategories"
+                         [(ngModel)]="importForm.createCategories" name="createCategories">
+                  <label class="form-check-label" for="createCategories">
+                    Auto-create categories
+                  </label>
+                  <div class="form-text">
+                    Automatically create categories from the category column
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary" [disabled]="!importForm.file || importing">
+                <span *ngIf="importing" class="spinner-border spinner-border-sm me-2"></span>
+                <i *ngIf="!importing" class="fas fa-upload me-2"></i>
+                {{importing ? 'Importing...' : 'Import Products'}}
+              </button>
+              
+              <button type="button" class="btn btn-outline-secondary" (click)="downloadTemplate()">
+                <i class="fas fa-download me-2"></i>
+                Download Template
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="card-title mb-0">CSV Format Guide</h6>
+        </div>
+        
+        <div class="card-body">
+          <h6>Required Columns:</h6>
+          <ul class="list-unstyled">
+            <li><code>title</code> - Product name</li>
+            <li><code>price</code> - Product price</li>
+            <li><code>stock</code> - Stock quantity</li>
+          </ul>
+
+          <h6>Optional Columns:</h6>
+          <ul class="list-unstyled">
+            <li><code>description</code> - Product description</li>
+            <li><code>sku</code> - Stock keeping unit</li>
+            <li><code>category</code> - Category path (e.g., "Electronics > Phones")</li>
+            <li><code>attr_*</code> - Product attributes (e.g., attr_color, attr_size)</li>
+          </ul>
+
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Tip:</strong> Use the "category" column with " > " to create nested categories automatically.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Import History</h5>
+        </div>
+        
+        <div class="card-body">
+          <div *ngIf="loading" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <div *ngIf="!loading && importLogs.length === 0" class="text-center text-muted">
+            <i class="fas fa-history fa-3x mb-3"></i>
+            <p>No import history found.</p>
+          </div>
+
+          <div *ngIf="!loading && importLogs.length > 0" class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>File</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                  <th>Success</th>
+                  <th>Failed</th>
+                  <th>Created</th>
+                  <th>Updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let log of importLogs">
+                  <td>
+                    <small>{{formatDate(log.created_at)}}</small>
+                  </td>
+                  <td>
+                    <span class="text-truncate" style="max-width: 150px; display: inline-block;">
+                      {{log.filename}}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge" [class]="getStatusBadgeClass(log.status)">
+                      <i [class]="getStatusIcon(log.status)"></i>
+                      {{log.status | titlecase}}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge bg-light text-dark">{{log.total_rows}}</span>
+                  </td>
+                  <td>
+                    <span class="badge bg-success">{{log.successful_rows}}</span>
+                  </td>
+                  <td>
+                    <span class="badge bg-danger">{{log.failed_rows}}</span>
+                  </td>
+                  <td>
+                    <span class="badge bg-info">{{log.products_created}}</span>
+                  </td>
+                  <td>
+                    <span class="badge bg-warning">{{log.products_updated}}</span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary" (click)="viewImportDetails(log)">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
