@@ -1,23 +1,25 @@
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { registerLocaleData } from '@angular/common';
+import localeFa from '@angular/common/locales/fa';
+
+// Register Farsi locale
+registerLocaleData(localeFa);
 
 // Routing
 import { AppRoutingModule } from './app-routing.module';
 
-// Components
+// Platform Components (Store Management Focus)
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/shared/header/header.component';
 import { LoadingComponent } from './components/shared/loading/loading.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
-import { ProductListComponent } from './components/product/product-list/product-list.component';
-import { ProductDetailComponent } from './components/product/product-detail/product-detail.component';
-import { BasketComponent } from './components/basket/basket.component';
-import { HomeComponent } from './components/home/home.component';
-import { CheckoutComponent } from './components/checkout/checkout.component';
+import { PlatformHomeComponent } from './components/platform/platform-home/platform-home.component';
+import { StoreManagementComponent } from './components/store-management/store-management.component';
 
 // Interceptors
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -33,11 +35,10 @@ import { AuthGuard } from './guards/auth.guard';
     LoadingComponent,
     LoginComponent,
     RegisterComponent,
-    ProductListComponent,
-    ProductDetailComponent,
-    BasketComponent,
-    HomeComponent,
-    CheckoutComponent
+    PlatformHomeComponent,
+    StoreManagementComponent
+    // Removed: ProductListComponent, ProductDetailComponent, BasketComponent, CheckoutComponent
+    // These are now for individual store websites, not the platform
   ],
   imports: [
     BrowserModule,
@@ -58,6 +59,10 @@ import { AuthGuard } from './guards/auth.guard';
       provide: HTTP_INTERCEPTORS,
       useClass: LoadingInterceptor,
       multi: true
+    },
+    {
+      provide: LOCALE_ID,
+      useValue: 'fa' // Set Farsi as default locale
     }
   ],
   bootstrap: [AppComponent]
