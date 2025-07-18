@@ -9,7 +9,8 @@
     "build:prod": "ng build --configuration production",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "serve:multi": "ng serve --host 0.0.0.0 --disable-host-check"
   },
   "dependencies": {
     "@angular/animations": "^16.0.0",
@@ -27,7 +28,8 @@
     "zone.js": "^0.13.0",
     "@ngrx/store": "^16.0.0",
     "@ngrx/effects": "^16.0.0",
-    "@ngrx/store-devtools": "^16.0.0"
+    "@ngrx/store-devtools": "^16.0.0",
+    "ngx-toastr": "^17.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.0.0",
