@@ -126,6 +126,17 @@ import { Observable } from 'rxjs';
             </button>
           </div>
           
+          <div class="bg-green-50 border border-green-200 p-4 rounded-lg mb-6">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-green-600 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+              </svg>
+              <p class="text-green-800 text-sm font-medium">
+                پس از ارسال فرم، کارشناسان ما خیلی زود با شما تماس خواهند گرفت
+              </p>
+            </div>
+          </div>
+          
           <form (ngSubmit)="submitRequest()" #requestForm="ngForm">
             <div class="space-y-4">
               <!-- Store Name -->
@@ -239,7 +250,7 @@ export class HeaderComponent implements OnInit {
   submitRequest(): void {
     console.log('Store Request Submitted:', this.storeRequest);
     // TODO: Send request to backend API
-    alert('درخواست شما با موفقیت ارسال شد! به زودی با شما تماس خواهیم گرفت.');
+    alert('درخواست شما با موفقیت ارسال شد! کارشناسان ما خیلی زود با شما تماس خواهند گرفت.');
     this.showRequestForm = false;
     this.storeRequest = {
       storeName: '',
