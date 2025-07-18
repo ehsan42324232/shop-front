@@ -1,41 +1,4 @@
-    <!-- Request Form Section -->
-    <section id="request" class="py-24 bg-gradient-to-br from-gray-50 to-blue-50" dir="rtl">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h2 class="text-5xl md:text-6xl font-black text-gray-900 mb-8">
-            همین الان <span class="text-blue-600">شروع کنید!</span>
-          </h2>
-          <p class="text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            فقط ۳ مرحله ساده تا اولین فروش شما
-          </p>
-        </div>
-
-        <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-12 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
-          
-          <div class="relative z-10">
-            <div class="text-center mb-8">
-              <h3 class="text-3xl font-bold text-gray-900 mb-4">فرم درخواست فروشگاه</h3>
-              <p class="text-gray-600">اطلاعات زیر را پر کنید تا در کمتر از ۲۴ ساعت فروشگاه شما آماده شود</p>
-            </div>
-            
-            <form class="space-y-8">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="relative">
-                  <label class="block text-lg font-bold text-gray-700 mb-3">نام فروشگاه شما</label>
-                  <input type="text" class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all" placeholder="مثال: فروشگاه پوشاک آریا">
-                </div>
-                <div class="relative">
-                  <label class="block text-lg font-bold text-gray-700 mb-3">شماره تماس</label>
-                  <input type="tel" class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all" placeholder="09123456789">
-                </div>
-              </div>
-              
-              <div class="relative">
-                <label class="block text-lg font-bold text-gray-700 mb-3">نوع محصولات شما</label>
-                <textarea rows="5" class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all" placeholder="مثال: پوشاک زنانه و مردانه، کیف و کفش، لوازم جانبی، زیورآلات...
-
-نکته: هر چه دقیق‌تر توضیح دهید، فروشگاه بهتری برایتان طراحی می‌کنیم!"></textarea>
+تر توضیح دهید، فروشگاه بهتری برایتان طراحی می‌کنیم!"></textarea>
               </div>
               
               <!-- Benefits reminder -->
@@ -147,11 +110,6 @@
     
     .animate-fade-in-up {
       animation: fadeInUp 0.8s ease-out;
-    }
-    
-    /* Persian font styles */
-    * {
-      font-family: 'Vazirmatn', 'Tahoma', 'Arial', sans-serif !important;
     }
     
     @media (max-width: 768px) {
