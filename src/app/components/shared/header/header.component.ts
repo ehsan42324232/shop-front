@@ -7,37 +7,43 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-header',
   template: `
-    <header class="bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50" dir="rtl">
+    <header class="gradient-bg shadow-lg sticky top-0 z-50" dir="rtl">
       <div class="container mx-auto px-4 py-4">
         <div class="flex items-center justify-between">
           <!-- Logo -->
           <div class="flex items-center space-x-3 space-x-reverse">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            <div class="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white border-opacity-30">
+              <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                <circle cx="6" cy="8" r="1" opacity="0.7"/>
+                <circle cx="18" cy="14" r="1" opacity="0.7"/>
+                <line x1="7" y1="8" x2="10" y2="10" stroke="currentColor" stroke-width="0.5" opacity="0.6"/>
+                <line x1="14" y1="10" x2="17" y2="13" stroke="currentColor" stroke-width="0.5" opacity="0.6"/>
               </svg>
             </div>
-            <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent cursor-pointer" 
-                (click)="router.navigate(['/'])">
-              فروشگاه‌ساز
-            </h1>
+            <div class="cursor-pointer" (click)="router.navigate(['/'])">
+              <h1 class="text-2xl font-bold text-white">
+                سایت‌ساز
+              </h1>
+              <p class="text-sm text-white text-opacity-80 font-medium">همسایه</p>
+            </div>
           </div>
 
           <!-- Navigation Menu -->
           <nav class="hidden md:flex items-center space-x-8 space-x-reverse" *ngIf="currentUser$ | async">
-            <a class="text-gray-600 hover:text-blue-600 font-medium transition-colors cursor-pointer" 
+            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
                (click)="router.navigate(['/my-store'])">
               پنل مدیریت
             </a>
-            <a class="text-gray-600 hover:text-blue-600 font-medium transition-colors cursor-pointer" 
+            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
                (click)="router.navigate(['/products'])">
               محصولات
             </a>
-            <a class="text-gray-600 hover:text-blue-600 font-medium transition-colors cursor-pointer" 
+            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
                (click)="router.navigate(['/orders'])">
               سفارشات
             </a>
-            <a class="text-gray-600 hover:text-blue-600 font-medium transition-colors cursor-pointer" 
+            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
                (click)="router.navigate(['/analytics'])">
               آمار و گزارش
             </a>
@@ -45,15 +51,15 @@ import { Observable } from 'rxjs';
 
           <!-- User Menu -->
           <div *ngIf="currentUser$ | async as user; else authButtons" class="relative">
-            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer p-2 rounded-xl hover:bg-gray-50 transition-all duration-200" (click)="toggleUserMenu()">
-              <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-lg">
+            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer glass-morphism p-3 rounded-xl hover:bg-white hover:bg-opacity-20 transition-all duration-200" (click)="toggleUserMenu()">
+              <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-white text-sm font-semibold border border-white border-opacity-30">
                 {{ user.username.charAt(0).toUpperCase() }}
               </div>
               <div class="hidden md:block">
-                <p class="text-gray-700 font-medium">{{ user.username }}</p>
-                <p class="text-gray-400 text-xs">خوش آمدید!</p>
+                <p class="text-white font-medium">{{ user.username }}</p>
+                <p class="text-white text-opacity-70 text-xs">خوش آمدید!</p>
               </div>
-              <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" [class.rotate-180]="showUserMenu" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-white text-opacity-70 transition-transform duration-200" [class.rotate-180]="showUserMenu" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </div>
@@ -95,16 +101,99 @@ import { Observable } from 'rxjs';
           <!-- Auth Buttons -->
           <ng-template #authButtons>
             <div class="flex items-center space-x-3 space-x-reverse">
-              <button class="px-6 py-2.5 text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200" 
+              <button class="px-6 py-2.5 text-white text-opacity-80 hover:text-white font-medium transition-colors duration-200 glass-morphism rounded-xl" 
                       (click)="router.navigate(['/login'])">
                 ورود
               </button>
-              <button class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl" 
-                      (click)="router.navigate(['/register'])">
-                درخواست فروشگاه
+              <button class="px-6 py-2.5 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-medium rounded-xl transition-all duration-200 border border-white border-opacity-30 backdrop-blur-sm" 
+                      (click)="showRequestForm = true">
+                درخواست سایت
               </button>
             </div>
           </ng-template>
+        </div>
+      </div>
+      
+      <!-- Request Form Modal -->
+      <div *ngIf="showRequestForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">درخواست ساخت سایت</h2>
+            <button (click)="showRequestForm = false" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <form (ngSubmit)="submitRequest()" #requestForm="ngForm">
+            <div class="space-y-4">
+              <!-- Store Name -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">نام فروشگاه</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="storeRequest.storeName"
+                  name="storeName"
+                  required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="مثال: فروشگاه همسایه">
+              </div>
+              
+              <!-- Phone Number -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">شماره تماس</label>
+                <input 
+                  type="tel" 
+                  [(ngModel)]="storeRequest.phoneNumber"
+                  name="phoneNumber"
+                  required
+                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="09123456789">
+              </div>
+              
+              <!-- Product Type -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">نوع محصولات</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="storeRequest.productType"
+                  name="productType"
+                  required
+                  list="productTypes"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="پوشاک، لوازم خانگی، الکترونیک، ...">
+                <datalist id="productTypes">
+                  <option value="پوشاک">
+                  <option value="کفش و کیف">
+                  <option value="لوازم خانگی">
+                  <option value="الکترونیک">
+                  <option value="کتاب و لوازم التحریر">
+                  <option value="زیبایی و بهداشت">
+                  <option value="ورزش و سرگرمی">
+                  <option value="خودرو و موتور">
+                  <option value="مواد غذایی">
+                  <option value="صنایع دستی">
+                  <option value="سایر">
+                </datalist>
+              </div>
+            </div>
+            
+            <div class="flex space-x-3 space-x-reverse mt-8">
+              <button 
+                type="submit" 
+                [disabled]="!requestForm.form.valid"
+                class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                ارسال درخواست
+              </button>
+              <button 
+                type="button" 
+                (click)="showRequestForm = false"
+                class="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                انصراف
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </header>
@@ -121,6 +210,13 @@ import { Observable } from 'rxjs';
 export class HeaderComponent implements OnInit {
   currentUser$: Observable<User | null>;
   showUserMenu = false;
+  showRequestForm = false;
+  
+  storeRequest = {
+    storeName: '',
+    phoneNumber: '',
+    productType: ''
+  };
 
   constructor(
     public router: Router,
@@ -138,5 +234,17 @@ export class HeaderComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.showUserMenu = false;
+  }
+  
+  submitRequest(): void {
+    console.log('Store Request Submitted:', this.storeRequest);
+    // TODO: Send request to backend API
+    alert('درخواست شما با موفقیت ارسال شد! به زودی با شما تماس خواهیم گرفت.');
+    this.showRequestForm = false;
+    this.storeRequest = {
+      storeName: '',
+      phoneNumber: '',
+      productType: ''
+    };
   }
 }
