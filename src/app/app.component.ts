@@ -4,9 +4,9 @@ import { AuthService } from './services/auth.service';
 @Component({
   selector: 'app-root',
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div class="min-h-screen">
       <app-header></app-header>
-      <main class="relative">
+      <main>
         <router-outlet></router-outlet>
       </main>
       <!-- Temporarily comment out loading to test -->
