@@ -1,5 +1,6 @@
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -42,6 +43,7 @@ import { AuthGuard } from './guards/auth.guard';
   ],
   imports: [
     BrowserModule,
+    CommonModule, // Added CommonModule for number pipe support
     BrowserAnimationsModule,
     HttpClientModule,
     ReactiveFormsModule,
