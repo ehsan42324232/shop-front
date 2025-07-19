@@ -1,11 +1,33 @@
-// Export all models
-export * from './bulk-import-log.model';
-export * from './category.models';
-export * from './order.models';
-export * from './product-attribute-value.model';
-export * from './product-attribute.model';
-export * from './product.models';
-export * from './store.models';
+// Export specific models to avoid conflicts
+export { ImportError, BulkImportLog } from './bulk-import-log.model';
+export { Category, CategoryTree } from './category.models';
+export { 
+  Order, 
+  OrderItem, 
+  OrderStatus, 
+  PaymentMethod, 
+  ShippingMethod, 
+  ProductVariant 
+} from './order.models';
+export { ProductAttributeValue } from './product-attribute-value.model';
+export { ProductAttribute, AttributeType } from './product-attribute.model';
+export { 
+  Product, 
+  ProductImage, 
+  ProductPrice,
+  ProductStock,
+  ProductSEO,
+  ProductVariant as ProductProductVariant,
+  ProductCollection
+} from './product.models';
+export { 
+  Store, 
+  StoreSettings, 
+  StoreTheme, 
+  StoreDomain,
+  StoreAnalytics,
+  StoreSubscription
+} from './store.models';
 
 // Enhanced User model for multi-tenant architecture
 export interface User {
@@ -145,7 +167,7 @@ export interface BasketItem {
 }
 
 // Legacy Order models
-export interface OrderItem {
+export interface LegacyOrderItem {
   id: number;
   product: LegacyProduct;
   quantity: number;
@@ -159,7 +181,7 @@ export interface LegacyOrder {
   created_at: string;
   is_paid: boolean;
   logistics_status: string;
-  items: OrderItem[];
+  items: LegacyOrderItem[];
   total_amount: number;
 }
 
