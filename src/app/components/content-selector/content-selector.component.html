@@ -1,0 +1,468 @@
+<p-dialog 
+  [(visible)]="visible" 
+  [header]="'انتخاب محتوا از شبکه‌های اجتماعی'" 
+  [modal]="true" 
+  [closable]="true"
+  [maximizable]="true"
+  [style]="{width: '95vw', height: '90vh'}"
+  styleClass="content-selector-dialog"
+  (onHide)="close()">
+  
+  <!-- Header with filters and sync button -->
+  <div class="dialog-header mb-4">
+    <div class="grid">
+      <div class="col-12 md:col-8">
+        <form [formGroup]="filterForm" class="grid">
+          <div class="col-12 md:col-3">
+            <label class="block text-sm font-medium mb-2">نوع محتوا</label>
+            <p-dropdown 
+              formControlName="content_type"
+              [options]="contentTypes"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="انتخاب نوع محتوا"
+              class="w-full">
+            </p-dropdown>
+          </div>
+          
+          <div class="col-12 md:col-3">
+            <label class="block text-sm font-medium mb-2">پلتفرم</label>
+            <p-dropdown 
+              formControlName="platform_type"
+              [options]="platforms"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="انتخاب پلتفرم"
+              class="w-full">
+            </p-dropdown>
+          </div>
+          
+          <div class="col-12 md:col-3">
+            <label class="block text-sm font-medium mb-2">نوع رسانه</label>
+            <p-dropdown 
+              formControlName="media_type"
+              [options]="mediaTypes"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="انتخاب نوع رسانه"
+              class="w-full">
+            </p-dropdown>
+          </div>
+          
+          <div class="col-12 md:col-3">
+            <label class="block text-sm font-medium mb-2">جستجو</label>
+            <span class="p-input-icon-left w-full">
+              <i class="pi pi-search"></i>
+              <input 
+                type="text" 
+                pInputText 
+                formControlName="search"
+                placeholder="جستجو در محتوا..."
+                class="w-full">
+            </span>
+          </div>
+        </form>
+      </div>
+      
+      <div class="col-12 md:col-4 text-right">
+        <button 
+          pButton 
+          type="button" 
+          label="همگام‌سازی محتوا"
+          icon="pi pi-refresh"
+          class="p-button-outlined mb-2"
+          [loading]="loading"
+          (click)="syncContent()">
+        </button>
+        
+        <div class="text-sm text-gray-600 mt-2">
+          <span class="font-medium">{{ selectedItems.length }}</span> محتوا انتخاب شده
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content grid -->
+  <div class="content-grid" style="height: calc(90vh - 300px); overflow-y: auto;">
+    <div class="grid" *ngIf="!loading; else loadingTemplate">
+      <div 
+        class="col-12 md:col-6 lg:col-4 xl:col-3"
+        *ngFor="let content of getAllContent(); trackBy: trackByContentId">
+        
+        <div class="content-card p-3 border-round-md border-1 border-gray-200 h-full hover:shadow-2 transition-all transition-duration-200">
+          <!-- Content header -->
+          <div class="flex justify-content-between align-items-center mb-3">
+            <div class="flex align-items-center">
+              <i [class]="getPlatformIcon(content.platform_info.type)" class="text-lg mr-2"></i>
+              <div class="text-sm">
+                <div class="font-medium">{{ content.platform_info.display_name }}</div>
+                <div class="text-gray-600">@{{ content.platform_info.username }}</div>
+              </div>
+            </div>
+            
+            <div class="text-right">
+              <span class="inline-flex align-items-center px-2 py-1 border-round text-xs font-medium"
+                    [ngClass]="{
+                      'bg-blue-100 text-blue-800': content.type === 'story',
+                      'bg-green-100 text-green-800': content.type === 'post'
+                    }">
+                {{ content.type === 'story' ? 'استوری' : 'پست' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Content preview -->
+          <div class="content-preview mb-3">
+            <!-- Image preview -->
+            <div *ngIf="content.extracted_images.length > 0" class="relative">
+              <img 
+                [src]="content.extracted_images[0].url" 
+                [alt]="'Content image'"
+                class="w-full h-8rem object-cover border-round-md"
+                loading="lazy">
+              <div class="absolute top-0 left-0 bg-black-alpha-70 text-white px-2 py-1 border-round text-xs"
+                   *ngIf="content.extracted_images.length > 1">
+                +{{ content.extracted_images.length - 1 }}
+              </div>
+            </div>
+            
+            <!-- Video preview -->
+            <div *ngIf="content.extracted_videos.length > 0 && content.extracted_images.length === 0" 
+                 class="relative bg-gray-100 h-8rem flex align-items-center justify-content-center border-round-md">
+              <i class="pi pi-play-circle text-4xl text-gray-500"></i>
+              <div class="absolute top-0 left-0 bg-black-alpha-70 text-white px-2 py-1 border-round text-xs">
+                {{ content.extracted_videos.length }} ویدیو
+              </div>
+            </div>
+            
+            <!-- Text only preview -->
+            <div *ngIf="content.extracted_images.length === 0 && content.extracted_videos.length === 0" 
+                 class="bg-gray-50 p-3 border-round-md h-8rem flex align-items-center">
+              <i class="pi pi-file-text text-2xl text-gray-400 mr-2"></i>
+              <div class="text-sm text-gray-700 line-height-3">
+                {{ content.extracted_text | slice:0:100 }}{{ content.extracted_text?.length > 100 ? '...' : '' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Content info -->
+          <div class="content-info mb-3">
+            <div class="text-sm text-gray-700 mb-2 line-height-3">
+              {{ (content.caption || content.text_content || content.extracted_text) | slice:0:120 }}
+              {{ (content.caption || content.text_content || content.extracted_text)?.length > 120 ? '...' : '' }}
+            </div>
+            
+            <div class="flex justify-content-between align-items-center text-xs text-gray-500">
+              <div class="flex align-items-center">
+                <i [class]="getMediaTypeIcon(content.content_type)" class="mr-1"></i>
+                {{ getContentTypeLabel(content.content_type) }}
+              </div>
+              
+              <div>
+                {{ content.time_since_created || content.time_since_published }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Content stats -->
+          <div class="content-stats flex justify-content-between align-items-center mb-3 text-xs text-gray-600">
+            <div class="flex align-items-center" *ngIf="content.view_count">
+              <i class="pi pi-eye mr-1"></i>
+              {{ content.view_count | number }}
+            </div>
+            
+            <div class="flex align-items-center" *ngIf="content.like_count">
+              <i class="pi pi-heart mr-1"></i>
+              {{ content.like_count | number }}
+            </div>
+            
+            <div class="flex align-items-center">
+              <i class="pi pi-images mr-1" *ngIf="content.extracted_images.length > 0"></i>
+              <span *ngIf="content.extracted_images.length > 0">{{ content.extracted_images.length }}</span>
+              
+              <i class="pi pi-video mr-1 ml-2" *ngIf="content.extracted_videos.length > 0"></i>
+              <span *ngIf="content.extracted_videos.length > 0">{{ content.extracted_videos.length }}</span>
+              
+              <i class="pi pi-file-text mr-1 ml-2" *ngIf="content.extracted_text"></i>
+            </div>
+          </div>
+
+          <!-- Action button -->
+          <button 
+            pButton 
+            type="button"
+            label="انتخاب محتوا"
+            icon="pi pi-plus"
+            class="p-button-sm w-full"
+            (click)="openSelectionModal(content)">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #loadingTemplate>
+      <div class="flex justify-content-center align-items-center h-20rem">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    </ng-template>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && getAllContent().length === 0" 
+         class="text-center py-8">
+      <i class="pi pi-inbox text-6xl text-gray-300 mb-3"></i>
+      <h3 class="text-gray-500 mb-2">محتوایی یافت نشد</h3>
+      <p class="text-gray-400 mb-4">
+        محتوایی با فیلترهای انتخاب شده یافت نشد. لطفاً فیلترها را تغییر دهید یا محتوای جدید همگام‌سازی کنید.
+      </p>
+      <button 
+        pButton 
+        type="button"
+        label="همگام‌سازی محتوا"
+        icon="pi pi-refresh"
+        class="p-button-outlined"
+        (click)="syncContent()">
+      </button>
+    </div>
+  </div>
+
+  <!-- Selected items panel -->
+  <div class="selected-items-panel mt-4 p-3 bg-gray-50 border-round-md" *ngIf="selectedItems.length > 0">
+    <h4 class="mb-3">محتوای انتخاب شده ({{ selectedItems.length }})</h4>
+    
+    <div class="grid">
+      <div class="col-12 md:col-6 lg:col-4" 
+           *ngFor="let item of selectedItems; let i = index; trackBy: trackBySelectionId">
+        <div class="selected-item p-2 bg-white border-round border-1 border-gray-200">
+          <div class="flex justify-content-between align-items-center">
+            <div class="flex-1">
+              <div class="text-sm font-medium mb-1">
+                {{ item.content_type === 'story' ? 'استوری' : 'پست' }} - 
+                {{ getContentTypeLabel(item.selected_media_type) }}
+              </div>
+              <div class="text-xs text-gray-600">
+                <span *ngIf="item.use_as_product_image" class="inline-block bg-blue-100 text-blue-800 px-2 py-1 border-round mr-1 mb-1">تصویر محصول</span>
+                <span *ngIf="item.use_in_description" class="inline-block bg-green-100 text-green-800 px-2 py-1 border-round mr-1 mb-1">توضیحات</span>
+                <span *ngIf="item.use_as_gallery" class="inline-block bg-purple-100 text-purple-800 px-2 py-1 border-round mr-1 mb-1">گالری</span>
+              </div>
+            </div>
+            <button 
+              pButton 
+              type="button"
+              icon="pi pi-times"
+              class="p-button-rounded p-button-text p-button-sm p-button-danger"
+              (click)="removeFromSelection(i)">
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-between align-items-center">
+      <div class="text-sm text-gray-600">
+        {{ getAllContent().length }} محتوا یافت شد
+      </div>
+      
+      <div class="flex align-items-center">
+        <button 
+          pButton 
+          type="button"
+          label="انصراف"
+          class="p-button-outlined p-button-secondary mr-2"
+          (click)="close()">
+        </button>
+        
+        <button 
+          pButton 
+          type="button"
+          label="تایید انتخاب"
+          [disabled]="selectedItems.length === 0"
+          [loading]="loading"
+          (click)="confirmSelection()">
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Selection Modal -->
+<p-dialog 
+  [(visible)]="showSelectionModal" 
+  [header]="'تنظیمات انتخاب محتوا'" 
+  [modal]="true" 
+  [closable]="true"
+  [style]="{width: '600px'}"
+  styleClass="selection-modal">
+  
+  <div *ngIf="currentContent">
+    <!-- Content preview -->
+    <div class="content-preview mb-4 p-3 bg-gray-50 border-round-md">
+      <div class="flex align-items-center mb-2">
+        <i [class]="getPlatformIcon(currentContent.platform_info.type)" class="text-lg mr-2"></i>
+        <div class="text-sm">
+          <div class="font-medium">{{ currentContent.platform_info.display_name }}</div>
+          <div class="text-gray-600">{{ currentContent.type === 'story' ? 'استوری' : 'پست' }}</div>
+        </div>
+      </div>
+      
+      <div class="text-sm text-gray-700 line-height-3" *ngIf="currentContent.extracted_text">
+        {{ currentContent.extracted_text | slice:0:200 }}
+        {{ currentContent.extracted_text?.length > 200 ? '...' : '' }}
+      </div>
+    </div>
+
+    <!-- Selection form -->
+    <form [formGroup]="selectionForm" class="grid">
+      <div class="col-12">
+        <label class="block text-sm font-medium mb-2">نوع محتوا انتخابی *</label>
+        <div class="grid">
+          <div class="col-4" *ngIf="currentContent.extracted_images.length > 0">
+            <p-radioButton 
+              formControlName="selected_media_type"
+              value="image"
+              inputId="media_type_image"
+              (onChange)="updateSelectedMedia()">
+            </p-radioButton>
+            <label for="media_type_image" class="mr-2">
+              تصاویر ({{ currentContent.extracted_images.length }})
+            </label>
+          </div>
+          
+          <div class="col-4" *ngIf="currentContent.extracted_videos.length > 0">
+            <p-radioButton 
+              formControlName="selected_media_type"
+              value="video"
+              inputId="media_type_video"
+              (onChange)="updateSelectedMedia()">
+            </p-radioButton>
+            <label for="media_type_video" class="mr-2">
+              ویدیوها ({{ currentContent.extracted_videos.length }})
+            </label>
+          </div>
+          
+          <div class="col-4" *ngIf="currentContent.extracted_text">
+            <p-radioButton 
+              formControlName="selected_media_type"
+              value="text"
+              inputId="media_type_text">
+            </p-radioButton>
+            <label for="media_type_text" class="mr-2">
+              متن
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text editor for text selection -->
+      <div class="col-12" *ngIf="selectionForm.get('selected_media_type')?.value === 'text'">
+        <label class="block text-sm font-medium mb-2">متن انتخاب شده</label>
+        <textarea 
+          pInputTextarea 
+          formControlName="selected_text"
+          rows="4"
+          class="w-full"
+          placeholder="متن مورد نظر را وارد کنید...">
+        </textarea>
+      </div>
+
+      <!-- Media preview for image/video selection -->
+      <div class="col-12" *ngIf="selectionForm.get('selected_media_type')?.value === 'image' && currentContent.extracted_images.length > 0">
+        <label class="block text-sm font-medium mb-2">تصاویر انتخاب شده</label>
+        <div class="grid">
+          <div class="col-3" *ngFor="let image of currentContent.extracted_images.slice(0, 4)">
+            <img 
+              [src]="image.url" 
+              [alt]="'Image'"
+              class="w-full h-4rem object-cover border-round border-1 border-gray-200">
+          </div>
+        </div>
+        <div class="text-xs text-gray-600 mt-2">
+          {{ currentContent.extracted_images.length }} تصویر انتخاب شده
+        </div>
+      </div>
+
+      <div class="col-12" *ngIf="selectionForm.get('selected_media_type')?.value === 'video' && currentContent.extracted_videos.length > 0">
+        <label class="block text-sm font-medium mb-2">ویدیوهای انتخاب شده</label>
+        <div class="bg-gray-100 p-3 border-round text-center">
+          <i class="pi pi-video text-2xl text-gray-500 mb-2"></i>
+          <div class="text-sm text-gray-700">
+            {{ currentContent.extracted_videos.length }} ویدیو انتخاب شده
+          </div>
+        </div>
+      </div>
+
+      <!-- Usage options -->
+      <div class="col-12">
+        <label class="block text-sm font-medium mb-2">نحوه استفاده *</label>
+        <div class="grid">
+          <div class="col-4">
+            <p-checkbox 
+              formControlName="use_as_product_image"
+              inputId="use_product_image"
+              binary="true">
+            </p-checkbox>
+            <label for="use_product_image" class="mr-2 text-sm">
+              تصویر اصلی محصول
+            </label>
+          </div>
+          
+          <div class="col-4">
+            <p-checkbox 
+              formControlName="use_in_description"
+              inputId="use_description"
+              binary="true">
+            </p-checkbox>
+            <label for="use_description" class="mr-2 text-sm">
+              در توضیحات محصول
+            </label>
+          </div>
+          
+          <div class="col-4">
+            <p-checkbox 
+              formControlName="use_as_gallery"
+              inputId="use_gallery"
+              binary="true">
+            </p-checkbox>
+            <label for="use_gallery" class="mr-2 text-sm">
+              گالری محصول
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="col-12">
+        <label class="block text-sm font-medium mb-2">یادداشت (اختیاری)</label>
+        <textarea 
+          pInputTextarea 
+          formControlName="selection_notes"
+          rows="2"
+          class="w-full"
+          placeholder="یادداشت یا توضیحات اضافی...">
+        </textarea>
+      </div>
+    </form>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end">
+      <button 
+        pButton 
+        type="button"
+        label="انصراف"
+        class="p-button-outlined p-button-secondary mr-2"
+        (click)="showSelectionModal = false">
+      </button>
+      
+      <button 
+        pButton 
+        type="button"
+        label="افزودن به انتخاب‌ها"
+        [disabled]="!selectionForm.valid"
+        (click)="addToSelection()">
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
