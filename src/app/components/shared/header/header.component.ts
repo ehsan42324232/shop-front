@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { DomainService } from '../../../services/domain.service';
 import { User } from '../../../models';
 import { Observable } from 'rxjs';
 
@@ -212,12 +213,69 @@ import { Observable } from 'rxjs';
                   <option value="سایر">
                 </datalist>
               </div>
+
+              <!-- Custom Domain Option -->
+              <div>
+                <label class="flex items-center">
+                  <input 
+                    type="checkbox" 
+                    [(ngModel)]="storeRequest.wantCustomDomain"
+                    name="wantCustomDomain"
+                    class="rounded border-gray-300 text-blue-600 focus:border-blue-500 focus:ring-blue-500">
+                  <span class="mr-2 text-sm text-gray-700">می‌خواهم دامنه .ir اختصاصی داشته باشم</span>
+                </label>
+              </div>
+
+              <!-- Custom Domain Input -->
+              <div *ngIf="storeRequest.wantCustomDomain">
+                <label class="block text-sm font-medium text-gray-700 mb-2">دامنه دلخواه</label>
+                <div class="flex">
+                  <input 
+                    type="text" 
+                    [(ngModel)]="storeRequest.customDomain"
+                    name="customDomain"
+                    (input)="checkDomainAvailability()"
+                    class="flex-1 px-4 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="mystore">
+                  <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                    .ir
+                  </span>
+                </div>
+                
+                <!-- Domain Status -->
+                <div class="mt-2" *ngIf="domainCheckResult">
+                  <div *ngIf="domainCheckResult.available" class="flex items-center text-green-600 text-sm">
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    دامنه {{ storeRequest.customDomain }}.ir در دسترس است
+                  </div>
+                  <div *ngIf="!domainCheckResult.available" class="flex items-center text-red-600 text-sm">
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    دامنه {{ storeRequest.customDomain }}.ir در دسترس نیست
+                    <span *ngIf="domainCheckResult.suggestion" class="mr-2">
+                      (پیشنهاد: {{ domainCheckResult.suggestion }}.ir)
+                    </span>
+                  </div>
+                </div>
+                
+                <!-- Domain checking -->
+                <div *ngIf="checkingDomain" class="mt-2 flex items-center text-gray-500 text-sm">
+                  <svg class="animate-spin w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  در حال بررسی دامنه...
+                </div>
+              </div>
             </div>
             
             <div class="flex space-x-3 space-x-reverse mt-8">
               <button 
                 type="submit" 
-                [disabled]="!requestForm.form.valid"
+                [disabled]="!requestForm.form.valid || (storeRequest.wantCustomDomain && (!domainCheckResult || !domainCheckResult.available))"
                 class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                 ارسال درخواست
               </button>
@@ -247,15 +305,21 @@ export class HeaderComponent implements OnInit {
   showUserMenu = false;
   showRequestForm = false;
   
+  checkingDomain = false;
+  domainCheckResult: { available: boolean; suggestion?: string } | null = null;
+  
   storeRequest = {
     storeName: '',
     phoneNumber: '',
-    productType: ''
+    productType: '',
+    wantCustomDomain: false,
+    customDomain: ''
   };
 
   constructor(
     public router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private domainService: DomainService
   ) {
     this.currentUser$ = this.authService.currentUser$;
   }
@@ -270,16 +334,45 @@ export class HeaderComponent implements OnInit {
     this.authService.logout();
     this.showUserMenu = false;
   }
+
+  checkDomainAvailability(): void {
+    if (!this.storeRequest.customDomain || this.storeRequest.customDomain.length < 3) {
+      this.domainCheckResult = null;
+      return;
+    }
+
+    this.checkingDomain = true;
+    this.domainService.checkIrDomainAvailability(this.storeRequest.customDomain).subscribe({
+      next: (result) => {
+        this.domainCheckResult = result;
+        this.checkingDomain = false;
+      },
+      error: () => {
+        this.checkingDomain = false;
+        this.domainCheckResult = null;
+      }
+    });
+  }
   
   submitRequest(): void {
     console.log('Store Request Submitted:', this.storeRequest);
+    
+    const requestData = {
+      ...this.storeRequest,
+      customDomain: this.storeRequest.wantCustomDomain ? 
+        `${this.storeRequest.customDomain}.ir` : null
+    };
+    
     // TODO: Send request to backend API
     alert('درخواست شما با موفقیت ارسال شد! کارشناسان ما خیلی زود با شما تماس خواهند گرفت.');
     this.showRequestForm = false;
     this.storeRequest = {
       storeName: '',
       phoneNumber: '',
-      productType: ''
+      productType: '',
+      wantCustomDomain: false,
+      customDomain: ''
     };
+    this.domainCheckResult = null;
   }
 }
