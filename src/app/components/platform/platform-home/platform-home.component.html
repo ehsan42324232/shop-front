@@ -1,212 +1,502 @@
-<!-- Platform Home Page -->
-<div class="min-h-screen bg-gray-50" dir="rtl">
-  <!-- Hero Section -->
-  <section class="gradient-bg min-h-screen flex items-center justify-center relative overflow-hidden">
-    <div class="container mx-auto px-4 text-center text-white relative z-10">
-      <div class="max-w-4xl mx-auto">
-        <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in-up">
-          سایت‌ساز
-          <span class="typing-text">همسایه</span>
-        </h1>
-        <p class="text-xl md:text-2xl mb-8 opacity-90 animate-fade-in-up" style="animation-delay: 0.3s;">
-          ساده، سریع و بدون نیاز به دانش فنی - پشتیبانی ۲۴/۷
-        </p>
-        <div class="bg-yellow-400 text-black px-6 py-3 rounded-lg inline-block mb-8 font-bold text-xl animate-fade-in-up" style="animation-delay: 0.4s;">
-          تنها ماهی ۲۰۰ هزار تومان - بدون محدودیت
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-background">
+    <div class="hero-gradient"></div>
+    <div class="hero-particles"></div>
+  </div>
+  
+  <div class="container hero-container" [@fadeInUp]>
+    <div class="grid h-full align-items-center">
+      <div class="col-12 lg:col-6">
+        <div class="hero-content">
+          <h1 class="hero-title">
+            فروشگاه آنلاین
+            <span class="hero-highlight">هوشمند</span>
+            شما
+          </h1>
+          
+          <p class="hero-subtitle">
+            قیمت بسیار کمتر از رقبا، نه به خاطر کم کردن از کیفیت، بلکه چون عاشق کیفیت هستیم. 
+            ما امکانات غیرضروری و زیادی شیک اما کم‌کاربرد را حذف کرده‌ایم تا تمام تلاش‌مان را روی 
+            بسته‌ای کامل و کارآمد از تمام اجزای ضروری یک وب‌سایت زیبا و قابل اعتماد بگذاریم.
+          </p>
+          
+          <div class="hero-features">
+            <div class="feature-item">
+              <i class="pi pi-check-circle"></i>
+              <span>تیم کوچک = هزینه کمتر = قیمت دوستانه‌تر</span>
+            </div>
+            <div class="feature-item">
+              <i class="pi pi-headphones"></i>
+              <span>پشتیبانی ۲۴/۷ (تلفن، پیامک، ایمیل، چت آنلاین)</span>
+            </div>
+            <div class="feature-item">
+              <i class="pi pi-heart-fill"></i>
+              <span>تازه شروع کرده‌ایم و عاشقانه کار می‌کنیم</span>
+            </div>
+          </div>
+          
+          <div class="hero-actions">
+            <button 
+              pButton 
+              type="button"
+              label="شروع رایگان ۱۴ روزه"
+              icon="pi pi-play"
+              class="p-button-lg p-button-success hero-cta"
+              (click)="startFreeTrial()">
+            </button>
+            
+            <button 
+              pButton 
+              type="button"
+              label="مشاهده امکانات"
+              icon="pi pi-eye"
+              class="p-button-lg p-button-outlined hero-demo"
+              (click)="navigateToFeatures()">
+            </button>
+          </div>
+          
+          <div class="hero-guarantee">
+            <i class="pi pi-shield"></i>
+            <span>بدون نیاز به کارت اعتباری • لغو آسان • ۱۴ روز کاملاً رایگان</span>
+          </div>
         </div>
-        <div class="space-x-4 space-x-reverse animate-fade-in-up" style="animation-delay: 0.6s;">
-          <button class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors shadow-lg">
-            شروع رایگان
+      </div>
+      
+      <div class="col-12 lg:col-6" [@slideInRight]>
+        <div class="hero-visual">
+          <div class="hero-video-container">
+            <video 
+              #videoPlayer
+              [src]="features[currentVideoIndex]?.video" 
+              autoplay 
+              muted 
+              loop
+              class="hero-video">
+            </video>
+            <div class="video-controls">
+              <button 
+                pButton 
+                type="button"
+                icon="pi pi-chevron-left"
+                class="p-button-rounded p-button-text"
+                (click)="previousVideo()">
+              </button>
+              <div class="video-indicators">
+                <span 
+                  *ngFor="let feature of features; let i = index"
+                  class="indicator"
+                  [class.active]="i === currentVideoIndex"
+                  (click)="currentVideoIndex = i">
+                </span>
+              </div>
+              <button 
+                pButton 
+                type="button"
+                icon="pi pi-chevron-right"
+                class="p-button-rounded p-button-text"
+                (click)="nextVideo()">
+              </button>
+            </div>
+            <div class="video-caption">
+              <h4>{{ features[currentVideoIndex]?.title }}</h4>
+              <p>{{ features[currentVideoIndex]?.description | slice:0:100 }}...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+  <div class="container">
+    <div class="grid" [@staggerAnimation]>
+      <div class="col-6 md:col-3" *ngFor="let stat of stats">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i [class]="stat.icon"></i>
+          </div>
+          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features-section">
+  <div class="container">
+    <div class="section-header text-center mb-6" [@fadeInUp]>
+      <h2 class="section-title">امکانات کامل و پیشرفته</h2>
+      <p class="section-subtitle">
+        همه چیزهایی که برای راه‌اندازی یک فروشگاه آنلاین موفق نیاز دارید
+      </p>
+    </div>
+    
+    <div class="features-grid">
+      <div 
+        class="feature-card" 
+        *ngFor="let feature of features; let i = index"
+        [@fadeInUp]
+        [style.animation-delay.ms]="i * 100">
+        
+        <div class="feature-header">
+          <div class="feature-icon">
+            <i [class]="feature.icon"></i>
+          </div>
+          <div class="feature-badge" *ngIf="feature.id === 'social-integration'">جدید</div>
+        </div>
+        
+        <div class="feature-content">
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
+          
+          <div class="feature-image" *ngIf="feature.image">
+            <img [src]="feature.image" [alt]="feature.title" loading="lazy">
+            <div class="feature-overlay">
+              <button 
+                pButton 
+                type="button"
+                icon="pi pi-play"
+                class="p-button-rounded p-button-lg"
+                (click)="openDemo(feature)">
+              </button>
+            </div>
+          </div>
+          
+          <ul class="feature-benefits">
+            <li *ngFor="let benefit of feature.benefits">
+              <i class="pi pi-check"></i>
+              <span>{{ benefit }}</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="feature-actions">
+          <button 
+            pButton 
+            type="button"
+            label="مشاهده نمونه"
+            icon="pi pi-external-link"
+            class="p-button-outlined p-button-sm"
+            (click)="openDemo(feature)">
           </button>
-          <button class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-600 transition-colors">
-            مشاهده نمونه‌ها
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us Section -->
+<section class="why-choose-section">
+  <div class="container">
+    <div class="grid align-items-center">
+      <div class="col-12 lg:col-6" [@slideInLeft]>
+        <h2 class="section-title">چرا ما را انتخاب کنید؟</h2>
+        
+        <div class="reasons">
+          <div class="reason-item">
+            <div class="reason-icon">
+              <i class="pi pi-dollar"></i>
+            </div>
+            <div class="reason-content">
+              <h4>قیمت دوستانه</h4>
+              <p>تیم کوچک ما باعث می‌شود هزینه‌ها کمتر و قیمت‌ها دوستانه‌تر باشد</p>
+            </div>
+          </div>
+          
+          <div class="reason-item">
+            <div class="reason-icon">
+              <i class="pi pi-heart"></i>
+            </div>
+            <div class="reason-content">
+              <h4>عاشق کیفیت</h4>
+              <p>ما عاشق کیفیت هستیم و تمام تلاش‌مان را برای ارائه بهترین خدمات می‌کنیم</p>
+            </div>
+          </div>
+          
+          <div class="reason-item">
+            <div class="reason-icon">
+              <i class="pi pi-headphones"></i>
+            </div>
+            <div class="reason-content">
+              <h4>پشتیبانی عالی</h4>
+              <p>پشتیبانی کارکشته و اعصاب‌خردکن نداریم. ۲۴/۷ در کنار شما هستیم</p>
+            </div>
+          </div>
+          
+          <div class="reason-item">
+            <div class="reason-icon">
+              <i class="pi pi-cog"></i>
+            </div>
+            <div class="reason-content">
+              <h4>فقط ضروری‌ها</h4>
+              <p>امکانات غیرضروری را حذف کرده‌ایم تا روی اجزای واقعاً مهم تمرکز کنیم</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-12 lg:col-6" [@slideInRight]>
+        <div class="comparison-chart">
+          <h3>مقایسه با سایر پلتفرم‌ها</h3>
+          <div class="chart-container">
+            <!-- Comparison chart would go here -->
+            <img src="/assets/images/comparison-chart.png" alt="مقایسه قیمت و امکانات" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing Section -->
+<section id="pricing" class="pricing-section">
+  <div class="container">
+    <div class="section-header text-center mb-6" [@fadeInUp]>
+      <h2 class="section-title">پلن‌های قیمتی</h2>
+      <p class="section-subtitle">
+        شروع رایگان ۱۴ روزه فقط برای آشنایی شما با تمام قابلیت‌های وب‌سایت‌تان طراحی شده
+      </p>
+    </div>
+    
+    <div class="pricing-grid">
+      <div 
+        class="pricing-card" 
+        *ngFor="let plan of pricingPlans; let i = index"
+        [class.highlighted]="plan.highlighted"
+        [@fadeInUp]
+        [style.animation-delay.ms]="i * 200">
+        
+        <div class="pricing-badge" *ngIf="plan.badge">{{ plan.badge }}</div>
+        
+        <div class="pricing-header">
+          <h3 class="plan-name">{{ plan.name }}</h3>
+          <div class="plan-price">
+            <span class="currency">تومان</span>
+            <span class="amount">{{ formatPrice(plan.price) }}</span>
+            <span class="period">/ {{ plan.duration }}</span>
+          </div>
+          <div class="original-price" *ngIf="plan.originalPrice">
+            <span>{{ formatPrice(plan.originalPrice) }} تومان</span>
+          </div>
+        </div>
+        
+        <div class="pricing-features">
+          <ul>
+            <li *ngFor="let feature of plan.features">
+              <i class="pi pi-check"></i>
+              <span>{{ feature }}</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="pricing-action">
+          <button 
+            pButton 
+            type="button"
+            [label]="plan.highlighted ? 'شروع کنید' : 'انتخاب پلن'"
+            class="p-button-lg w-full"
+            [class]="plan.highlighted ? 'p-button-success' : 'p-button-outlined'"
+            (click)="selectPlan(plan)">
           </button>
         </div>
       </div>
     </div>
     
-    <!-- Floating Elements -->
-    <div class="absolute top-20 left-20 w-20 h-20 bg-white opacity-10 rounded-full animate-float"></div>
-    <div class="absolute bottom-32 right-32 w-16 h-16 bg-white opacity-10 rounded-full animate-float" style="animation-delay: 2s;"></div>
-    <div class="absolute top-1/2 left-1/4 w-12 h-12 bg-white opacity-10 rounded-full animate-float" style="animation-delay: 4s;"></div>
-  </section>
+    <div class="pricing-note text-center mt-6">
+      <p>
+        <i class="pi pi-info-circle"></i>
+        تمام پلن‌ها شامل تمام امکانات پلتفرم هستند • بدون محدودیت محصول یا سفارش
+      </p>
+    </div>
+  </div>
+</section>
 
-  <!-- Main Features Section -->
-  <section class="py-20 bg-white">
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-16">
-        <h2 class="text-4xl font-bold text-gray-800 mb-4">قابلیت‌های منحصر به فرد</h2>
-        <p class="text-xl text-gray-600">ارزان‌تر از رقبا، با کیفیت بیشتر از رقبای ایرانی و در حد رقبای جهانی نظیر شاپیفای</p>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Instagram Integration -->
-        <div class="text-center glass-morphism p-8 rounded-xl">
-          <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-            </svg>
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+  <div class="container">
+    <div class="section-header text-center mb-6" [@fadeInUp]>
+      <h2 class="section-title">نظرات مشتریان</h2>
+      <p class="section-subtitle">ببینید دیگران چه می‌گویند</p>
+    </div>
+    
+    <div class="testimonials-grid">
+      <div 
+        class="testimonial-card" 
+        *ngFor="let testimonial of testimonials; let i = index"
+        [@fadeInUp]
+        [style.animation-delay.ms]="i * 200">
+        
+        <div class="testimonial-content">
+          <div class="testimonial-rating">
+            <i 
+              class="pi pi-star-fill" 
+              *ngFor="let star of generateStars(testimonial.rating)">
+            </i>
           </div>
-          <h3 class="text-xl font-bold mb-4">اتصال مستقیم به اینستاگرام</h3>
-          <p class="text-gray-600">امکان خواندن عکس و فیلم به طور مستقیم از پست و استوری اینستاگرام شما</p>
+          
+          <blockquote class="testimonial-text">
+            "{{ testimonial.text }}"
+          </blockquote>
+          
+          <div class="testimonial-sales">
+            <i class="pi pi-chart-line"></i>
+            <span>{{ testimonial.sales }}</span>
+          </div>
         </div>
-
-        <!-- Product Categories -->
-        <div class="text-center glass-morphism p-8 rounded-xl">
-          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
+        
+        <div class="testimonial-author">
+          <div class="author-avatar">
+            <img [src]="testimonial.image" [alt]="testimonial.name" loading="lazy">
           </div>
-          <h3 class="text-xl font-bold mb-4">راه‌اندازی فوری</h3>
-          <p class="text-gray-600">در عرض چند دقیقه فروشگاه خود را راه‌اندازی کنید - بدون نیاز به دانش فنی</p>
-        </div>
-
-        <!-- Support -->
-        <div class="text-center glass-morphism p-8 rounded-xl">
-          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2v4m0 12v4m10-10h-4M6 12H2"></path>
-            </svg>
+          <div class="author-info">
+            <h4 class="author-name">{{ testimonial.name }}</h4>
+            <p class="author-business">{{ testimonial.business }}</p>
           </div>
-          <h3 class="text-xl font-bold mb-4">پشتیبانی ۲۴/۷</h3>
-          <p class="text-gray-600">پشتیبانی کامل و مستمر، هر ساعت از شبانه‌روز در خدمت شما</p>
-        </div>
-
-        <!-- Advanced Features -->
-        <div class="text-center glass-morphism p-8 rounded-xl">
-          <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold mb-4">امکانات پیشرفته</h3>
-          <p class="text-gray-600">شامل سئو، جستجوی پیشرفته، پیشنهاددهی محصولات، نظرات و امتیازات</p>
-        </div>
-
-        <!-- Payment Gateway -->
-        <div class="text-center glass-morphism p-8 rounded-xl">
-          <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold mb-4">پرداخت و ارسال</h3>
-          <p class="text-gray-600">سبد خرید و اتصال به درگاه پرداخت و سامانه‌های ارسال کالا</p>
-        </div>
-
-        <!-- Promotions -->
-        <div class="text-center glass-morphism p-8 rounded-xl">
-          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold mb-4">پروموشن و تخفیف</h3>
-          <p class="text-gray-600">امکان تعریف پروموشن (تخفیف، کمپین جذب مشتری، ...) و مشاهده گزارشات تحلیلی</p>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Additional Features -->
-  <section class="py-20 bg-gray-100">
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-16">
-        <h2 class="text-4xl font-bold text-gray-800 mb-4">چرا سایت‌ساز همسایه؟</h2>
-        <p class="text-xl text-gray-600">سادگی، سرعت و عدم نیاز به دانش فنی</p>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Manual/Excel Product Definition -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
-              <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold">تعریف آسان محصولات</h3>
-          </div>
-          <p class="text-gray-600">تعریف محصولات به صورت دستی یا با فایل اکسل - بدون نیاز به دانش فنی</p>
-        </div>
-
-        <!-- Custom Domain -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center mr-4">
-              <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold">آدرس اختصاصی</h3>
-          </div>
-          <p class="text-gray-600">آدرس سایت به دلخواه شما بدون دامنه و کلمه اضافی، بدون نیاز به تهیه دامنه از طرف شما</p>
-        </div>
-
-        <!-- Price Advantage -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
-              <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold">قیمت استثنایی</h3>
-          </div>
-          <p class="text-gray-600">تنها ماهی ۲۰۰ هزار تومان برای تمام این قابلیت‌ها، بدون محدودیت</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Section -->
-  <section class="py-20 bg-blue-600 text-white text-center">
-    <div class="container mx-auto px-4">
-      <h2 class="text-4xl font-bold mb-4">آماده شروع هستید؟</h2>
-      <p class="text-xl mb-4 opacity-90">همین امروز سایت خود را راه‌اندازی کنید - ساده، سریع و بدون دانش فنی</p>
-      <p class="text-lg mb-8 opacity-80">پشتیبانی ۲۴/۷ در خدمت شما</p>
-      <div class="bg-yellow-400 text-black px-8 py-4 rounded-lg inline-block mb-6 font-bold text-xl">
-        ماهی ۲۰۰ هزار تومان - شروع رایگان
-      </div>
-      <br>
-      <button class="bg-white text-blue-600 px-12 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors shadow-lg">
-        شروع رایگان
-      </button>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="bg-gray-800 text-white py-12">
-    <div class="container mx-auto px-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div>
-          <h3 class="text-xl font-bold mb-4">سایت‌ساز همسایه</h3>
-          <p class="text-gray-400">ساده، سریع و بدون نیاز به دانش فنی</p>
-          <p class="text-gray-400 mt-2">پشتیبانی ۲۴/۷</p>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-4">محصولات</h4>
-          <ul class="space-y-2 text-gray-400">
-            <li><a href="#" class="hover:text-white">سایت‌ساز</a></li>
-            <li><a href="#" class="hover:text-white">اتصال اینستاگرام</a></li>
-            <li><a href="#" class="hover:text-white">درگاه پرداخت</a></li>
-            <li><a href="#" class="hover:text-white">مدیریت موجودی</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-4">تماس با ما</h4>
-          <ul class="space-y-2 text-gray-400">
-            <li><a href="#" class="hover:text-white">پشتیبانی ۲۴/۷</a></li>
-            <li><a href="#" class="hover:text-white">تماس با ما</a></li>
-            <li><a href="#" class="hover:text-white">درباره ما</a></li>
-          </ul>
+<!-- FAQ Section -->
+<section class="faq-section">
+  <div class="container">
+    <div class="grid">
+      <div class="col-12 lg:col-6" [@slideInLeft]>
+        <h2 class="section-title">سوالات متداول</h2>
+        <p class="section-subtitle">
+          پاسخ سوالات رایج در اینجا آمده. اگر سوال دیگری دارید، با ما تماس بگیرید.
+        </p>
+        
+        <div class="contact-options">
+          <button 
+            pButton 
+            type="button"
+            label="تماس تلفنی"
+            icon="pi pi-phone"
+            class="p-button-outlined contact-btn"
+            (click)="callSupport()">
+          </button>
+          
+          <button 
+            pButton 
+            type="button"
+            label="ارسال پیامک"
+            icon="pi pi-mobile"
+            class="p-button-outlined contact-btn"
+            (click)="sendSMS()">
+          </button>
+          
+          <button 
+            pButton 
+            type="button"
+            label="چت آنلاین"
+            icon="pi pi-comments"
+            class="p-button-outlined contact-btn"
+            (click)="openLiveChat()">
+          </button>
+          
+          <button 
+            pButton 
+            type="button"
+            label="ارسال ایمیل"
+            icon="pi pi-envelope"
+            class="p-button-outlined contact-btn"
+            (click)="sendEmail()">
+          </button>
         </div>
       </div>
       
-      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-        <p>&copy; ۱۴۰۳ سایت‌ساز همسایه. تمامی حقوق محفوظ است.</p>
+      <div class="col-12 lg:col-6" [@slideInRight]>
+        <p-accordion>
+          <p-accordionTab 
+            *ngFor="let faq of faqs"
+            [header]="faq.question">
+            <p>{{ faq.answer }}</p>
+          </p-accordionTab>
+        </p-accordion>
       </div>
     </div>
-  </footer>
-</div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content text-center" [@fadeInUp]>
+      <h2 class="cta-title">آماده شروع هستید؟</h2>
+      <p class="cta-subtitle">
+        فروشگاه آنلاین خود را در کمتر از ۵ دقیقه راه‌اندازی کنید
+      </p>
+      
+      <div class="cta-features">
+        <div class="cta-feature">
+          <i class="pi pi-check-circle"></i>
+          <span>بدون نیاز به کارت اعتباری</span>
+        </div>
+        <div class="cta-feature">
+          <i class="pi pi-check-circle"></i>
+          <span>۱۴ روز کاملاً رایگان</span>
+        </div>
+        <div class="cta-feature">
+          <i class="pi pi-check-circle"></i>
+          <span>راه‌اندازی در ۵ دقیقه</span>
+        </div>
+      </div>
+      
+      <div class="cta-actions">
+        <button 
+          pButton 
+          type="button"
+          label="شروع رایگان کنید"
+          icon="pi pi-arrow-left"
+          class="p-button-lg p-button-success cta-primary"
+          (click)="startFreeTrial()">
+        </button>
+        
+        <button 
+          pButton 
+          type="button"
+          label="مشاهده نمونه کار"
+          icon="pi pi-eye"
+          class="p-button-lg p-button-outlined cta-secondary"
+          (click)="navigateToDemo()">
+        </button>
+      </div>
+      
+      <div class="cta-guarantee">
+        <i class="pi pi-shield"></i>
+        <span>تضمین رضایت ۱۰۰٪ یا پول شما بازگردانده می‌شود</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Trust Indicators -->
+<section class="trust-section">
+  <div class="container">
+    <div class="trust-indicators">
+      <div class="trust-item">
+        <i class="pi pi-lock"></i>
+        <span>امنیت SSL</span>
+      </div>
+      <div class="trust-item">
+        <i class="pi pi-server"></i>
+        <span>۹۹.۹٪ آپتایم</span>
+      </div>
+      <div class="trust-item">
+        <i class="pi pi-shield"></i>
+        <span>پشتیبانی ۲۴/۷</span>
+      </div>
+      <div class="trust-item">
+        <i class="pi pi-verified"></i>
+        <span>تضمین کیفیت</span>
+      </div>
+    </div>
+  </div>
+</section>
