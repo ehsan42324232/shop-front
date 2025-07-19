@@ -1,32 +1,63 @@
-// Export specific models to avoid conflicts
+// Export specific models to avoid conflicts - Fixed Version
+
+// Bulk Import Models
 export { ImportError, BulkImportLog } from './bulk-import-log.model';
+
+// Category Models
 export { Category, CategoryTree } from './category.models';
+
+// Product Attribute Models
+export { ProductAttribute, AttributeType } from './product-attribute.model';
+export { ProductAttributeValue } from './product-attribute-value.model';
+
+// Order Models - with aliased exports to avoid conflicts
 export { 
   Order, 
   OrderItem, 
   OrderStatus, 
-  PaymentMethod, 
-  ShippingMethod, 
-  ProductVariant 
+  PaymentMethod as OrderPaymentMethod, 
+  ShippingMethod as OrderShippingMethod, 
+  ProductVariant as OrderProductVariant 
 } from './order.models';
-export { ProductAttributeValue } from './product-attribute-value.model';
-export { ProductAttribute, AttributeType } from './product-attribute.model';
+
+// Product Models - with aliased exports to avoid conflicts
 export { 
   Product, 
   ProductImage, 
   ProductPrice,
   ProductStock,
   ProductSEO,
-  ProductVariant as ProductProductVariant,
-  ProductCollection
+  ProductVariant as ProductModelVariant,
+  ProductCollection,
+  ProductFilter,
+  ProductListResult,
+  ProductReview,
+  ProductImportRow,
+  ProductExportOptions,
+  BulkProductOperation,
+  BulkProductResult,
+  ProductTemplate,
+  ProductWishlist,
+  ProductComparison,
+  ProductRecommendation,
+  RecommendationRequest,
+  ProductStatus,
+  ProductVisibility,
+  ProductAnalytics,
+  ProductSortBy,
+  ReviewStatus
 } from './product.models';
+
+// Store Models - with aliased exports to avoid conflicts
 export { 
   Store, 
   StoreSettings, 
   StoreTheme, 
   StoreDomain,
   StoreAnalytics,
-  StoreSubscription
+  StoreSubscription,
+  PaymentMethod as StorePaymentMethod,
+  ShippingMethod as StoreShippingMethod
 } from './store.models';
 
 // Enhanced User model for multi-tenant architecture
