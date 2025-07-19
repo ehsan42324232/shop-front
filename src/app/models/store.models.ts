@@ -4,7 +4,7 @@ export interface Store {
   id: string;
   name: string;
   subdomain: string; // e.g., "store1.toolbox.com"
-  customDomain?: string; // e.g., "mystore.com"
+  customDomain?: string; // e.g., "mystore.ir"
   ownerId: string;
   
   // Store Configuration
@@ -17,9 +17,6 @@ export interface Store {
   // Timestamps
   createdAt: Date;
   updatedAt: Date;
-  
-  // Subscription & Billing
-  subscription: StoreSubscription;
 }
 
 export interface StoreSettings {
@@ -89,6 +86,55 @@ export interface StoreFeatures {
   // Analytics
   enableAnalytics: boolean;
   googleAnalyticsId?: string;
+  
+  // Chat Support
+  enableLiveChat: boolean;
+  chatProvider?: 'internal' | 'telegram' | 'whatsapp' | 'custom';
+  chatSettings?: ChatSettings;
+}
+
+export interface ChatSettings {
+  // Internal chat settings
+  autoReply?: {
+    enabled: boolean;
+    message: string;
+    workingHours?: {
+      enabled: boolean;
+      start: string; // HH:mm format
+      end: string;
+      days: number[]; // 0-6, Sunday=0
+      timezone: string;
+    };
+  };
+  
+  // Telegram integration
+  telegram?: {
+    botToken?: string;
+    chatId?: string;
+    enabled: boolean;
+  };
+  
+  // WhatsApp integration
+  whatsapp?: {
+    phoneNumber: string;
+    enabled: boolean;
+    autoMessage?: string;
+  };
+  
+  // Custom chat widget
+  customWidget?: {
+    embedCode: string;
+    enabled: boolean;
+  };
+  
+  // Chat appearance
+  appearance: {
+    position: 'bottom-right' | 'bottom-left' | 'bottom-center';
+    primaryColor: string;
+    textColor: string;
+    welcomeMessage: string;
+    placeholder: string;
+  };
 }
 
 export interface PaymentMethod {
@@ -138,6 +184,7 @@ export interface ThemeLayout {
   showSearchBar: boolean;
   showCartIcon: boolean;
   showWishlistIcon: boolean;
+  showChatWidget: boolean;
   
   // Homepage Layout
   homepage: {
@@ -202,22 +249,6 @@ export interface ThemeComponents {
 
 export type StoreStatus = 'active' | 'inactive' | 'suspended' | 'pending_setup';
 
-export interface StoreSubscription {
-  plan: 'free' | 'basic' | 'premium' | 'enterprise';
-  status: 'active' | 'cancelled' | 'expired' | 'trial';
-  trialEndsAt?: Date;
-  subscriptionEndsAt?: Date;
-  features: {
-    maxProducts: number;
-    maxCategories: number;
-    maxAttributes: number;
-    maxStorage: number; // in MB
-    customDomain: boolean;
-    removeWatermark: boolean;
-    prioritySupport: boolean;
-  };
-}
-
 // Store Template (for quick setup)
 export interface StoreTemplate {
   id: string;
@@ -255,6 +286,11 @@ export interface StoreAnalytics {
   
   // Time-based data
   hourlyTraffic: { [hour: string]: number };
+  
+  // Chat metrics
+  chatSessions: number;
+  averageResponseTime: number; // in minutes
+  customerSatisfaction: number; // 1-5 rating
   
   // Timestamps
   calculatedAt: Date;
@@ -334,65 +370,282 @@ export interface AttributeOption {
   id: string;
   value: string;
   label: string;
+  color?: string; // For color attributes
+  image?: string; // For image-based options
   order: number;
 }
 
 export interface AttributeValidation {
   minLength?: number;
   maxLength?: number;
-  min?: number;
-  max?: number;
-  pattern?: string; // regex pattern
+  minValue?: number;
+  maxValue?: number;
+  pattern?: string; // Regex pattern
   required?: boolean;
+  allowedFileTypes?: string[]; // For file attributes
+  maxFileSize?: number; // In bytes
 }
 
 // Excel Import/Export Models
+export interface ExcelImportRequest {
+  storeId: string;
+  type: 'categories' | 'products' | 'both';
+  file: File;
+  options: ImportOptions;
+}
+
+export interface ImportOptions {
+  updateExisting: boolean;
+  createMissingCategories: boolean;
+  validateData: boolean;
+  skipErrors: boolean;
+  
+  // Column mapping (Excel column -> system field)
+  columnMapping: { [excelColumn: string]: string };
+}
+
 export interface ExcelImportResult {
   success: boolean;
   totalRows: number;
   successfulRows: number;
-  failedRows: ExcelImportError[];
-  warnings: ExcelImportWarning[];
-  importedData: {
-    categories?: CategoryTree[];
-    products?: Product[];
-    attributes?: CategoryAttribute[];
-  };
+  failedRows: number;
+  errors: ImportError[];
+  warnings: ImportWarning[];
+  
+  // Created entities
+  createdCategories: number;
+  createdProducts: number;
+  updatedCategories: number;
+  updatedProducts: number;
 }
 
-export interface ExcelImportError {
+export interface ImportError {
   row: number;
   column?: string;
   message: string;
-  data: any;
+  severity: 'error' | 'warning';
 }
 
-export interface ExcelImportWarning {
+export interface ImportWarning {
   row: number;
   column?: string;
   message: string;
-  data: any;
+  suggestion?: string;
 }
 
-export interface ExcelTemplate {
-  type: 'categories' | 'products' | 'attributes';
-  headers: ExcelHeader[];
-  sampleData: any[];
-  validationRules: ExcelValidationRule[];
+// Bulk Operations
+export interface BulkOperation {
+  id: string;
+  storeId: string;
+  type: 'import' | 'export' | 'update' | 'delete';
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  
+  // Progress tracking
+  totalItems: number;
+  processedItems: number;
+  
+  // Results
+  result?: ExcelImportResult;
+  
+  // File references
+  inputFile?: string; // File path or URL
+  outputFile?: string; // Generated file path or URL
+  
+  // Timestamps
+  createdAt: Date;
+  startedAt?: Date;
+  completedAt?: Date;
+  
+  // Error handling
+  error?: string;
 }
 
-export interface ExcelHeader {
-  key: string;
-  label: string;
-  required: boolean;
-  type: 'text' | 'number' | 'boolean' | 'date' | 'dropdown';
-  description?: string;
-  example?: string;
+// Theme Presets (simplified - no subscription restrictions)
+export const THEME_PRESETS: { [key: string]: Partial<StoreTheme> } = {
+  modern: {
+    name: 'مدرن',
+    colors: {
+      primary: '#3B82F6',
+      secondary: '#8B5CF6',
+      accent: '#F59E0B',
+      background: '#FFFFFF',
+      surface: '#F8FAFC',
+      text: '#1F2937',
+      textSecondary: '#6B7280',
+      border: '#E5E7EB',
+      success: '#10B981',
+      warning: '#F59E0B',
+      error: '#EF4444',
+      info: '#3B82F6'
+    },
+    typography: {
+      primaryFont: 'Inter',
+      fontSize: {
+        xs: '0.75rem',
+        sm: '0.875rem',
+        base: '1rem',
+        lg: '1.125rem',
+        xl: '1.25rem',
+        '2xl': '1.5rem',
+        '3xl': '1.875rem'
+      },
+      fontWeight: {
+        light: 300,
+        normal: 400,
+        medium: 500,
+        semibold: 600,
+        bold: 700
+      }
+    }
+  },
+  classic: {
+    name: 'کلاسیک',
+    colors: {
+      primary: '#1F2937',
+      secondary: '#6B7280',
+      accent: '#D97706',
+      background: '#FFFFFF',
+      surface: '#F9FAFB',
+      text: '#111827',
+      textSecondary: '#4B5563',
+      border: '#D1D5DB',
+      success: '#059669',
+      warning: '#D97706',
+      error: '#DC2626',
+      info: '#2563EB'
+    }
+  },
+  minimal: {
+    name: 'مینیمال',
+    colors: {
+      primary: '#000000',
+      secondary: '#666666',
+      accent: '#FF6B6B',
+      background: '#FFFFFF',
+      surface: '#FAFAFA',
+      text: '#000000',
+      textSecondary: '#666666',
+      border: '#E0E0E0',
+      success: '#4CAF50',
+      warning: '#FF9800',
+      error: '#F44336',
+      info: '#2196F3'
+    }
+  },
+  vibrant: {
+    name: 'پررنگ',
+    colors: {
+      primary: '#8B5CF6',
+      secondary: '#EC4899',
+      accent: '#F59E0B',
+      background: '#FAFAFA',
+      surface: '#FFFFFF',
+      text: '#1F2937',
+      textSecondary: '#6B7280',
+      border: '#E5E7EB',
+      success: '#10B981',
+      warning: '#F59E0B',
+      error: '#EF4444',
+      info: '#3B82F6'
+    }
+  }
+};
+
+// Chat Message Models
+export interface ChatMessage {
+  id: string;
+  storeId: string;
+  sessionId: string;
+  
+  // Message content
+  type: 'text' | 'image' | 'file' | 'system';
+  content: string;
+  attachments?: ChatAttachment[];
+  
+  // Sender info
+  senderId: string;
+  senderType: 'customer' | 'admin' | 'system';
+  senderName: string;
+  
+  // Status
+  status: 'sent' | 'delivered' | 'read';
+  
+  // Timestamps
+  sentAt: Date;
+  readAt?: Date;
 }
 
-export interface ExcelValidationRule {
-  column: string;
-  rule: 'required' | 'unique' | 'max_length' | 'min_length' | 'numeric' | 'positive' | 'url' | 'email';
-  value?: any;
-  message: string;
+export interface ChatAttachment {
+  id: string;
+  type: 'image' | 'file';
+  url: string;
+  filename: string;
+  size: number;
+  mimeType: string;
+}
+
+export interface ChatSession {
+  id: string;
+  storeId: string;
+  
+  // Customer info
+  customerId?: string;
+  customerName: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  
+  // Session details
+  status: 'active' | 'closed' | 'waiting';
+  lastMessage?: string;
+  lastMessageAt?: Date;
+  
+  // Assigned agent
+  assignedTo?: string;
+  assignedAt?: Date;
+  
+  // Metadata
+  userAgent?: string;
+  ipAddress?: string;
+  referrer?: string;
+  
+  // Timestamps
+  startedAt: Date;
+  endedAt?: Date;
+  
+  // Rating
+  rating?: number; // 1-5
+  feedback?: string;
+}
+
+// Chat Statistics
+export interface ChatAnalytics {
+  storeId: string;
+  period: 'day' | 'week' | 'month';
+  
+  // Volume metrics
+  totalSessions: number;
+  activeSessions: number;
+  messagesCount: number;
+  
+  // Performance metrics
+  averageResponseTime: number; // in minutes
+  averageSessionDuration: number; // in minutes
+  firstResponseTime: number; // in minutes
+  
+  // Satisfaction metrics
+  customerSatisfaction: number; // average rating 1-5
+  ratingsCount: number;
+  
+  // Conversion metrics
+  sessionsWithPurchase: number;
+  conversionRate: number;
+  
+  // Agent performance
+  agentStats: {
+    agentId: string;
+    agentName: string;
+    sessionsHandled: number;
+    averageResponseTime: number;
+    customerRating: number;
+  }[];
 }
