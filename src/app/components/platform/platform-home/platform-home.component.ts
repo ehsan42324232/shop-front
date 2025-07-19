@@ -62,6 +62,7 @@ export class PlatformHomeComponent implements OnInit {
 
   currentVideoIndex = 0;
   autoplayInterval: any;
+  openFaqIndex: number | null = null;
 
   features: Feature[] = [
     {
@@ -111,118 +112,6 @@ export class PlatformHomeComponent implements OnInit {
         'طراحی ریسپانسیو برای همه دستگاه‌ها',
         'بهینه‌سازی برای سرعت'
       ]
-    },
-    {
-      id: 'categories-attributes',
-      title: 'دسته‌بندی و ویژگی‌های هوشمند',
-      description: 'می‌توانید دسته‌بندی‌ها و زیردسته‌ها و ویژگی‌های محصول خودتان را تعریف کنید. ما همه آن‌ها را به شکل زیبایی در صفحه داده محصول به کاربران شما نشان می‌دهیم و محصولات شما را بر اساس آن‌ها متمایز می‌کنیم.',
-      icon: 'pi pi-sitemap',
-      image: '/assets/images/categories-demo.png',
-      video: '/assets/videos/categories-demo.mp4',
-      demoUrl: '#categories-demo',
-      benefits: [
-        'دسته‌بندی نامحدود با ساختار درختی',
-        'ویژگی‌های سفارشی برای هر دسته',
-        'فیلترهای پیشرفته برای مشتریان',
-        'نمایش بهینه در صفحه محصول',
-        'قابلیت جستجوی پیشرفته'
-      ]
-    },
-    {
-      id: 'seo-optimization',
-      title: 'بهینه‌سازی هوشمند SEO',
-      description: 'متن‌های شما از سیستم هوشمند ما عبور می‌کند تا بدون تغییر چیزی در متن شما، برای موتورهای جستجو بهینه شود. بنابراین علاوه بر شبکه‌های اجتماعی، در جستجوهای عمومی یا تخصصی گوگل نیز پیدا می‌شوید.',
-      icon: 'pi pi-search',
-      image: '/assets/images/seo-demo.png',
-      video: '/assets/videos/seo-demo.mp4',
-      demoUrl: '#seo-demo',
-      benefits: [
-        'بهینه‌سازی خودکار کلمات کلیدی',
-        'تولید متا تگ‌های بهینه',
-        'ساختار URL دوستدار SEO',
-        'نقشه سایت XML خودکار',
-        'افزایش رتبه در گوگل'
-      ]
-    },
-    {
-      id: 'customer-management',
-      title: 'مدیریت مشتریان و پیامک',
-      description: 'مشتریان شما می‌توانند با شماره‌های خود در وب‌سایت شما حساب کاربری ایجاد کنند و شما سپس پیامک‌های تبلیغاتی شخصی‌سازی شده برای آن‌ها ارسال کنید.',
-      icon: 'pi pi-users',
-      image: '/assets/images/customer-management-demo.png',
-      video: '/assets/videos/customer-management-demo.mp4',
-      demoUrl: '#customer-demo',
-      benefits: [
-        'ثبت‌نام ساده با شماره موبایل',
-        'پنل مدیریت مشتریان کامل',
-        'ارسال پیامک تبلیغاتی هدفمند',
-        'پروفایل مشتری با تاریخچه خرید',
-        'دسته‌بندی مشتریان'
-      ]
-    },
-    {
-      id: 'promotions',
-      title: 'تخفیف‌ها و پیشنهادات ویژه',
-      description: 'می‌توانید دسته‌های مختلف محصولات خود را بر اساس ویژگی‌های متنوع‌شان انتخاب کرده و تخفیف‌های سفارشی روی آن‌ها تعریف کنید.',
-      icon: 'pi pi-percentage',
-      image: '/assets/images/promotions-demo.png',
-      video: '/assets/videos/promotions-demo.mp4',
-      demoUrl: '#promotions-demo',
-      benefits: [
-        'تخفیف‌های درصدی و مقداری',
-        'کوپن‌های تخفیف شخصی',
-        'تخفیف‌های زمان‌دار',
-        'تخفیف بر اساس مقدار خرید',
-        'ترکیب تخفیف‌های مختلف'
-      ]
-    },
-    {
-      id: 'excel-import',
-      title: 'وارد کردن انبوه با اکسل',
-      description: 'می‌توانید دسته‌بندی‌ها و محصولات خود را یکی یکی از طریق پنل کاربرپسند تعریف کنید، یا فقط یک اکسل منطبق با قالب‌های ما آپلود کنید و ما خودمان همه دسته‌بندی‌ها و محصولات و ویژگی‌ها را می‌سازیم.',
-      icon: 'pi pi-file-excel',
-      image: '/assets/images/excel-import-demo.png',
-      video: '/assets/videos/excel-import-demo.mp4',
-      demoUrl: '#excel-demo',
-      benefits: [
-        'قالب اکسل استاندارد آماده',
-        'وارد کردن هزاران محصول با یک فایل',
-        'تشخیص خودکار دسته‌بندی‌ها',
-        'گزارش کامل از عملیات import',
-        'صرفه‌جویی چشمگیر در زمان'
-      ]
-    },
-    {
-      id: 'analytics',
-      title: 'گزارش‌های تحلیلی پیشرفته',
-      description: 'می‌توانید گزارش‌های آموزنده‌ای درباره فروش خود مشاهده کنید. از آمار فروش تا تحلیل رفتار مشتریان، همه چیز در دسترس شماست.',
-      icon: 'pi pi-chart-line',
-      image: '/assets/images/analytics-demo.png',
-      video: '/assets/videos/analytics-demo.mp4',
-      demoUrl: '#analytics-demo',
-      benefits: [
-        'گزارش‌های فروش در بازه‌های زمانی',
-        'تحلیل محبوب‌ترین محصولات',
-        'آمار بازدید و تبدیل مشتری',
-        'گزارش‌گیری PDF و Excel',
-        'داشبورد تحلیلی پیشرفته'
-      ]
-    },
-    {
-      id: 'payment-logistics',
-      title: 'پرداخت و ارسال یکپارچه',
-      description: 'وب‌سایت شما دارای سبد خرید است و با درگاه‌های پرداخت معتبر مختلف و ارائه‌دهندگان خدمات حمل‌ونقل یکپارچه شده است. بنابراین شما هیچ نگرانی از پردازش سفارش‌هایتان نداشته باشید و زمان بیشتری برای تمرکز بر برنامه‌های آتی‌تان داشته باشید.',
-      icon: 'pi pi-credit-card',
-      image: '/assets/images/payment-logistics-demo.png',
-      video: '/assets/videos/payment-logistics-demo.mp4',
-      demoUrl: '#payment-demo',
-      benefits: [
-        'درگاه‌های پرداخت معتبر (زرین‌پال، ملت، پارسیان)',
-        'ارسال با پست، اسنپ‌باکس، تیپاکس',
-        'محاسبه خودکار هزینه ارسال',
-        'پیگیری کامل مرحله‌ای سفارش',
-        'مدیریت موجودی خودکار'
-      ]
     }
   ];
 
@@ -258,24 +147,6 @@ export class PlatformHomeComponent implements OnInit {
         'چت آنلاین',
         '۱۷% تخفیف'
       ]
-    },
-    {
-      id: 'biannual',
-      name: 'شش‌ماهه',
-      price: 1000000,
-      duration: '۶ ماه',
-      originalPrice: 1200000,
-      badge: 'بیشترین صرفه‌جویی',
-      features: [
-        'تمام امکانات پلتفرم',
-        'آدرس اختصاصی',
-        'پشتیبانی ۲۴/۷',
-        'بک‌آپ روزانه',
-        'گواهی SSL رایگان',
-        'چت آنلاین',
-        '۱۷% تخفیف',
-        'مشاوره رایگان طراحی'
-      ]
     }
   ];
 
@@ -295,14 +166,6 @@ export class PlatformHomeComponent implements OnInit {
       text: 'پشتیبانی عالی و امکانات کامل. واقعاً متفاوت از سایر پلتفرم‌هاست. تیم پشتیبانی همیشه پاسخگو هستند.',
       rating: 5,
       sales: '۱۵۰+ فروش در ماه'
-    },
-    {
-      name: 'مریم کریمی',
-      business: 'فروشگاه زیورآلات مریم',
-      image: '/assets/images/testimonial-3.jpg',
-      text: 'قیمت‌ها بسیار مناسب و کیفیت عالی. حتماً پیشنهاد می‌کنم! فروشم ۳ برابر شده.',
-      rating: 5,
-      sales: '۳۰۰+ فروش در ماه'
     }
   ];
 
@@ -358,6 +221,10 @@ export class PlatformHomeComponent implements OnInit {
     this.currentVideoIndex = this.currentVideoIndex === 0 
       ? this.features.length - 1 
       : this.currentVideoIndex - 1;
+  }
+
+  toggleFaq(index: number) {
+    this.openFaqIndex = this.openFaqIndex === index ? null : index;
   }
 
   selectPlan(plan: PricingPlan) {
