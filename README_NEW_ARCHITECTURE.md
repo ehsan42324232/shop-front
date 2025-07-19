@@ -1,12 +1,13 @@
 # سایت‌ساز جعبه ابزار - پلتفرم چندمستاجره فروشگاه‌سازی
 
-پلتفرم پیشرفته و انعطاف‌پذیر برای ایجاد فروشگاه‌های آنلاین با قابلیت سفارشی‌سازی کامل دسته‌بندی‌ها و ویژگی‌های محصولات.
+پلتفرم پیشرفته و انعطاف‌پذیر برای ایجاد فروشگاه‌های آنلاین با قابلیت سفارشی‌سازی کامل دسته‌بندی‌ها، ویژگی‌های محصولات، و دامنه اختصاصی.
 
 ## 🚀 ویژگی‌های کلیدی
 
 ### 🏪 **چندمستاجره (Multi-tenant)**
 - هر فروشنده فروشگاه مستقل با زیردامنه اختصاصی
-- دامنه سفارشی برای پلن‌های پریمیوم
+- **دامنه .ir اختصاصی** برای هر فروشگاه
+- بررسی دسترسی دامنه در زمان واقعی
 - جداسازی کامل داده‌ها بین فروشگاه‌ها
 
 ### 📂 **دسته‌بندی انعطاف‌پذیر**
@@ -18,6 +19,24 @@
 - **۳ ویژگی ثابت**: نام، قیمت، تعداد
 - **تا ۵۰ ویژگی سفارشی** برای هر محصول
 - ۱۲ نوع ویژگی مختلف (متن، عدد، لیست، رنگ، تاریخ، ...)
+
+### 🎥 **پشتیبانی کامل از ویدیو**
+- آپلود ویدیوهای متعدد برای هر محصول
+- پشتیبانی از YouTube، Vimeo، Instagram، TikTok
+- ویدیوهای کوتاه برای نمایش محصولات
+- پردازش خودکار کیفیت‌های مختلف
+
+### 💬 **چت آنلاین پیشرفته**
+- چت مستقیم با مشتریان
+- یکپارچگی با Telegram و WhatsApp
+- پاسخ خودکار و ساعت کاری
+- ویجت چت زیبا و کاربردی
+
+### 🌐 **دامنه‌های .ir**
+- بررسی دسترسی دامنه در فرم درخواست
+- ثبت خودکار دامنه‌های .ir
+- پیشنهادات دامنه‌های جایگزین
+- تنظیم DNS خودکار
 
 ### 🎨 **سیستم قالب پیشرفته**
 - قالب‌های آماده: مدرن، کلاسیک، مینیمال، پررنگ
@@ -34,10 +53,9 @@ interface Store {
   id: string;
   name: string;
   subdomain: string; // "mystore.toolbox.com"
-  customDomain?: string;
+  customDomain?: string; // "mystore.ir"
   settings: StoreSettings;
   theme: StoreTheme;
-  subscription: StoreSubscription;
 }
 ```
 
@@ -46,7 +64,7 @@ interface Store {
 interface CategoryTree {
   id: string;
   name: string;
-  level: number; // 0-9
+  level: number; // 0-9 (حداکثر ۱۰ سطح)
   parentId?: string;
   attributes: CategoryAttribute[]; // ویژگی‌های این دسته
   children?: CategoryTree[];
@@ -61,235 +79,238 @@ interface Product {
   price: number;
   count: number;
   
-  // ویژگی‌های سفارشی
+  // ویژگی‌های سفارشی (تا ۵۰)
   attributes: ProductAttributeValue[];
-  categories: string[];
+  
+  // رسانه
   images: ProductImage[];
+  videos: ProductVideo[]; // پشتیبانی از ویدیوهای متعدد
+  
+  // سایر اطلاعات
+  categories: string[];
+  seo: ProductSEO;
 }
 ```
 
-## 📋 راهنمای پیاده‌سازی
+## 🎯 فرآیند راه‌اندازی فروشگاه
 
-### ۱. راه‌اندازی فروشگاه جدید
-
+### 1️⃣ **درخواست فروشگاه با دامنه .ir**
 ```typescript
-// ایجاد فروشگاه
-const newStore = await storeService.createStore({
-  name: "فروشگاه نمونه",
-  subdomain: "sample-store",
-  settings: {
-    displayName: "فروشگاه نمونه",
-    contactEmail: "info@sample.com",
-    currency: "IRR",
-    language: "fa"
-  }
-});
+const storeRequest = {
+  storeName: "فروشگاه پوشاک آریا",
+  phoneNumber: "09123456789",
+  productType: "پوشاک",
+  wantCustomDomain: true,
+  customDomain: "aria-fashion" // می‌شود aria-fashion.ir
+};
+
+// بررسی دسترسی دامنه
+const domainResult = await domainService.checkIrDomainAvailability("aria-fashion");
+// { available: true, domain: "aria-fashion", suggestion: null }
 ```
 
-### ۲. تعریف دسته‌بندی‌ها
-
-```typescript
-// افزودن دسته‌بندی اصلی
-const mainCategory = await categoryService.createCategory(storeId, {
-  name: "پوشاک",
-  level: 0,
-  attributes: [
-    {
-      name: "برند",
-      type: "text",
-      required: true
-    },
-    {
-      name: "رنگ",
-      type: "dropdown",
-      options: [
-        { value: "red", label: "قرمز" },
-        { value: "blue", label: "آبی" }
-      ]
-    }
-  ]
-});
-
-// افزودن زیردسته
-const subCategory = await categoryService.createCategory(storeId, {
-  name: "پیراهن زنانه",
-  parentId: mainCategory.id,
-  level: 1,
-  attributes: [
-    {
-      name: "سایز",
-      type: "dropdown",
-      options: [
-        { value: "S", label: "کوچک" },
-        { value: "M", label: "متوسط" },
-        { value: "L", label: "بزرگ" }
-      ]
-    }
-  ]
-});
+### 2️⃣ **تنظیم دسته‌بندی‌ها (از طریق Excel)**
+```excel
+Level 1    | Level 2  | Level 3     | Level 4  | Attributes
+پوشاک     | زنانه    | پیراهن      | مجلسی    | رنگ,سایز,جنس,برند,یقه,آستین
+پوشاک     | زنانه    | شلوار       | جین      | رنگ,سایز,برند,قد,مدل
+پوشاک     | مردانه   | پیراهن      | کژوال    | رنگ,سایز,جنس,برند,طرح
+کفش       | زنانه    | کفش پاشنه‌دار | مجلسی    | رنگ,سایز,برند,ارتفاع_پاشنه
 ```
 
-### ۳. افزودن محصولات
-
+### 3️⃣ **افزودن محصولات با ویدیو**
 ```typescript
 const product = await productService.createProduct(storeId, {
   name: "پیراهن زنانه گلدار",
   price: 150000,
   count: 25,
-  categories: [subCategory.id],
-  primaryCategoryId: subCategory.id,
-  attributes: [
+  
+  // ویدیوهای محصول
+  videos: [
     {
-      attributeId: "brand-attr-id",
-      attributeName: "برند",
-      attributeType: "text",
-      value: "زارا"
+      type: 'upload',
+      url: '/videos/product-demo.mp4',
+      title: 'نمایش محصول',
+      thumbnail: '/images/video-thumb.jpg',
+      duration: 30
     },
     {
-      attributeId: "color-attr-id",
-      attributeName: "رنگ",
-      attributeType: "dropdown",
-      value: "blue"
-    },
-    {
-      attributeId: "size-attr-id",
-      attributeName: "سایز",
-      attributeType: "dropdown",
-      value: "M"
+      type: 'instagram',
+      url: 'https://instagram.com/p/abc123',
+      title: 'ویدیو اینستاگرام',
+      platformData: {
+        originalUrl: 'https://instagram.com/p/abc123'
+      }
     }
   ],
-  images: [
-    {
-      url: "/images/product1.jpg",
-      alt: "پیراهن زنانه گلدار",
-      isPrimary: true,
-      order: 0
-    }
+  
+  // ویژگی‌های سفارشی
+  attributes: [
+    { attributeName: "رنگ", value: "آبی" },
+    { attributeName: "سایز", value: "M" },
+    { attributeName: "جنس", value: "پنبه" }
   ]
 });
 ```
 
-### ۴. تغییر قالب
-
+### 4️⃣ **تنظیم چت آنلاین**
 ```typescript
-// استفاده از قالب آماده
-const modernTheme = storeService.getThemePresets()['modern'];
-await storeService.updateTheme(storeId, modernTheme);
-
-// سفارشی‌سازی رنگ‌ها
-const customTheme = {
-  ...modernTheme,
-  colors: {
-    ...modernTheme.colors,
-    primary: '#FF6B6B',
-    secondary: '#4ECDC4'
+const chatSettings: ChatSettings = {
+  autoReply: {
+    enabled: true,
+    message: "سلام! خوش آمدید. چطور می‌تونم کمکتون کنم؟",
+    workingHours: {
+      enabled: true,
+      start: "09:00",
+      end: "18:00",
+      days: [1, 2, 3, 4, 5], // شنبه تا چهارشنبه
+      timezone: "Asia/Tehran"
+    }
+  },
+  telegram: {
+    enabled: true,
+    botToken: "YOUR_BOT_TOKEN"
+  },
+  whatsapp: {
+    enabled: true,
+    phoneNumber: "989123456789"
+  },
+  appearance: {
+    position: 'bottom-right',
+    primaryColor: '#3B82F6',
+    welcomeMessage: 'سلام! چطور می‌تونم کمکتون کنم؟',
+    placeholder: 'پیام خود را بنویسید...'
   }
 };
-await storeService.updateTheme(storeId, customTheme);
+
+await chatService.updateChatSettings(storeId, chatSettings);
 ```
 
 ## 📊 بارگذاری Excel
 
-### قالب دسته‌بندی‌ها
+### قالب محصولات با ویدیو
 ```excel
-Level 1    | Level 2  | Level 3   | Attributes
-پوشاک     | زنانه    | پیراهن    | رنگ,سایز,جنس,برند
-پوشاک     | زنانه    | شلوار     | رنگ,سایز,جنس,برند,قد
-پوشاک     | مردانه   | پیراهن    | رنگ,سایز,جنس,برند,یقه
-```
-
-### قالب محصولات
-```excel
-Name        | Price  | Count | Category              | رنگ  | سایز | جنس
-پیراهن مجلسی | 150000 | 25    | پوشاک>زنانه>پیراهن     | آبی  | M    | پلی‌استر
-شلوار جین    | 120000 | 15    | پوشاک>زنانه>شلوار      | مشکی | L    | پنبه
+Name            | Price  | Count | Category              | رنگ  | سایز | Videos
+پیراهن مجلسی    | 150000 | 25    | پوشاک>زنانه>پیراهن     | آبی  | M    | /videos/demo1.mp4|https://youtu.be/abc123
+شلوار جین       | 120000 | 15    | پوشاک>زنانه>شلوار      | مشکی | L    | /videos/demo2.mp4
+کفش پاشنه‌دار    | 450000 | 8     | کفش>زنانه>کفش پاشنه‌دار | مشکی | 38   | https://instagram.com/p/xyz789
 ```
 
 ### کد بارگذاری
 ```typescript
-// بارگذاری دسته‌بندی‌ها
-const importOptions = {
+const result = await productService.importProductsFromExcel(storeId, file, {
   updateExisting: true,
-  createMissingCategories: false,
-  validateData: true,
+  processVideos: true, // پردازش خودکار ویدیوها
+  validateVideoUrls: true,
   columnMapping: {
-    'نام دسته‌بندی': 'name',
-    'دسته والد': 'parentName',
-    'ویژگی‌ها': 'attributes'
+    'Videos': 'videos' // ستون Videos به فیلد videos
+  }
+});
+```
+
+## 💬 استفاده از چت
+
+### افزودن ویجت چت
+```html
+<!-- در قالب فروشگاه -->
+<app-chat-widget 
+  *ngIf="store.settings.features.enableLiveChat">
+</app-chat-widget>
+```
+
+### پیکربندی چت
+```typescript
+// تنظیم Telegram Bot
+await chatService.setupTelegramBot(storeId, botToken);
+
+// تنظیم WhatsApp
+await chatService.setupWhatsApp(storeId, phoneNumber);
+
+// ایجاد پاسخ خودکار
+await chatService.createAutoReply(storeId, 
+  "سلام", 
+  "سلام! خوش آمدید به فروشگاه ما. چطور می‌تونم کمکتون کنم؟"
+);
+```
+
+## 🌐 مدیریت دامنه
+
+### بررسی دسترسی دامنه
+```typescript
+// در فرم درخواست
+async checkDomainAvailability() {
+  const result = await this.domainService.checkIrDomainAvailability("mystore");
+  
+  if (result.available) {
+    // دامنه در دسترس است
+    this.showAvailableMessage();
+  } else {
+    // پیشنهاد دامنه جایگزین
+    this.showSuggestion(result.suggestion);
+  }
+}
+```
+
+### ثبت دامنه
+```typescript
+const domainData = {
+  domain: "mystore.ir",
+  storeId: storeId,
+  ownerInfo: {
+    name: "نام مالک",
+    email: "owner@email.com", 
+    phone: "09123456789",
+    address: "آدرس کامل",
+    nationalId: "کد ملی"
   }
 };
 
-const result = await categoryService.importCategoriesFromExcel(
-  storeId, 
-  excelFile, 
-  importOptions
-);
-
-console.log(`${result.createdCategories} دسته‌بندی جدید ایجاد شد`);
+await domainService.registerDomain(domainData);
 ```
 
-## 🎯 استفاده از کامپوننت‌ها
+## 🎨 کار با قالب‌ها
 
-### کامپوننت مدیریت دسته‌بندی‌ها
+### انتخاب قالب
+```typescript
+// استفاده از قالب آماده
+const vibrantTheme = storeService.getThemePresets()['vibrant'];
+
+// سفارشی‌سازی
+const customTheme = {
+  ...vibrantTheme,
+  colors: {
+    ...vibrantTheme.colors,
+    primary: '#8B5CF6', // بنفش
+    secondary: '#EC4899' // صورتی
+  },
+  layout: {
+    ...vibrantTheme.layout,
+    showChatWidget: true // نمایش ویجت چت
+  }
+};
+
+await storeService.updateTheme(storeId, customTheme);
+```
+
+## 📱 کامپوننت‌ها
+
+### مدیریت دسته‌بندی‌ها
 ```html
 <app-category-management></app-category-management>
 ```
 
-### کامپوننت انتخاب قالب
+### ویجت چت
 ```html
-<app-theme-selector 
-  [currentTheme]="store.theme"
-  (themeSelected)="onThemeSelected($event)">
-</app-theme-selector>
+<app-chat-widget></app-chat-widget>
 ```
 
-### کامپوننت آپلود Excel
+### آپلود Excel
 ```html
 <app-excel-uploader 
-  [uploadType]="'categories'"
+  [uploadType]="'products'"
+  [supportVideos]="true"
   (uploadComplete)="onUploadComplete($event)">
 </app-excel-uploader>
-```
-
-## 📈 پلن‌های اشتراک
-
-| ویژگی | رایگان | پایه | حرفه‌ای | سازمانی |
-|--------|---------|------|---------|----------|
-| محصولات | ۱۰ | ۱۰۰ | ۱۰۰۰ | نامحدود |
-| دسته‌بندی‌ها | ۵ | ۲۰ | ۵۰ | نامحدود |
-| ویژگی‌ها | ۱۰ | ۲۵ | ۵۰ | ۵۰ |
-| فضای ذخیره | ۱۰۰ مگ | ۱ گیگ | ۵ گیگ | ۲۰ گیگ |
-| دامنه سفارشی | ❌ | ❌ | ✅ | ✅ |
-
-## 🛠️ نصب و راه‌اندازی
-
-### پیش‌نیازها
-- Node.js 18+
-- Angular 15+
-- TypeScript 4.8+
-
-### نصب
-```bash
-# کلون کردن پروژه
-git clone https://github.com/ehsan42324232/shop-front.git
-cd shop-front
-
-# نصب وابستگی‌ها
-npm install
-
-# راه‌اندازی سرور توسعه
-ng serve
-```
-
-### متغیرهای محیط
-```typescript
-// src/environments/environment.ts
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:8000/api',
-  storageUrl: 'http://localhost:8000/media',
-  wsUrl: 'ws://localhost:8000/ws'
-};
 ```
 
 ## 🔧 API های کلیدی
@@ -299,128 +320,105 @@ export const environment = {
 GET    /api/stores/current              # دریافت فروشگاه جاری
 PUT    /api/stores/{id}/settings        # بروزرسانی تنظیمات
 PUT    /api/stores/{id}/theme           # تغییر قالب
-POST   /api/stores/{id}/theme/preview   # پیش‌نمایش قالب
 ```
 
-### Category Management
+### Domain Management
 ```http
-GET    /api/stores/{id}/categories/tree           # درخت دسته‌بندی‌ها
-POST   /api/stores/{id}/categories                # ایجاد دسته‌بندی
-POST   /api/stores/{id}/categories/import         # بارگذاری Excel
-GET    /api/stores/{id}/categories/export         # دانلود Excel
+GET    /api/domains/check-ir            # بررسی دامنه .ir
+POST   /api/domains/register            # ثبت دامنه
+POST   /api/domains/{id}/setup-dns      # تنظیم DNS
 ```
 
-### Product Management
+### Chat Management
 ```http
-GET    /api/stores/{id}/products                  # لیست محصولات
-POST   /api/stores/{id}/products                  # ایجاد محصول
-POST   /api/stores/{id}/products/bulk-update      # بروزرسانی دسته‌ای
-POST   /api/stores/{id}/products/import           # بارگذاری Excel
+POST   /api/stores/{id}/chat/sessions   # شروع جلسه چت
+GET    /api/chat/sessions/{id}/messages # دریافت پیام‌ها
+POST   /api/chat/sessions/{id}/messages # ارسال پیام
+PUT    /api/stores/{id}/chat/settings   # تنظیمات چت
 ```
 
-## 🎨 ساختار قالب‌ها
+### Product & Video Management
+```http
+POST   /api/stores/{id}/products        # ایجاد محصول با ویدیو
+POST   /api/products/{id}/videos        # افزودن ویدیو
+GET    /api/videos/{id}/status          # وضعیت پردازش ویدیو
+```
 
-### رنگ‌های قالب
+## 🛠️ نصب و راه‌اندازی
+
+### پیش‌نیازها
+- Node.js 18+
+- Angular 15+
+- WebSocket support برای چت
+- FFmpeg برای پردازش ویدیو
+
+### نصب
+```bash
+git clone https://github.com/ehsan42324232/shop-front.git
+cd shop-front
+npm install
+ng serve
+```
+
+### متغیرهای محیط
 ```typescript
-interface ThemeColors {
-  primary: string;      // رنگ اصلی
-  secondary: string;    // رنگ ثانویه
-  accent: string;       // رنگ تاکیدی
-  background: string;   // پس‌زمینه
-  surface: string;      // سطح کارت‌ها
-  text: string;         // متن اصلی
-  textSecondary: string; // متن ثانویه
-  border: string;       // حاشیه‌ها
-}
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8000/api',
+  wsUrl: 'ws://localhost:8000/ws', // برای چت
+  storageUrl: 'http://localhost:8000/media',
+  
+  // تنظیمات دامنه
+  domainRegistrar: {
+    apiKey: 'YOUR_REGISTRAR_API_KEY',
+    endpoint: 'https://api.registrar.ir'
+  },
+  
+  // تنظیمات ویدیو
+  videoProcessing: {
+    maxFileSize: 100 * 1024 * 1024, // 100MB
+    allowedFormats: ['mp4', 'webm', 'mov'],
+    qualities: ['360p', '480p', '720p', '1080p']
+  }
+};
 ```
 
-### تایپوگرافی
-```typescript
-interface ThemeTypography {
-  primaryFont: string;
-  fontSize: {
-    xs: string;
-    sm: string;
-    base: string;
-    lg: string;
-    xl: string;
-    '2xl': string;
-    '3xl': string;
-  };
-}
-```
+## 📈 ویژگی‌های پیشرفته
 
-## 📱 واکنش‌گرایی
+### پردازش ویدیو
+- تبدیل خودکار به فرمت‌های مختلف
+- ایجاد thumbnail های خودکار
+- فشرده‌سازی برای وب
+- پشتیبانی از کیفیت‌های مختلف
 
-سیستم بر اساس Tailwind CSS طراحی شده و کاملاً واکنش‌گرا است:
+### چت هوشمند
+- پاسخ خودکار بر اساس کلمات کلیدی
+- انتقال خودکار به Telegram/WhatsApp
+- آمار و تحلیل مکالمات
+- ذخیره تاریخچه چت
 
-- **موبایل**: < 768px
-- **تبلت**: 768px - 1024px  
-- **دسکتاپ**: > 1024px
+### مدیریت دامنه
+- بررسی دسترسی در زمان واقعی
+- ثبت خودکار در سایت NIC ایران
+- تنظیم DNS خودکار
+- تمدید خودکار دامنه
 
-## 🔒 امنیت
+## 🔐 امنیت
 
-- جداسازی کامل داده‌ها بین فروشگاه‌ها
-- اعتبارسنجی ورودی‌ها
-- محدودیت نرخ درخواست
-- رمزگذاری فایل‌های آپلود شده
-- احراز هویت JWT
+- SSL برای تمام دامنه‌ها
+- رمزگذاری پیام‌های چت
+- احراز هویت دومرحله‌ای
+- جداسازی کامل داده‌های فروشگاه‌ها
+- بکاپ خودکار روزانه
 
-## 🐛 رفع مشکلات
+## 🚀 عملکرد
 
-### مشکلات رایج
-
-**۱. مشکل در بارگذاری Excel**
-```typescript
-// بررسی فرمت فایل
-if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-  throw new Error('فرمت فایل پشتیبانی نمی‌شود');
-}
-
-// بررسی حجم فایل
-if (file.size > 10 * 1024 * 1024) { // 10MB
-  throw new Error('حجم فایل بیش از حد مجاز است');
-}
-```
-
-**۲. مشکل در نمایش قالب**
-```css
-/* اطمینان از لود شدن CSS سفارشی */
-.theme-custom {
-  --primary-color: var(--theme-primary, #3B82F6);
-  --secondary-color: var(--theme-secondary, #8B5CF6);
-}
-```
-
-**۳. مدیریت حافظه**
-```typescript
-// استفاده از OnDestroy برای پاکسازی
-ngOnDestroy() {
-  this.subscription?.unsubscribe();
-  this.categoryService.clearCache();
-}
-```
-
-## 🤝 مشارکت
-
-برای مشارکت در پروژه:
-
-1. فورک کنید
-2. برنچ جدید بسازید: `git checkout -b feature/amazing-feature`
-3. تغییرات را کامیت کنید: `git commit -m 'Add amazing feature'`
-4. پوش کنید: `git push origin feature/amazing-feature`  
-5. Pull Request ایجاد کنید
-
-## 📝 مجوز
-
-این پروژه تحت مجوز MIT منتشر شده است. فایل [LICENSE](LICENSE) را مطالعه کنید.
-
-## 📞 پشتیبانی
-
-- **ایمیل**: support@toolbox-sitebuilder.com
-- **تلگرام**: @toolbox_support
-- **مستندات**: [docs.toolbox-sitebuilder.com](https://docs.toolbox-sitebuilder.com)
+- CDN برای ویدیوها و تصاویر
+- Cache هوشمند
+- Lazy loading برای رسانه
+- WebSocket برای چت real-time
+- Progressive Web App (PWA)
 
 ---
 
-**سایت‌ساز جعبه ابزار** - ساخت فروشگاه آنلاین هرگز آسان‌تر نبوده! 🚀
+**سایت‌ساز جعبه ابزار** - ساخت فروشگاه آنلاین با دامنه .ir اختصاصی و چت آنلاین! 🚀
