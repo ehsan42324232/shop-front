@@ -1,9 +1,11 @@
+export type AttributeType = 'text' | 'number' | 'boolean' | 'choice' | 'color' | 'date';
+
 export interface ProductAttribute {
   id: string;
   store: string;
   name: string;
   slug: string;
-  attribute_type: 'text' | 'number' | 'boolean' | 'choice' | 'color' | 'date';
+  attribute_type: AttributeType;
   is_required: boolean;
   is_filterable: boolean;
   is_searchable: boolean;
@@ -16,7 +18,7 @@ export interface ProductAttribute {
 
 export interface CreateProductAttributeRequest {
   name: string;
-  attribute_type: string;
+  attribute_type: AttributeType;
   is_required?: boolean;
   is_filterable?: boolean;
   is_searchable?: boolean;
