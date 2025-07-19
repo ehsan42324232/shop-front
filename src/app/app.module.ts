@@ -10,6 +10,17 @@ import localeFa from '@angular/common/locales/fa';
 // Register Farsi locale
 registerLocaleData(localeFa);
 
+// PrimeNG Modules
+import { ButtonModule } from 'primeng/button';
+import { AccordionModule } from 'primeng/accordion';
+import { CardModule } from 'primeng/card';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { DialogModule } from 'primeng/dialog';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputTextModule } from 'primeng/inputtext';
+import { CheckboxModule } from 'primeng/checkbox';
+import { RadioButtonModule } from 'primeng/radiobutton';
+
 // Routing
 import { AppRoutingModule } from './app-routing.module';
 
@@ -48,7 +59,17 @@ import { AuthGuard } from './guards/auth.guard';
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
-    AppRoutingModule
+    AppRoutingModule,
+    // PrimeNG Modules
+    ButtonModule,
+    AccordionModule,
+    CardModule,
+    ProgressSpinnerModule,
+    DialogModule,
+    DropdownModule,
+    InputTextModule,
+    CheckboxModule,
+    RadioButtonModule
   ],
   providers: [
     AuthGuard,
