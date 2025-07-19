@@ -5,7 +5,7 @@
     <div class="hero-particles"></div>
   </div>
   
-  <div class="container hero-container" [@fadeInUp]>
+  <div class="container hero-container">
     <div class="grid h-full align-items-center">
       <div class="col-12 lg:col-6">
         <div class="hero-content">
@@ -23,47 +23,43 @@
           
           <div class="hero-features">
             <div class="feature-item">
-              <i class="pi pi-check-circle"></i>
+              <span>✓</span>
               <span>تیم کوچک = هزینه کمتر = قیمت دوستانه‌تر</span>
             </div>
             <div class="feature-item">
-              <i class="pi pi-headphones"></i>
+              <span>📞</span>
               <span>پشتیبانی ۲۴/۷ (تلفن، پیامک، ایمیل، چت آنلاین)</span>
             </div>
             <div class="feature-item">
-              <i class="pi pi-heart-fill"></i>
+              <span>❤️</span>
               <span>تازه شروع کرده‌ایم و عاشقانه کار می‌کنیم</span>
             </div>
           </div>
           
           <div class="hero-actions">
             <button 
-              pButton 
               type="button"
-              label="شروع رایگان ۱۴ روزه"
-              icon="pi pi-play"
-              class="p-button-lg p-button-success hero-cta"
+              class="btn btn-primary btn-lg hero-cta"
               (click)="startFreeTrial()">
+              ▶ شروع رایگان ۱۴ روزه
             </button>
             
             <button 
-              pButton 
               type="button"
-              label="مشاهده امکانات"
-              icon="pi pi-eye"
-              class="p-button-lg p-button-outlined hero-demo"
+              class="btn btn-outline btn-lg hero-demo"
               (click)="navigateToFeatures()">
+              👁 مشاهده امکانات
             </button>
           </div>
           
           <div class="hero-guarantee">
-            <i class="pi pi-shield"></i>
+            <span>🛡️</span>
             <span>بدون نیاز به کارت اعتباری • لغو آسان • ۱۴ روز کاملاً رایگان</span>
           </div>
         </div>
       </div>
       
-      <div class="col-12 lg:col-6" [@slideInRight]>
+      <div class="col-12 lg:col-6">
         <div class="hero-visual">
           <div class="hero-video-container">
             <video 
@@ -76,11 +72,10 @@
             </video>
             <div class="video-controls">
               <button 
-                pButton 
                 type="button"
-                icon="pi pi-chevron-left"
-                class="p-button-rounded p-button-text"
+                class="btn btn-rounded btn-text"
                 (click)="previousVideo()">
+                ◀
               </button>
               <div class="video-indicators">
                 <span 
@@ -91,16 +86,15 @@
                 </span>
               </div>
               <button 
-                pButton 
                 type="button"
-                icon="pi pi-chevron-right"
-                class="p-button-rounded p-button-text"
+                class="btn btn-rounded btn-text"
                 (click)="nextVideo()">
+                ▶
               </button>
             </div>
             <div class="video-caption">
               <h4>{{ features[currentVideoIndex]?.title }}</h4>
-              <p>{{ features[currentVideoIndex]?.description | slice:0:100 }}...</p>
+              <p>{{ (features[currentVideoIndex]?.description || '').substring(0, 100) }}...</p>
             </div>
           </div>
         </div>
@@ -112,11 +106,11 @@
 <!-- Stats Section -->
 <section class="stats-section">
   <div class="container">
-    <div class="grid" [@staggerAnimation]>
+    <div class="grid">
       <div class="col-6 md:col-3" *ngFor="let stat of stats">
         <div class="stat-card">
           <div class="stat-icon">
-            <i [class]="stat.icon"></i>
+            <span>📊</span>
           </div>
           <div class="stat-value">{{ stat.value }}</div>
           <div class="stat-label">{{ stat.label }}</div>
@@ -129,7 +123,7 @@
 <!-- Features Section -->
 <section id="features" class="features-section">
   <div class="container">
-    <div class="section-header text-center mb-6" [@fadeInUp]>
+    <div class="section-header text-center mb-6">
       <h2 class="section-title">امکانات کامل و پیشرفته</h2>
       <p class="section-subtitle">
         همه چیزهایی که برای راه‌اندازی یک فروشگاه آنلاین موفق نیاز دارید
@@ -139,13 +133,11 @@
     <div class="features-grid">
       <div 
         class="feature-card" 
-        *ngFor="let feature of features; let i = index"
-        [@fadeInUp]
-        [style.animation-delay.ms]="i * 100">
+        *ngFor="let feature of features; let i = index">
         
         <div class="feature-header">
           <div class="feature-icon">
-            <i [class]="feature.icon"></i>
+            <span>🚀</span>
           </div>
           <div class="feature-badge" *ngIf="feature.id === 'social-integration'">جدید</div>
         </div>
@@ -158,18 +150,17 @@
             <img [src]="feature.image" [alt]="feature.title" loading="lazy">
             <div class="feature-overlay">
               <button 
-                pButton 
                 type="button"
-                icon="pi pi-play"
-                class="p-button-rounded p-button-lg"
+                class="btn btn-rounded btn-lg"
                 (click)="openDemo(feature)">
+                ▶
               </button>
             </div>
           </div>
           
           <ul class="feature-benefits">
             <li *ngFor="let benefit of feature.benefits">
-              <i class="pi pi-check"></i>
+              <span>✓</span>
               <span>{{ benefit }}</span>
             </li>
           </ul>
@@ -177,76 +168,11 @@
         
         <div class="feature-actions">
           <button 
-            pButton 
             type="button"
-            label="مشاهده نمونه"
-            icon="pi pi-external-link"
-            class="p-button-outlined p-button-sm"
+            class="btn btn-outline btn-sm"
             (click)="openDemo(feature)">
+            🔗 مشاهده نمونه
           </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Why Choose Us Section -->
-<section class="why-choose-section">
-  <div class="container">
-    <div class="grid align-items-center">
-      <div class="col-12 lg:col-6" [@slideInLeft]>
-        <h2 class="section-title">چرا ما را انتخاب کنید؟</h2>
-        
-        <div class="reasons">
-          <div class="reason-item">
-            <div class="reason-icon">
-              <i class="pi pi-dollar"></i>
-            </div>
-            <div class="reason-content">
-              <h4>قیمت دوستانه</h4>
-              <p>تیم کوچک ما باعث می‌شود هزینه‌ها کمتر و قیمت‌ها دوستانه‌تر باشد</p>
-            </div>
-          </div>
-          
-          <div class="reason-item">
-            <div class="reason-icon">
-              <i class="pi pi-heart"></i>
-            </div>
-            <div class="reason-content">
-              <h4>عاشق کیفیت</h4>
-              <p>ما عاشق کیفیت هستیم و تمام تلاش‌مان را برای ارائه بهترین خدمات می‌کنیم</p>
-            </div>
-          </div>
-          
-          <div class="reason-item">
-            <div class="reason-icon">
-              <i class="pi pi-headphones"></i>
-            </div>
-            <div class="reason-content">
-              <h4>پشتیبانی عالی</h4>
-              <p>پشتیبانی کارکشته و اعصاب‌خردکن نداریم. ۲۴/۷ در کنار شما هستیم</p>
-            </div>
-          </div>
-          
-          <div class="reason-item">
-            <div class="reason-icon">
-              <i class="pi pi-cog"></i>
-            </div>
-            <div class="reason-content">
-              <h4>فقط ضروری‌ها</h4>
-              <p>امکانات غیرضروری را حذف کرده‌ایم تا روی اجزای واقعاً مهم تمرکز کنیم</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-12 lg:col-6" [@slideInRight]>
-        <div class="comparison-chart">
-          <h3>مقایسه با سایر پلتفرم‌ها</h3>
-          <div class="chart-container">
-            <!-- Comparison chart would go here -->
-            <img src="/assets/images/comparison-chart.png" alt="مقایسه قیمت و امکانات" loading="lazy">
-          </div>
         </div>
       </div>
     </div>
@@ -256,7 +182,7 @@
 <!-- Pricing Section -->
 <section id="pricing" class="pricing-section">
   <div class="container">
-    <div class="section-header text-center mb-6" [@fadeInUp]>
+    <div class="section-header text-center mb-6">
       <h2 class="section-title">پلن‌های قیمتی</h2>
       <p class="section-subtitle">
         شروع رایگان ۱۴ روزه فقط برای آشنایی شما با تمام قابلیت‌های وب‌سایت‌تان طراحی شده
@@ -267,9 +193,7 @@
       <div 
         class="pricing-card" 
         *ngFor="let plan of pricingPlans; let i = index"
-        [class.highlighted]="plan.highlighted"
-        [@fadeInUp]
-        [style.animation-delay.ms]="i * 200">
+        [class.highlighted]="plan.highlighted">
         
         <div class="pricing-badge" *ngIf="plan.badge">{{ plan.badge }}</div>
         
@@ -288,7 +212,7 @@
         <div class="pricing-features">
           <ul>
             <li *ngFor="let feature of plan.features">
-              <i class="pi pi-check"></i>
+              <span>✓</span>
               <span>{{ feature }}</span>
             </li>
           </ul>
@@ -296,12 +220,11 @@
         
         <div class="pricing-action">
           <button 
-            pButton 
             type="button"
-            [label]="plan.highlighted ? 'شروع کنید' : 'انتخاب پلن'"
-            class="p-button-lg w-full"
-            [class]="plan.highlighted ? 'p-button-success' : 'p-button-outlined'"
+            class="btn btn-lg w-full"
+            [class]="plan.highlighted ? 'btn-success' : 'btn-outline'"
             (click)="selectPlan(plan)">
+            {{ plan.highlighted ? 'شروع کنید' : 'انتخاب پلن' }}
           </button>
         </div>
       </div>
@@ -309,7 +232,7 @@
     
     <div class="pricing-note text-center mt-6">
       <p>
-        <i class="pi pi-info-circle"></i>
+        <span>ℹ️</span>
         تمام پلن‌ها شامل تمام امکانات پلتفرم هستند • بدون محدودیت محصول یا سفارش
       </p>
     </div>
@@ -319,7 +242,7 @@
 <!-- Testimonials Section -->
 <section class="testimonials-section">
   <div class="container">
-    <div class="section-header text-center mb-6" [@fadeInUp]>
+    <div class="section-header text-center mb-6">
       <h2 class="section-title">نظرات مشتریان</h2>
       <p class="section-subtitle">ببینید دیگران چه می‌گویند</p>
     </div>
@@ -327,16 +250,14 @@
     <div class="testimonials-grid">
       <div 
         class="testimonial-card" 
-        *ngFor="let testimonial of testimonials; let i = index"
-        [@fadeInUp]
-        [style.animation-delay.ms]="i * 200">
+        *ngFor="let testimonial of testimonials; let i = index">
         
         <div class="testimonial-content">
           <div class="testimonial-rating">
-            <i 
-              class="pi pi-star-fill" 
+            <span 
               *ngFor="let star of generateStars(testimonial.rating)">
-            </i>
+              ⭐
+            </span>
           </div>
           
           <blockquote class="testimonial-text">
@@ -344,7 +265,7 @@
           </blockquote>
           
           <div class="testimonial-sales">
-            <i class="pi pi-chart-line"></i>
+            <span>📈</span>
             <span>{{ testimonial.sales }}</span>
           </div>
         </div>
@@ -367,7 +288,7 @@
 <section class="faq-section">
   <div class="container">
     <div class="grid">
-      <div class="col-12 lg:col-6" [@slideInLeft]>
+      <div class="col-12 lg:col-6">
         <h2 class="section-title">سوالات متداول</h2>
         <p class="section-subtitle">
           پاسخ سوالات رایج در اینجا آمده. اگر سوال دیگری دارید، با ما تماس بگیرید.
@@ -375,51 +296,54 @@
         
         <div class="contact-options">
           <button 
-            pButton 
             type="button"
-            label="تماس تلفنی"
-            icon="pi pi-phone"
-            class="p-button-outlined contact-btn"
+            class="btn btn-outline contact-btn"
             (click)="callSupport()">
+            📞 تماس تلفنی
           </button>
           
           <button 
-            pButton 
             type="button"
-            label="ارسال پیامک"
-            icon="pi pi-mobile"
-            class="p-button-outlined contact-btn"
+            class="btn btn-outline contact-btn"
             (click)="sendSMS()">
+            📱 ارسال پیامک
           </button>
           
           <button 
-            pButton 
             type="button"
-            label="چت آنلاین"
-            icon="pi pi-comments"
-            class="p-button-outlined contact-btn"
+            class="btn btn-outline contact-btn"
             (click)="openLiveChat()">
+            💬 چت آنلاین
           </button>
           
           <button 
-            pButton 
             type="button"
-            label="ارسال ایمیل"
-            icon="pi pi-envelope"
-            class="p-button-outlined contact-btn"
+            class="btn btn-outline contact-btn"
             (click)="sendEmail()">
+            ✉️ ارسال ایمیل
           </button>
         </div>
       </div>
       
-      <div class="col-12 lg:col-6" [@slideInRight]>
-        <p-accordion>
-          <p-accordionTab 
-            *ngFor="let faq of faqs"
-            [header]="faq.question">
-            <p>{{ faq.answer }}</p>
-          </p-accordionTab>
-        </p-accordion>
+      <div class="col-12 lg:col-6">
+        <!-- Simple accordion replacement -->
+        <div class="faq-accordion">
+          <div 
+            class="faq-item"
+            *ngFor="let faq of faqs; let i = index">
+            <div 
+              class="faq-header"
+              (click)="toggleFaq(i)">
+              <h3>{{ faq.question }}</h3>
+              <span class="faq-toggle">{{ openFaqIndex === i ? '−' : '+' }}</span>
+            </div>
+            <div 
+              class="faq-content"
+              [class.open]="openFaqIndex === i">
+              <p>{{ faq.answer }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -428,7 +352,7 @@
 <!-- CTA Section -->
 <section class="cta-section">
   <div class="container">
-    <div class="cta-content text-center" [@fadeInUp]>
+    <div class="cta-content text-center">
       <h2 class="cta-title">آماده شروع هستید؟</h2>
       <p class="cta-subtitle">
         فروشگاه آنلاین خود را در کمتر از ۵ دقیقه راه‌اندازی کنید
@@ -436,41 +360,37 @@
       
       <div class="cta-features">
         <div class="cta-feature">
-          <i class="pi pi-check-circle"></i>
+          <span>✓</span>
           <span>بدون نیاز به کارت اعتباری</span>
         </div>
         <div class="cta-feature">
-          <i class="pi pi-check-circle"></i>
+          <span>✓</span>
           <span>۱۴ روز کاملاً رایگان</span>
         </div>
         <div class="cta-feature">
-          <i class="pi pi-check-circle"></i>
+          <span>✓</span>
           <span>راه‌اندازی در ۵ دقیقه</span>
         </div>
       </div>
       
       <div class="cta-actions">
         <button 
-          pButton 
           type="button"
-          label="شروع رایگان کنید"
-          icon="pi pi-arrow-left"
-          class="p-button-lg p-button-success cta-primary"
+          class="btn btn-lg btn-success cta-primary"
           (click)="startFreeTrial()">
+          ← شروع رایگان کنید
         </button>
         
         <button 
-          pButton 
           type="button"
-          label="مشاهده نمونه کار"
-          icon="pi pi-eye"
-          class="p-button-lg p-button-outlined cta-secondary"
+          class="btn btn-lg btn-outline cta-secondary"
           (click)="navigateToDemo()">
+          👁 مشاهده نمونه کار
         </button>
       </div>
       
       <div class="cta-guarantee">
-        <i class="pi pi-shield"></i>
+        <span>🛡️</span>
         <span>تضمین رضایت ۱۰۰٪ یا پول شما بازگردانده می‌شود</span>
       </div>
     </div>
@@ -482,19 +402,19 @@
   <div class="container">
     <div class="trust-indicators">
       <div class="trust-item">
-        <i class="pi pi-lock"></i>
+        <span>🔒</span>
         <span>امنیت SSL</span>
       </div>
       <div class="trust-item">
-        <i class="pi pi-server"></i>
+        <span>🖥️</span>
         <span>۹۹.۹٪ آپتایم</span>
       </div>
       <div class="trust-item">
-        <i class="pi pi-shield"></i>
+        <span>🛡️</span>
         <span>پشتیبانی ۲۴/۷</span>
       </div>
       <div class="trust-item">
-        <i class="pi pi-verified"></i>
+        <span>✅</span>
         <span>تضمین کیفیت</span>
       </div>
     </div>
