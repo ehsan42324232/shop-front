@@ -24,7 +24,7 @@ export interface Product {
   
   // Media
   images: ProductImage[];
-  videos?: ProductVideo[];
+  videos: ProductVideo[]; // Support for multiple videos
   documents?: ProductDocument[];
   
   // Pricing & Inventory
@@ -109,10 +109,36 @@ export interface ProductVideo {
   id: string;
   url: string;
   title: string;
-  type: 'youtube' | 'vimeo' | 'upload';
+  type: 'youtube' | 'vimeo' | 'upload' | 'instagram' | 'tiktok';
   thumbnail?: string;
   duration?: number; // in seconds
   order: number;
+  
+  // Video metadata
+  width?: number;
+  height?: number;
+  size?: number; // in bytes for uploaded videos
+  
+  // Platform specific data
+  platformData?: {
+    videoId?: string; // for YouTube, Vimeo
+    embedCode?: string; // for custom embeds
+    originalUrl?: string; // original social media link
+  };
+  
+  // Video settings
+  autoplay?: boolean;
+  muted?: boolean;
+  loop?: boolean;
+  controls?: boolean;
+  
+  // Video quality options for uploaded videos
+  qualities?: {
+    '360p'?: string;
+    '480p'?: string;
+    '720p'?: string;
+    '1080p'?: string;
+  };
 }
 
 export interface ProductDocument {
@@ -145,6 +171,7 @@ export interface ProductVariant {
   
   // Media specific to this variant
   images?: ProductImage[];
+  videos?: ProductVideo[];
   
   // Status
   isActive: boolean;
@@ -183,6 +210,11 @@ export interface ProductAnalytics {
   bounceRate?: number;
   timeOnPage?: number; // in seconds
   
+  // Video engagement metrics
+  videoViews?: number;
+  videoCompletionRate?: number;
+  averageWatchTime?: number;
+  
   // Last updated
   lastViewedAt?: Date;
   lastSoldAt?: Date;
@@ -207,6 +239,7 @@ export interface ProductFilter {
   isNew?: boolean;
   isOnSale?: boolean;
   hasStock?: boolean;
+  hasVideos?: boolean; // Filter products with videos
   
   // Attribute filters (dynamic based on category)
   attributes?: AttributeFilter[];
@@ -335,6 +368,7 @@ export interface ProductImportRow {
   
   // Media URLs (separated by |)
   images?: string; // "url1|url2|url3"
+  videos?: string; // "url1|url2|url3"
   
   // SEO
   seoTitle?: string;
@@ -358,6 +392,7 @@ export interface ProductExportOptions {
   includeStatus?: ProductStatus[];
   includeVariants?: boolean;
   includeImages?: boolean;
+  includeVideos?: boolean; // Include video URLs in export
   includeCustomAttributes?: boolean;
   
   // Format options
@@ -478,6 +513,30 @@ export interface RecommendationRequest {
   categoryId?: string;
   limit?: number;
   excludeProductIds?: string[];
+}
+
+// Video Processing Status
+export interface VideoProcessingStatus {
+  id: string;
+  productId: string;
+  videoId: string;
+  status: 'uploading' | 'processing' | 'completed' | 'failed';
+  progress: number; // 0-100
+  error?: string;
+  
+  // Processing details
+  processingSteps: {
+    step: 'upload' | 'thumbnail' | 'compression' | 'quality_variants';
+    status: 'pending' | 'processing' | 'completed' | 'failed';
+    progress: number;
+  }[];
+  
+  // Output files
+  outputFiles?: {
+    thumbnail: string;
+    preview: string;
+    qualities: { [quality: string]: string };
+  };
 }
 
 // Export all necessary types from store models
