@@ -1,421 +1,178 @@
-<!-- Hero Section -->
-<section class="hero-section">
-  <div class="hero-background">
-    <div class="hero-gradient"></div>
-    <div class="hero-particles"></div>
-  </div>
-  
-  <div class="container hero-container">
-    <div class="grid h-full align-items-center">
-      <div class="col-12 lg:col-6">
-        <div class="hero-content">
-          <h1 class="hero-title">
-            فروشگاه آنلاین
-            <span class="hero-highlight">هوشمند</span>
-            شما
-          </h1>
-          
-          <p class="hero-subtitle">
-            قیمت بسیار کمتر از رقبا، نه به خاطر کم کردن از کیفیت، بلکه چون عاشق کیفیت هستیم. 
-            ما امکانات غیرضروری و زیادی شیک اما کم‌کاربرد را حذف کرده‌ایم تا تمام تلاش‌مان را روی 
-            بسته‌ای کامل و کارآمد از تمام اجزای ضروری یک وب‌سایت زیبا و قابل اعتماد بگذاریم.
-          </p>
-          
-          <div class="hero-features">
-            <div class="feature-item">
-              <span>✓</span>
-              <span>تیم کوچک = هزینه کمتر = قیمت دوستانه‌تر</span>
-            </div>
-            <div class="feature-item">
-              <span>📞</span>
-              <span>پشتیبانی ۲۴/۷ (تلفن، پیامک، ایمیل، چت آنلاین)</span>
-            </div>
-            <div class="feature-item">
-              <span>❤️</span>
-              <span>تازه شروع کرده‌ایم و عاشقانه کار می‌کنیم</span>
-            </div>
-          </div>
-          
-          <div class="hero-actions">
-            <button 
-              type="button"
-              class="btn btn-primary btn-lg hero-cta"
-              (click)="startFreeTrial()">
-              ▶ شروع رایگان ۱۴ روزه
-            </button>
-            
-            <button 
-              type="button"
-              class="btn btn-outline btn-lg hero-demo"
-              (click)="navigateToFeatures()">
-              👁 مشاهده امکانات
-            </button>
-          </div>
-          
-          <div class="hero-guarantee">
-            <span>🛡️</span>
-            <span>بدون نیاز به کارت اعتباری • لغو آسان • ۱۴ روز کاملاً رایگان</span>
-          </div>
-        </div>
+                (click)="selectPlan({id: 'monthly', name: 'ماهانه', price: 200000, duration: 'ماه', features: []})">
+          انتخاب پلن
+        </button>
       </div>
       
-      <div class="col-12 lg:col-6">
-        <div class="hero-visual">
-          <div class="hero-video-container">
-            <video 
-              #videoPlayer
-              [src]="features[currentVideoIndex]?.video" 
-              autoplay 
-              muted 
-              loop
-              class="hero-video">
-            </video>
-            <div class="video-controls">
-              <button 
-                type="button"
-                class="btn btn-rounded btn-text"
-                (click)="previousVideo()">
-                ◀
-              </button>
-              <div class="video-indicators">
-                <span 
-                  *ngFor="let feature of features; let i = index"
-                  class="indicator"
-                  [class.active]="i === currentVideoIndex"
-                  (click)="currentVideoIndex = i">
-                </span>
-              </div>
-              <button 
-                type="button"
-                class="btn btn-rounded btn-text"
-                (click)="nextVideo()">
-                ▶
-              </button>
-            </div>
-            <div class="video-caption">
-              <h4>{{ features[currentVideoIndex]?.title }}</h4>
-              <p>{{ (features[currentVideoIndex]?.description || '').substring(0, 100) }}...</p>
-            </div>
+      <div class="pricing-card bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform scale-105 border-2 border-blue-500 relative">
+        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+          <span class="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold">محبوب‌ترین</span>
+        </div>
+        
+        <div class="text-center">
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">سه‌ماهه</h3>
+          <div class="mb-2">
+            <span class="text-4xl font-bold text-gray-900">{{ formatPrice(500000) }}</span>
+            <span class="text-gray-600 mr-2">تومان / ۳ ماه</span>
+          </div>
+          <div class="text-sm text-gray-500 line-through mb-6">{{ formatPrice(600000) }} تومان</div>
+        </div>
+        
+        <div class="space-y-3 mb-8">
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700">تمام امکانات پلتفرم</span>
+          </div>
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700">آدرس اختصاصی</span>
+          </div>
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700">پشتیبانی ۲۴/۷</span>
+          </div>
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700">بک‌آپ روزانه</span>
+          </div>
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700">گواهی SSL رایگان</span>
+          </div>
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-blue-500">✓</span>
+            <span class="text-gray-700 font-semibold">۱۷% تخفیف</span>
           </div>
         </div>
+        
+        <button type="button" 
+                class="w-full py-3 px-6 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+                (click)="selectPlan({id: 'quarterly', name: 'سه‌ماهه', price: 500000, duration: '۳ ماه', features: []})">
+          شروع کنید
+        </button>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- Stats Section -->
-<section class="stats-section">
-  <div class="container">
-    <div class="grid">
-      <div class="col-6 md:col-3" *ngFor="let stat of stats">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <span>📊</span>
+      
+      <div class="pricing-card bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+        <div class="text-center">
+          <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold mb-4 inline-block">
+            بیشترین صرفه‌جویی
           </div>
-          <div class="stat-value">{{ stat.value }}</div>
-          <div class="stat-label">{{ stat.label }}</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Features Section -->
-<section id="features" class="features-section">
-  <div class="container">
-    <div class="section-header text-center mb-6">
-      <h2 class="section-title">امکانات کامل و پیشرفته</h2>
-      <p class="section-subtitle">
-        همه چیزهایی که برای راه‌اندازی یک فروشگاه آنلاین موفق نیاز دارید
-      </p>
-    </div>
-    
-    <div class="features-grid">
-      <div 
-        class="feature-card" 
-        *ngFor="let feature of features; let i = index">
-        
-        <div class="feature-header">
-          <div class="feature-icon">
-            <span>🚀</span>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">شش‌ماهه</h3>
+          <div class="mb-2">
+            <span class="text-4xl font-bold text-gray-900">{{ formatPrice(1000000) }}</span>
+            <span class="text-gray-600 mr-2">تومان / ۶ ماه</span>
           </div>
-          <div class="feature-badge" *ngIf="feature.id === 'social-integration'">جدید</div>
+          <div class="text-sm text-gray-500 line-through mb-6">{{ formatPrice(1200000) }} تومان</div>
         </div>
         
-        <div class="feature-content">
-          <h3 class="feature-title">{{ feature.title }}</h3>
-          <p class="feature-description">{{ feature.description }}</p>
-          
-          <div class="feature-image" *ngIf="feature.image">
-            <img [src]="feature.image" [alt]="feature.title" loading="lazy">
-            <div class="feature-overlay">
-              <button 
-                type="button"
-                class="btn btn-rounded btn-lg"
-                (click)="openDemo(feature)">
-                ▶
-              </button>
-            </div>
+        <div class="space-y-3 mb-8">
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700">تمام امکانات پلتفرم</span>
           </div>
-          
-          <ul class="feature-benefits">
-            <li *ngFor="let benefit of feature.benefits">
-              <span>✓</span>
-              <span>{{ benefit }}</span>
-            </li>
-          </ul>
-        </div>
-        
-        <div class="feature-actions">
-          <button 
-            type="button"
-            class="btn btn-outline btn-sm"
-            (click)="openDemo(feature)">
-            🔗 مشاهده نمونه
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Pricing Section -->
-<section id="pricing" class="pricing-section">
-  <div class="container">
-    <div class="section-header text-center mb-6">
-      <h2 class="section-title">پلن‌های قیمتی</h2>
-      <p class="section-subtitle">
-        شروع رایگان ۱۴ روزه فقط برای آشنایی شما با تمام قابلیت‌های وب‌سایت‌تان طراحی شده
-      </p>
-    </div>
-    
-    <div class="pricing-grid">
-      <div 
-        class="pricing-card" 
-        *ngFor="let plan of pricingPlans; let i = index"
-        [class.highlighted]="plan.highlighted">
-        
-        <div class="pricing-badge" *ngIf="plan.badge">{{ plan.badge }}</div>
-        
-        <div class="pricing-header">
-          <h3 class="plan-name">{{ plan.name }}</h3>
-          <div class="plan-price">
-            <span class="currency">تومان</span>
-            <span class="amount">{{ formatPrice(plan.price) }}</span>
-            <span class="period">/ {{ plan.duration }}</span>
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700">آدرس اختصاصی</span>
           </div>
-          <div class="original-price" *ngIf="plan.originalPrice">
-            <span>{{ formatPrice(plan.originalPrice) }} تومان</span>
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700">پشتیبانی ۲۴/۷</span>
+          </div>
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700">بک‌آپ روزانه</span>
+          </div>
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700">گواهی SSL رایگان</span>
+          </div>
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700 font-semibold">۱۷% تخفیف</span>
+          </div>
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <span class="text-green-500">✓</span>
+            <span class="text-gray-700 font-semibold">مشاوره رایگان طراحی</span>
           </div>
         </div>
         
-        <div class="pricing-features">
-          <ul>
-            <li *ngFor="let feature of plan.features">
-              <span>✓</span>
-              <span>{{ feature }}</span>
-            </li>
-          </ul>
-        </div>
-        
-        <div class="pricing-action">
-          <button 
-            type="button"
-            class="btn btn-lg w-full"
-            [class]="plan.highlighted ? 'btn-success' : 'btn-outline'"
-            (click)="selectPlan(plan)">
-            {{ plan.highlighted ? 'شروع کنید' : 'انتخاب پلن' }}
-          </button>
-        </div>
+        <button type="button" 
+                class="w-full py-3 px-6 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all"
+                (click)="selectPlan({id: 'biannual', name: 'شش‌ماهه', price: 1000000, duration: '۶ ماه', features: []})">
+          انتخاب پلن
+        </button>
       </div>
     </div>
     
-    <div class="pricing-note text-center mt-6">
-      <p>
-        <span>ℹ️</span>
+    <div class="text-center mt-12">
+      <p class="text-gray-600">
+        <span class="text-2xl">ℹ️</span>
         تمام پلن‌ها شامل تمام امکانات پلتفرم هستند • بدون محدودیت محصول یا سفارش
       </p>
     </div>
   </div>
 </section>
 
-<!-- Testimonials Section -->
-<section class="testimonials-section">
-  <div class="container">
-    <div class="section-header text-center mb-6">
-      <h2 class="section-title">نظرات مشتریان</h2>
-      <p class="section-subtitle">ببینید دیگران چه می‌گویند</p>
-    </div>
-    
-    <div class="testimonials-grid">
-      <div 
-        class="testimonial-card" 
-        *ngFor="let testimonial of testimonials; let i = index">
-        
-        <div class="testimonial-content">
-          <div class="testimonial-rating">
-            <span 
-              *ngFor="let star of generateStars(testimonial.rating)">
-              ⭐
-            </span>
-          </div>
-          
-          <blockquote class="testimonial-text">
-            "{{ testimonial.text }}"
-          </blockquote>
-          
-          <div class="testimonial-sales">
-            <span>📈</span>
-            <span>{{ testimonial.sales }}</span>
-          </div>
-        </div>
-        
-        <div class="testimonial-author">
-          <div class="author-avatar">
-            <img [src]="testimonial.image" [alt]="testimonial.name" loading="lazy">
-          </div>
-          <div class="author-info">
-            <h4 class="author-name">{{ testimonial.name }}</h4>
-            <p class="author-business">{{ testimonial.business }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ Section -->
-<section class="faq-section">
-  <div class="container">
-    <div class="grid">
-      <div class="col-12 lg:col-6">
-        <h2 class="section-title">سوالات متداول</h2>
-        <p class="section-subtitle">
-          پاسخ سوالات رایج در اینجا آمده. اگر سوال دیگری دارید، با ما تماس بگیرید.
-        </p>
-        
-        <div class="contact-options">
-          <button 
-            type="button"
-            class="btn btn-outline contact-btn"
-            (click)="callSupport()">
-            📞 تماس تلفنی
-          </button>
-          
-          <button 
-            type="button"
-            class="btn btn-outline contact-btn"
-            (click)="sendSMS()">
-            📱 ارسال پیامک
-          </button>
-          
-          <button 
-            type="button"
-            class="btn btn-outline contact-btn"
-            (click)="openLiveChat()">
-            💬 چت آنلاین
-          </button>
-          
-          <button 
-            type="button"
-            class="btn btn-outline contact-btn"
-            (click)="sendEmail()">
-            ✉️ ارسال ایمیل
-          </button>
-        </div>
-      </div>
-      
-      <div class="col-12 lg:col-6">
-        <!-- Simple accordion replacement -->
-        <div class="faq-accordion">
-          <div 
-            class="faq-item"
-            *ngFor="let faq of faqs; let i = index">
-            <div 
-              class="faq-header"
-              (click)="toggleFaq(i)">
-              <h3>{{ faq.question }}</h3>
-              <span class="faq-toggle">{{ openFaqIndex === i ? '−' : '+' }}</span>
-            </div>
-            <div 
-              class="faq-content"
-              [class.open]="openFaqIndex === i">
-              <p>{{ faq.answer }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA Section -->
-<section class="cta-section">
-  <div class="container">
-    <div class="cta-content text-center">
-      <h2 class="cta-title">آماده شروع هستید؟</h2>
-      <p class="cta-subtitle">
+<!-- Call to Action Section -->
+<section class="py-20 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
+  <div class="container mx-auto px-4">
+    <div class="text-center space-y-8">
+      <h2 class="text-4xl lg:text-6xl font-bold leading-tight">
+        آماده شروع هستید؟
+      </h2>
+      <p class="text-xl lg:text-2xl text-gray-200 max-w-3xl mx-auto">
         فروشگاه آنلاین خود را در کمتر از ۵ دقیقه راه‌اندازی کنید
       </p>
       
-      <div class="cta-features">
-        <div class="cta-feature">
-          <span>✓</span>
-          <span>بدون نیاز به کارت اعتباری</span>
+      <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+        <div class="flex items-center space-x-4 space-x-reverse">
+          <span class="text-green-400 text-xl">✓</span>
+          <span class="text-lg">۱۴ روز کاملاً رایگان</span>
         </div>
-        <div class="cta-feature">
-          <span>✓</span>
-          <span>۱۴ روز کاملاً رایگان</span>
+        <div class="flex items-center space-x-4 space-x-reverse">
+          <span class="text-blue-400 text-xl">✓</span>
+          <span class="text-lg">راه‌اندازی در ۵ دقیقه</span>
         </div>
-        <div class="cta-feature">
-          <span>✓</span>
-          <span>راه‌اندازی در ۵ دقیقه</span>
+        <div class="flex items-center space-x-4 space-x-reverse">
+          <span class="text-purple-400 text-xl">✓</span>
+          <span class="text-lg">بدون هیچ تعهدی</span>
         </div>
       </div>
       
-      <div class="cta-actions">
+      <div class="flex flex-col sm:flex-row gap-6 justify-center">
         <button 
           type="button"
-          class="btn btn-lg btn-success cta-primary"
+          class="px-12 py-4 bg-gradient-to-r from-green-500 to-blue-600 text-white font-bold text-xl rounded-full hover:from-green-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 shadow-2xl"
           (click)="startFreeTrial()">
-          ← شروع رایگان کنید
+          <span class="mr-3">🚀</span>
+          شروع رایگان کنید
         </button>
         
         <button 
           type="button"
-          class="btn btn-lg btn-outline cta-secondary"
-          (click)="navigateToDemo()">
-          👁 مشاهده نمونه کار
+          class="px-12 py-4 border-2 border-white text-white font-bold text-xl rounded-full hover:bg-white hover:text-gray-900 transition-all duration-300"
+          (click)="scrollToSection('social-integration')">
+          <span class="mr-3">👁</span>
+          مشاهده نمونه کار
         </button>
       </div>
       
-      <div class="cta-guarantee">
-        <span>🛡️</span>
-        <span>تضمین رضایت ۱۰۰٪ یا پول شما بازگردانده می‌شود</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Trust Indicators -->
-<section class="trust-section">
-  <div class="container">
-    <div class="trust-indicators">
-      <div class="trust-item">
-        <span>🔒</span>
-        <span>امنیت SSL</span>
-      </div>
-      <div class="trust-item">
-        <span>🖥️</span>
-        <span>۹۹.۹٪ آپتایم</span>
-      </div>
-      <div class="trust-item">
-        <span>🛡️</span>
-        <span>پشتیبانی ۲۴/۷</span>
-      </div>
-      <div class="trust-item">
-        <span>✅</span>
-        <span>تضمین کیفیت</span>
+      <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-8 max-w-2xl mx-auto">
+        <div class="flex items-center justify-center space-x-6 space-x-reverse text-gray-300">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-white">۱۴</div>
+            <div class="text-sm">روز رایگان</div>
+          </div>
+          <div class="w-px h-12 bg-gray-600"></div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-white">۵</div>
+            <div class="text-sm">دقیقه راه‌اندازی</div>
+          </div>
+          <div class="w-px h-12 bg-gray-600"></div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-white">۲۴/۷</div>
+            <div class="text-sm">پشتیبانی</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
