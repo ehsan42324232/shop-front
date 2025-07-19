@@ -1,229 +1,197 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, debounceTime } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
-export interface StoreConfig {
-  store: {
-    id: string;
-    name: string;
-    description: string;
-    domain: string;
-    currency: string;
-    tax_rate: number;
-    email: string;
-    phone: string;
-    address: string;
-    logo: string | null;
-  };
-  theme: {
-    store_name: string;
-    store_logo: string | null;
-    primary_color: string;
-    secondary_color: string;
-    font_family: string;
-    custom_css: string;
-    favicon: string | null;
-  };
-  features: {
-    attributes_enabled: boolean;
-    categories_enabled: boolean;
-    featured_products_enabled: boolean;
-  };
-}
-
-export interface DomainStatus {
-  status: 'active' | 'not_found';
-  store_id?: string;
-  store_name?: string;
+export interface DomainCheckResult {
+  available: boolean;
   domain: string;
-  configured: boolean;
-  message?: string;
+  suggestion?: string;
+  price?: number;
+  registrarInfo?: {
+    name: string;
+    contact: string;
+  };
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class DomainService {
-  private storeConfigSubject = new BehaviorSubject<StoreConfig | null>(null);
-  private domainStatusSubject = new BehaviorSubject<DomainStatus | null>(null);
-  
-  public storeConfig$ = this.storeConfigSubject.asObservable();
-  public domainStatus$ = this.domainStatusSubject.asObservable();
-  
-  private currentDomain: string;
-  private apiUrl: string;
+  private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {
-    this.currentDomain = window.location.hostname;
-    this.apiUrl = this.getApiUrl();
+  constructor(private http: HttpClient) {}
+
+  // بررسی دسترسی دامنه .ir
+  checkIrDomainAvailability(domainName: string): Observable<DomainCheckResult> {
+    return this.http.get<DomainCheckResult>(`${this.apiUrl}/domains/check-ir`, {
+      params: { domain: domainName }
+    });
   }
 
-  private getApiUrl(): string {
-    // Check if we're on a custom domain or the main domain
-    const isCustomDomain = this.currentDomain !== 'localhost' && 
-                           this.currentDomain !== '127.0.0.1' && 
-                           !this.currentDomain.includes('localhost');
+  // بررسی دامنه‌های بین‌المللی
+  checkInternationalDomainAvailability(domainName: string, tld: string = 'com'): Observable<DomainCheckResult> {
+    return this.http.get<DomainCheckResult>(`${this.apiUrl}/domains/check-international`, {
+      params: { domain: domainName, tld }
+    });
+  }
+
+  // دریافت قیمت دامنه
+  getDomainPrice(domain: string): Observable<{ price: number; currency: string; period: string }> {
+    return this.http.get<any>(`${this.apiUrl}/domains/price`, {
+      params: { domain }
+    });
+  }
+
+  // ثبت دامنه
+  registerDomain(domainData: {
+    domain: string;
+    storeId: string;
+    ownerInfo: {
+      name: string;
+      email: string;
+      phone: string;
+      address: string;
+      nationalId: string;
+    };
+  }): Observable<{ success: boolean; registrationId: string; message: string }> {
+    return this.http.post<any>(`${this.apiUrl}/domains/register`, domainData);
+  }
+
+  // دریافت لیست دامنه‌های ثبت شده
+  getRegisteredDomains(storeId: string): Observable<{
+    domain: string;
+    status: 'active' | 'pending' | 'expired' | 'suspended';
+    registeredAt: Date;
+    expiresAt: Date;
+    autoRenew: boolean;
+  }[]> {
+    return this.http.get<any>(`${this.apiUrl}/stores/${storeId}/domains`);
+  }
+
+  // تمدید دامنه
+  renewDomain(domainId: string, years: number = 1): Observable<{ success: boolean; message: string }> {
+    return this.http.post<any>(`${this.apiUrl}/domains/${domainId}/renew`, { years });
+  }
+
+  // تنظیم DNS
+  setupDNS(domainId: string, storeId: string): Observable<{ success: boolean; message: string; dnsRecords: any[] }> {
+    return this.http.post<any>(`${this.apiUrl}/domains/${domainId}/setup-dns`, { storeId });
+  }
+
+  // تایید مالکیت دامنه
+  verifyDomainOwnership(domainId: string): Observable<{ verified: boolean; method: string; instructions: string }> {
+    return this.http.post<any>(`${this.apiUrl}/domains/${domainId}/verify`, {});
+  }
+
+  // پیشنهاد دامنه‌های مشابه
+  suggestSimilarDomains(domainName: string): Observable<string[]> {
+    return this.http.get<{ suggestions: string[] }>(`${this.apiUrl}/domains/suggestions`, {
+      params: { domain: domainName }
+    }).pipe(map(response => response.suggestions));
+  }
+
+  // اعتبارسنجی نام دامنه
+  validateDomainName(domainName: string): { valid: boolean; errors: string[] } {
+    const errors: string[] = [];
     
-    if (isCustomDomain) {
-      // Use the current domain for API calls
-      return `${window.location.protocol}//${this.currentDomain}/api`;
-    } else {
-      // Use the configured API URL
-      return environment.apiUrl;
+    // حداقل و حداکثر طول
+    if (domainName.length < 3) {
+      errors.push('نام دامنه باید حداقل ۳ کاراکتر باشد');
     }
+    if (domainName.length > 63) {
+      errors.push('نام دامنه باید حداکثر ۶۳ کاراکتر باشد');
+    }
+    
+    // کاراکترهای مجاز
+    const validPattern = /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$|^[a-zA-Z0-9]$/;
+    if (!validPattern.test(domainName)) {
+      errors.push('نام دامنه فقط می‌تواند شامل حروف انگلیسی، اعداد و خط تیره باشد');
+    }
+    
+    // نمی‌تواند با خط تیره شروع یا تمام شود
+    if (domainName.startsWith('-') || domainName.endsWith('-')) {
+      errors.push('نام دامنه نمی‌تواند با خط تیره شروع یا تمام شود');
+    }
+    
+    // دو خط تیره متوالی مجاز نیست
+    if (domainName.includes('--')) {
+      errors.push('دو خط تیره متوالی مجاز نیست');
+    }
+    
+    // کلمات رزرو شده
+    const reservedWords = [
+      'www', 'api', 'admin', 'app', 'mail', 'ftp', 'localhost', 
+      'test', 'staging', 'dev', 'development', 'prod', 'production',
+      'blog', 'shop', 'store', 'news', 'support', 'help'
+    ];
+    
+    if (reservedWords.includes(domainName.toLowerCase())) {
+      errors.push('این نام دامنه رزرو شده است');
+    }
+    
+    return { valid: errors.length === 0, errors };
   }
 
-  /**
-   * Initialize the domain service by loading store configuration
-   */
-  initialize(): Observable<StoreConfig> {
-    return this.loadStoreConfig().pipe(
-      tap(config => {
-        this.storeConfigSubject.next(config);
-        this.applyStoreTheme(config.theme);
-      }),
-      catchError(error => {
-        console.error('Failed to initialize domain service:', error);
-        this.storeConfigSubject.next(null);
-        throw error;
+  // تولید پیشنهادات خودکار
+  generateDomainSuggestions(baseName: string): string[] {
+    const suggestions: string[] = [];
+    const cleanName = baseName.toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
+    
+    // پیشوندها و پسوندها
+    const prefixes = ['my', 'best', 'top', 'super', 'mega', 'pro'];
+    const suffixes = ['shop', 'store', 'market', 'plaza', 'center', 'hub', 'zone'];
+    
+    // اضافه کردن اعداد
+    for (let i = 1; i <= 99; i++) {
+      suggestions.push(`${cleanName}${i}`);
+      if (suggestions.length >= 10) break;
+    }
+    
+    // اضافه کردن پیشوند
+    for (const prefix of prefixes) {
+      suggestions.push(`${prefix}${cleanName}`);
+      if (suggestions.length >= 15) break;
+    }
+    
+    // اضافه کردن پسوند
+    for (const suffix of suffixes) {
+      suggestions.push(`${cleanName}${suffix}`);
+      if (suggestions.length >= 20) break;
+    }
+    
+    return suggestions.slice(0, 10);
+  }
+
+  // کش کردن نتایج بررسی دامنه
+  private domainCheckCache = new Map<string, { result: DomainCheckResult; timestamp: number }>();
+  private cacheTimeout = 5 * 60 * 1000; // 5 دقیقه
+
+  checkDomainWithCache(domainName: string): Observable<DomainCheckResult> {
+    const cacheKey = `${domainName}.ir`;
+    const cached = this.domainCheckCache.get(cacheKey);
+    
+    if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
+      return new Observable(observer => {
+        observer.next(cached.result);
+        observer.complete();
+      });
+    }
+    
+    return this.checkIrDomainAvailability(domainName).pipe(
+      map(result => {
+        this.domainCheckCache.set(cacheKey, {
+          result,
+          timestamp: Date.now()
+        });
+        return result;
       })
     );
   }
 
-  /**
-   * Load store configuration for the current domain
-   */
-  loadStoreConfig(): Observable<StoreConfig> {
-    return this.http.get<StoreConfig>(`${this.apiUrl}/config/store_config`);
-  }
-
-  /**
-   * Check domain status
-   */
-  checkDomainStatus(): Observable<DomainStatus> {
-    return this.http.get<DomainStatus>(`${this.apiUrl}/config/domain_status`).pipe(
-      tap(status => {
-        this.domainStatusSubject.next(status);
-      })
-    );
-  }
-
-  /**
-   * Get current store configuration
-   */
-  getCurrentStoreConfig(): StoreConfig | null {
-    return this.storeConfigSubject.value;
-  }
-
-  /**
-   * Get current domain status
-   */
-  getCurrentDomainStatus(): DomainStatus | null {
-    return this.domainStatusSubject.value;
-  }
-
-  /**
-   * Apply store theme to the document
-   */
-  private applyStoreTheme(theme: any): void {
-    if (!theme) return;
-
-    const root = document.documentElement;
-    
-    // Apply CSS custom properties
-    if (theme.primary_color) {
-      root.style.setProperty('--store-primary-color', theme.primary_color);
-    }
-    if (theme.secondary_color) {
-      root.style.setProperty('--store-secondary-color', theme.secondary_color);
-    }
-    if (theme.font_family) {
-      root.style.setProperty('--store-font-family', theme.font_family);
-    }
-
-    // Update page title
-    if (theme.store_name) {
-      document.title = theme.store_name;
-    }
-
-    // Update favicon
-    if (theme.favicon) {
-      this.updateFavicon(theme.favicon);
-    }
-
-    // Apply custom CSS
-    if (theme.custom_css) {
-      this.applyCustomCSS(theme.custom_css);
-    }
-  }
-
-  /**
-   * Update favicon
-   */
-  private updateFavicon(faviconUrl: string): void {
-    const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement || 
-                document.createElement('link');
-    link.type = 'image/x-icon';
-    link.rel = 'shortcut icon';
-    link.href = faviconUrl;
-    document.getElementsByTagName('head')[0].appendChild(link);
-  }
-
-  /**
-   * Apply custom CSS
-   */
-  private applyCustomCSS(css: string): void {
-    const styleId = 'store-custom-css';
-    let styleElement = document.getElementById(styleId) as HTMLStyleElement;
-    
-    if (!styleElement) {
-      styleElement = document.createElement('style');
-      styleElement.id = styleId;
-      document.head.appendChild(styleElement);
-    }
-    
-    styleElement.textContent = css;
-  }
-
-  /**
-   * Check if current domain is a custom store domain
-   */
-  isCustomDomain(): boolean {
-    return this.currentDomain !== 'localhost' && 
-           this.currentDomain !== '127.0.0.1' && 
-           !this.currentDomain.includes('localhost');
-  }
-
-  /**
-   * Get store-specific API URL
-   */
-  getStoreApiUrl(): string {
-    return this.apiUrl;
-  }
-
-  /**
-   * Get current domain
-   */
-  getCurrentDomain(): string {
-    return this.currentDomain;
-  }
-
-  /**
-   * Redirect to store admin
-   */
-  redirectToAdmin(): void {
-    const adminUrl = this.isCustomDomain() 
-      ? `${window.location.protocol}//${this.currentDomain}/admin`
-      : `${environment.adminUrl}`;
-    window.location.href = adminUrl;
-  }
-
-  /**
-   * Redirect to main platform
-   */
-  redirectToPlatform(): void {
-    window.location.href = environment.platformUrl || 'https://platform.yoursite.com';
+  // پاکسازی کش
+  clearDomainCache(): void {
+    this.domainCheckCache.clear();
   }
 }
