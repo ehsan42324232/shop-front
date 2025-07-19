@@ -53,7 +53,7 @@ import { Router } from '@angular/router';
               </div>
               <div class="mr-4">
                 <p class="text-sm text-gray-600">فروش (تومان)</p>
-                <p class="text-2xl font-bold">{{ stats.revenue | number:'1.0-0' }}</p>
+                <p class="text-2xl font-bold">{{ formatNumber(stats.revenue) }}</p>
               </div>
             </div>
           </div>
@@ -151,6 +151,10 @@ export class StoreManagementComponent implements OnInit {
 
   loadStats(): void {
     // TODO: Implement API call to get real stats
+  }
+
+  formatNumber(num: number): string {
+    return new Intl.NumberFormat('fa-IR').format(num);
   }
 
   goToProducts(): void {
