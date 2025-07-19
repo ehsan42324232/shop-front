@@ -1,136 +1,484 @@
-// Enhanced Product models with dynamic attributes
+// Enhanced Product models for flexible attribute system
 
 export interface Product {
-  id: number;
-  title: string;
-  slug: string;
-  description: string;
-  short_description?: string;
-  sku: string;
+  id: string;
+  storeId: string;
+  
+  // Fixed default attributes (always present)
+  name: string;
   price: number;
-  compare_price?: number;
-  cost_price?: number;
-  stock: number;
-  track_inventory: boolean;
-  weight?: number;
+  count: number; // inventory count
+  
+  // Basic product info
+  description?: string;
+  shortDescription?: string;
+  sku?: string;
+  barcode?: string;
+  
+  // Categories (can belong to multiple categories in the tree)
+  categories: string[]; // Array of category IDs
+  primaryCategoryId: string; // Main category for navigation
+  
+  // Dynamic Attributes (up to 50 per product)
+  attributes: ProductAttributeValue[];
+  
+  // Media
+  images: ProductImage[];
+  videos?: ProductVideo[];
+  documents?: ProductDocument[];
+  
+  // Pricing & Inventory
+  comparePrice?: number; // Original price for discount display
+  costPrice?: number; // Cost price (for profit calculations)
+  weight?: number; // in grams
   dimensions?: ProductDimensions;
-  category_id: number;
-  category: Category;
-  category_path: Category[]; // Full category hierarchy
-  store_id: number;
-  media: ProductMedia[];
-  attributes: ProductAttribute[];
+  
+  // Variants (for products with multiple options like size, color)
   variants?: ProductVariant[];
-  seo_settings: ProductSEO;
-  status: 'draft' | 'active' | 'archived';
-  is_featured: boolean;
+  hasVariants: boolean;
+  
+  // SEO & Marketing
+  seo: ProductSEO;
   tags: string[];
-  average_rating: number;
-  rating_count: number;
-  reviews_count: number;
-  created_at: string;
-  updated_at: string;
+  isFeatured: boolean;
+  isNew: boolean;
+  isOnSale: boolean;
+  
+  // Status & Visibility
+  status: ProductStatus;
+  visibility: ProductVisibility;
+  
+  // Analytics
+  analytics: ProductAnalytics;
+  
+  // Timestamps
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt?: Date;
+  
+  // Relations
+  relatedProducts?: string[]; // Product IDs
+  crossSellProducts?: string[]; // Product IDs
+  upSellProducts?: string[]; // Product IDs
+}
+
+export interface ProductAttributeValue {
+  attributeId: string;
+  attributeName: string;
+  attributeType: AttributeType;
+  value: any; // The actual value based on attribute type
+  displayValue?: string; // Formatted value for display
+  
+  // For file/image attributes
+  files?: ProductFile[];
+  
+  // For multi-select attributes
+  values?: any[];
+}
+
+export interface ProductFile {
+  id: string;
+  url: string;
+  filename: string;
+  size: number; // in bytes
+  mimeType: string;
+  alt?: string; // For images
+}
+
+export interface ProductImage {
+  id: string;
+  url: string;
+  alt: string;
+  order: number;
+  isPrimary: boolean;
+  
+  // Image metadata
+  width?: number;
+  height?: number;
+  size?: number; // in bytes
+  
+  // Thumbnails
+  thumbnails?: {
+    small: string;
+    medium: string;
+    large: string;
+  };
+}
+
+export interface ProductVideo {
+  id: string;
+  url: string;
+  title: string;
+  type: 'youtube' | 'vimeo' | 'upload';
+  thumbnail?: string;
+  duration?: number; // in seconds
+  order: number;
+}
+
+export interface ProductDocument {
+  id: string;
+  url: string;
+  filename: string;
+  title: string;
+  type: 'pdf' | 'doc' | 'excel' | 'image' | 'other';
+  size: number; // in bytes
+  order: number;
 }
 
 export interface ProductDimensions {
-  length: number;
-  width: number;
-  height: number;
-  unit: 'cm' | 'in';
+  length: number; // in cm
+  width: number; // in cm
+  height: number; // in cm
+  unit: 'cm' | 'mm' | 'inch';
 }
-
-export interface ProductMedia {
-  id: number;
-  media_type: 'image' | 'video';
-  file: string;
-  alt_text?: string;
-  sort_order: number;
-  is_primary: boolean;
-}
-
-export interface ProductAttribute {
-  id: number;
-  attribute_definition_id: number;
-  attribute_name: string;
-  attribute_type: AttributeType;
-  value: any;
-  display_value: string;
-}
-
-export interface AttributeDefinition {
-  id: number;
-  name: string;
-  type: AttributeType;
-  is_required: boolean;
-  is_filterable: boolean;
-  is_searchable: boolean;
-  options?: AttributeOption[];
-  validation_rules?: any;
-  store_id: number;
-  created_at: string;
-}
-
-export interface AttributeOption {
-  id: number;
-  value: string;
-  display_value: string;
-  sort_order: number;
-}
-
-export type AttributeType = 
-  | 'text' 
-  | 'number' 
-  | 'boolean' 
-  | 'select' 
-  | 'multiselect' 
-  | 'date' 
-  | 'color' 
-  | 'file';
 
 export interface ProductVariant {
-  id: number;
-  product_id: number;
-  sku: string;
-  price: number;
-  stock: number;
-  attributes: { [key: string]: any };
-  image?: string;
-  is_active: boolean;
+  id: string;
+  name: string;
+  sku?: string;
+  price?: number; // If different from base price
+  comparePrice?: number;
+  count: number; // Inventory for this variant
+  
+  // Variant-specific attributes
+  attributes: ProductAttributeValue[];
+  
+  // Media specific to this variant
+  images?: ProductImage[];
+  
+  // Status
+  isActive: boolean;
+  order: number;
 }
 
 export interface ProductSEO {
-  meta_title?: string;
-  meta_description?: string;
-  meta_keywords?: string[];
-  og_title?: string;
-  og_description?: string;
-  og_image?: string;
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  slug: string;
+  ogImage?: string;
+  
+  // Schema.org structured data
+  schema?: {
+    brand?: string;
+    model?: string;
+    gtin?: string; // Global Trade Item Number
+    mpn?: string; // Manufacturer Part Number
+  };
 }
 
-export interface CreateProductRequest {
-  title: string;
-  description: string;
-  short_description?: string;
-  sku: string;
-  price: number;
-  compare_price?: number;
-  stock: number;
-  category_id: number;
-  attributes: { [key: number]: any };
-  media?: File[];
+export type ProductStatus = 'draft' | 'active' | 'inactive' | 'archived' | 'out_of_stock';
+export type ProductVisibility = 'public' | 'private' | 'hidden' | 'password_protected';
+
+export interface ProductAnalytics {
+  views: number;
+  sales: number;
+  revenue: number;
+  averageRating?: number;
+  reviewCount: number;
+  wishlistCount: number;
+  
+  // Performance metrics
+  conversionRate?: number;
+  bounceRate?: number;
+  timeOnPage?: number; // in seconds
+  
+  // Last updated
+  lastViewedAt?: Date;
+  lastSoldAt?: Date;
+  lastUpdatedAt?: Date;
+}
+
+// Product Filters for search and listing
+export interface ProductFilter {
+  storeId: string;
+  categoryIds?: string[];
+  
+  // Price range
+  minPrice?: number;
+  maxPrice?: number;
+  
+  // Status filters
+  status?: ProductStatus[];
+  visibility?: ProductVisibility[];
+  
+  // Boolean filters
+  isFeatured?: boolean;
+  isNew?: boolean;
+  isOnSale?: boolean;
+  hasStock?: boolean;
+  
+  // Attribute filters (dynamic based on category)
+  attributes?: AttributeFilter[];
+  
+  // Search
+  searchQuery?: string;
   tags?: string[];
-  seo_settings?: ProductSEO;
-  status: 'draft' | 'active';
+  
+  // Sorting
+  sortBy?: ProductSortBy;
+  sortOrder?: 'asc' | 'desc';
+  
+  // Pagination
+  page?: number;
+  limit?: number;
 }
 
-export interface BulkImportProduct {
-  title: string;
-  description: string;
-  sku: string;
-  price: number;
-  stock: number;
-  category_path: string; // e.g., "Electronics > Phones > Smartphones"
-  attributes: { [key: string]: any };
-  tags?: string;
-  image_urls?: string[];
+export interface AttributeFilter {
+  attributeId: string;
+  attributeName: string;
+  attributeType: AttributeType;
+  
+  // For different attribute types
+  value?: any;
+  values?: any[]; // For multi-select
+  minValue?: number; // For numeric ranges
+  maxValue?: number; // For numeric ranges
+  contains?: string; // For text search
 }
+
+export type ProductSortBy = 
+  | 'name' 
+  | 'price' 
+  | 'created_at' 
+  | 'updated_at' 
+  | 'sales' 
+  | 'views' 
+  | 'rating' 
+  | 'popularity' 
+  | 'stock'
+  | 'random';
+
+// Product listing result
+export interface ProductListResult {
+  products: Product[];
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  
+  // Facets for filtering
+  facets: ProductFacet[];
+}
+
+export interface ProductFacet {
+  attributeId: string;
+  attributeName: string;
+  attributeType: AttributeType;
+  options: FacetOption[];
+}
+
+export interface FacetOption {
+  value: any;
+  label: string;
+  count: number; // Number of products with this value
+  selected: boolean;
+}
+
+// Product Review & Rating
+export interface ProductReview {
+  id: string;
+  productId: string;
+  storeId: string;
+  
+  // Customer info
+  customerName: string;
+  customerEmail?: string;
+  customerId?: string;
+  
+  // Review content
+  rating: number; // 1-5
+  title?: string;
+  comment?: string;
+  
+  // Media
+  images?: ProductImage[];
+  videos?: ProductVideo[];
+  
+  // Verification
+  isVerifiedPurchase: boolean;
+  orderItemId?: string;
+  
+  // Status
+  status: ReviewStatus;
+  
+  // Timestamps
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Moderation
+  moderatedBy?: string;
+  moderationNote?: string;
+}
+
+export type ReviewStatus = 'pending' | 'approved' | 'rejected' | 'spam';
+
+// Product Import/Export for Excel
+export interface ProductImportRow {
+  // Fixed fields
+  name: string;
+  price: number;
+  count: number;
+  
+  // Optional basic fields
+  description?: string;
+  sku?: string;
+  barcode?: string;
+  
+  // Categories (can be multiple, separated by |)
+  categories: string; // "Category1|Category2|Category3"
+  primaryCategory: string;
+  
+  // Dynamic attributes (column names will be attribute names)
+  [attributeName: string]: any;
+  
+  // Media URLs (separated by |)
+  images?: string; // "url1|url2|url3"
+  
+  // SEO
+  seoTitle?: string;
+  seoDescription?: string;
+  slug?: string;
+  
+  // Status
+  status?: string;
+  visibility?: string;
+  isFeatured?: boolean;
+  isNew?: boolean;
+  isOnSale?: boolean;
+  
+  // Tags (separated by |)
+  tags?: string; // "tag1|tag2|tag3"
+}
+
+export interface ProductExportOptions {
+  storeId: string;
+  includeCategories?: string[]; // Category IDs to filter
+  includeStatus?: ProductStatus[];
+  includeVariants?: boolean;
+  includeImages?: boolean;
+  includeCustomAttributes?: boolean;
+  
+  // Format options
+  format: 'xlsx' | 'csv';
+  encoding?: 'utf8' | 'utf16';
+  
+  // Date range
+  dateFrom?: Date;
+  dateTo?: Date;
+}
+
+// Bulk Product Operations
+export interface BulkProductOperation {
+  operation: 'update' | 'delete' | 'activate' | 'deactivate' | 'feature' | 'unfeature';
+  productIds: string[];
+  
+  // For update operations
+  updateData?: Partial<Product>;
+  
+  // For attribute updates
+  attributeUpdates?: {
+    attributeId: string;
+    value: any;
+  }[];
+}
+
+export interface BulkProductResult {
+  success: boolean;
+  totalProcessed: number;
+  successCount: number;
+  errorCount: number;
+  errors: {
+    productId: string;
+    error: string;
+  }[];
+}
+
+// Product Templates (for quick product creation)
+export interface ProductTemplate {
+  id: string;
+  name: string;
+  description: string;
+  storeId: string;
+  categoryId: string;
+  
+  // Template data
+  template: Partial<Product>;
+  
+  // Default attributes for this template
+  defaultAttributes: {
+    attributeId: string;
+    defaultValue: any;
+  }[];
+  
+  // Usage stats
+  usageCount: number;
+  lastUsedAt?: Date;
+  
+  // Timestamps
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Product Wishlist
+export interface ProductWishlist {
+  id: string;
+  storeId: string;
+  customerId?: string;
+  sessionId?: string; // For guest users
+  
+  items: WishlistItem[];
+  
+  // Timestamps
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface WishlistItem {
+  id: string;
+  productId: string;
+  variantId?: string;
+  addedAt: Date;
+  
+  // Notification preferences
+  notifyOnPriceChange?: boolean;
+  notifyOnBackInStock?: boolean;
+}
+
+// Product Comparison
+export interface ProductComparison {
+  id: string;
+  storeId: string;
+  customerId?: string;
+  sessionId?: string; // For guest users
+  
+  productIds: string[];
+  
+  // Comparison settings
+  compareAttributes: string[]; // Attribute IDs to compare
+  
+  // Timestamps
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Product Recommendation Engine
+export interface ProductRecommendation {
+  type: 'related' | 'cross_sell' | 'up_sell' | 'recently_viewed' | 'trending' | 'personalized';
+  products: Product[];
+  score: number; // Recommendation confidence score
+  reason?: string; // Why this product is recommended
+}
+
+export interface RecommendationRequest {
+  storeId: string;
+  customerId?: string;
+  productId?: string; // For related/cross-sell/up-sell
+  categoryId?: string;
+  limit?: number;
+  excludeProductIds?: string[];
+}
+
+// Export all necessary types from store models
+export type { AttributeType, CategoryTree, CategoryAttribute, AttributeOption, AttributeValidation } from './store.models';
