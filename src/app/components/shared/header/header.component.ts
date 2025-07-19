@@ -14,30 +14,40 @@ import { Observable } from 'rxjs';
           <div class="flex items-center space-x-3 space-x-reverse">
             <div class="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white border-opacity-30">
               <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                <circle cx="6" cy="8" r="1" opacity="0.7"/>
-                <circle cx="18" cy="14" r="1" opacity="0.7"/>
-                <line x1="7" y1="8" x2="10" y2="10" stroke="currentColor" stroke-width="0.5" opacity="0.6"/>
-                <line x1="14" y1="10" x2="17" y2="13" stroke="currentColor" stroke-width="0.5" opacity="0.6"/>
+                <!-- Toolbox icon -->
+                <path d="M20 8h-3V6a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zM9 6h6v2H9V6zm11 4v2h-4v-2h4zM8 12v2H4v-2h4zm0 4H4v2h4v-2zm2 2v-6h4v6h-4zm6 0v-2h4v2h-4z"/>
+                <!-- Tools inside -->
+                <circle cx="10" cy="15" r="0.5" opacity="0.8"/>
+                <circle cx="12" cy="13" r="0.5" opacity="0.8"/>
+                <circle cx="14" cy="15" r="0.5" opacity="0.8"/>
+                <line x1="10" y1="14" x2="14" y2="14" stroke="currentColor" stroke-width="0.3" opacity="0.6"/>
               </svg>
             </div>
             <div class="cursor-pointer" (click)="router.navigate(['/'])">
               <h1 class="text-2xl font-bold text-white">
                 سایت‌ساز
               </h1>
-              <p class="text-sm text-white text-opacity-80 font-medium">همسایه</p>
+              <p class="text-sm text-white text-opacity-80 font-medium">جعبه ابزار</p>
             </div>
           </div>
 
           <!-- Navigation Menu -->
           <nav class="hidden md:flex items-center space-x-8 space-x-reverse" *ngIf="currentUser$ | async">
             <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
-               (click)="router.navigate(['/my-store'])">
-              پنل مدیریت
+               (click)="router.navigate(['/store-management'])">
+              مدیریت فروشگاه
+            </a>
+            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
+               (click)="router.navigate(['/categories'])">
+              دسته‌بندی‌ها
             </a>
             <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
                (click)="router.navigate(['/products'])">
               محصولات
+            </a>
+            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
+               (click)="router.navigate(['/themes'])">
+              قالب‌ها
             </a>
             <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
                (click)="router.navigate(['/orders'])">
@@ -67,11 +77,25 @@ import { Observable } from 'rxjs';
             <!-- Dropdown Menu -->
             <div *ngIf="showUserMenu" class="absolute left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl py-2 z-50 border border-gray-100">
               <a class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer" 
-                 (click)="router.navigate(['/my-store']); toggleUserMenu()">
+                 (click)="router.navigate(['/store-management']); toggleUserMenu()">
                 <svg class="w-4 h-4 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                 </svg>
-                فروشگاه من
+                مدیریت فروشگاه
+              </a>
+              <a class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer" 
+                 (click)="router.navigate(['/categories']); toggleUserMenu()">
+                <svg class="w-4 h-4 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5m14 14H5"></path>
+                </svg>
+                دسته‌بندی‌ها
+              </a>
+              <a class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer" 
+                 (click)="router.navigate(['/themes']); toggleUserMenu()">
+                <svg class="w-4 h-4 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
+                </svg>
+                قالب‌ها و طراحی
               </a>
               <a class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer" 
                  (click)="router.navigate(['/orders']); toggleUserMenu()">
@@ -107,7 +131,7 @@ import { Observable } from 'rxjs';
               </button>
               <button class="px-6 py-2.5 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-medium rounded-xl transition-all duration-200 border border-white border-opacity-30 backdrop-blur-sm" 
                       (click)="showRequestForm = true">
-                درخواست سایت
+                درخواست فروشگاه
               </button>
             </div>
           </ng-template>
@@ -118,7 +142,7 @@ import { Observable } from 'rxjs';
       <div *ngIf="showRequestForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
           <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">درخواست ساخت سایت</h2>
+            <h2 class="text-2xl font-bold text-gray-800">درخواست ساخت فروشگاه</h2>
             <button (click)="showRequestForm = false" class="text-gray-400 hover:text-gray-600">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -148,7 +172,7 @@ import { Observable } from 'rxjs';
                   name="storeName"
                   required
                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="مثال: فروشگاه همسایه">
+                  placeholder="مثال: فروشگاه جعبه ابزار">
               </div>
               
               <!-- Phone Number -->
