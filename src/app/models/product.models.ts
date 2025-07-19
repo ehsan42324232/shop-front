@@ -1,4 +1,5 @@
 // Enhanced Product models for flexible attribute system
+import { AttributeType } from './product-attribute.model';
 
 export interface Product {
   id: string;
@@ -539,5 +540,38 @@ export interface VideoProcessingStatus {
   };
 }
 
-// Export all necessary types from store models
-export type { AttributeType, CategoryTree, CategoryAttribute, AttributeOption, AttributeValidation } from './store.models';
+// Pricing related models
+export interface ProductPrice {
+  basePrice: number;
+  salePrice?: number;
+  currency: string;
+  taxIncluded: boolean;
+  taxRate?: number;
+}
+
+export interface ProductStock {
+  quantity: number;
+  reservedQuantity: number;
+  availableQuantity: number;
+  lowStockThreshold: number;
+  trackQuantity: boolean;
+  allowBackorder: boolean;
+}
+
+export interface ProductCollection {
+  id: string;
+  name: string;
+  description?: string;
+  productIds: string[];
+  rules?: CollectionRule[];
+  isAutomatic: boolean;
+  sortOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CollectionRule {
+  field: string;
+  operator: 'equals' | 'not_equals' | 'contains' | 'not_contains' | 'greater_than' | 'less_than';
+  value: any;
+}
