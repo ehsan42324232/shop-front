@@ -1,537 +1,289 @@
-# Multi-Store E-commerce Platform - Frontend
+# ShopSphere - Modern E-commerce Platform
 
-A modern, responsive Angular frontend for a comprehensive multi-tenant e-commerce platform. This application provides both platform administration and individual store management interfaces.
+🚀 **Transform your business with our cutting-edge e-commerce platform**
 
-## 🚀 Features
+ShopSphere is a modern, feature-rich e-commerce platform built with Angular and designed for scalability, performance, and user experience.
 
-### 🏪 Multi-Store Architecture
-- **Domain-based routing** - Each store operates on its own domain
-- **Store-specific themes** - Custom branding and styling per store
-- **Independent interfaces** - Separate admin panels for platform and stores
-- **Responsive design** - Mobile-first approach with Tailwind CSS
+## ✨ Key Features
 
-### 👑 Admin Interfaces
+### 🏪 **Complete E-commerce Solution**
+- Modern, responsive design with dark theme
+- Advanced product management
+- Real-time inventory tracking
+- Multi-currency and multi-language support
+- Mobile-optimized shopping experience
 
-#### Platform Admin Panel (`/admin`)
-- ✅ **Store Management** - Approve, manage, and monitor all stores
-- ✅ **User Management** - Handle store owners and platform users
-- ✅ **Analytics Dashboard** - Cross-store performance metrics
-- ✅ **System Configuration** - Platform-wide settings and policies
-- ✅ **Bulk Operations** - Mass store creation and management
+### 💳 **Flexible Payment Options**
+- Digital wallet integration
+- Bank transfer support
+- Cryptocurrency payments
+- Subscription management
+- Secure payment processing
 
-#### Store Admin Panel (`/store-admin`)
-- ✅ **Product Management** - Complete CRUD for products with rich editor
-- ✅ **Category Management** - Hierarchical category creation and organization
-- ✅ **Bulk Import/Export** - CSV/Excel upload with validation and preview
-- ✅ **Inventory Tracking** - Real-time stock management and alerts
-- ✅ **Order Management** - Process orders with status tracking
-- ✅ **Store Customization** - Branding, themes, and configuration
-- ✅ **Analytics** - Store-specific performance metrics
+### 📊 **Advanced Analytics**
+- Real-time sales dashboard
+- Customer behavior insights
+- Inventory analytics
+- Revenue forecasting
+- AI-powered recommendations
 
-### 🛍️ Customer Experience
-- ✅ **Product Browsing** - Advanced search, filtering, and sorting
-- ✅ **Shopping Cart** - Persistent cart with real-time updates
-- ✅ **Checkout Process** - Streamlined multi-step checkout
-- ✅ **Address Management** - Save and manage multiple addresses
-- ✅ **Order Tracking** - Real-time order status with notifications
-- ✅ **Wishlist** - Save products for later purchase
-- ✅ **Product Reviews** - Rate and review products
-- ✅ **User Account** - Profile management and order history
+### 🔒 **Enterprise Security**
+- Bank-level encryption
+- Two-factor authentication
+- Role-based access control
+- GDPR compliance
+- Regular security audits
 
-### 🎨 Modern UI/UX
-- ✅ **Persian (Farsi) RTL Support** - Complete right-to-left layout
-- ✅ **Responsive Design** - Mobile, tablet, and desktop optimized
-- ✅ **Modern Animations** - Smooth transitions and micro-interactions
-- ✅ **Accessibility** - WCAG compliant with screen reader support
-- ✅ **Component Library** - Reusable UI components
-- ✅ **Toast Notifications** - User-friendly feedback system
+### 💬 **Customer Support**
+- Integrated live chat system
+- 24/7 customer support
+- Knowledge base integration
+- Ticket management system
+- Multi-channel communication
 
-## 🏗️ Architecture
+## 🏗️ Technical Architecture
 
-### Frontend Structure
-```
-shop-front/
-├── src/app/
-│   ├── components/           # Shared components
-│   │   ├── auth/            # Authentication components
-│   │   ├── shared/          # Reusable UI components
-│   │   ├── platform/        # Platform-specific components
-│   │   └── store-home/      # Store homepage components
-│   ├── modules/             # Feature modules
-│   │   ├── admin/           # Platform admin module
-│   │   ├── store-admin/     # Store admin module
-│   │   └── account/         # User account module
-│   ├── services/            # Angular services
-│   │   ├── auth.service.ts
-│   │   ├── store.service.ts
-│   │   ├── product.service.ts
-│   │   ├── cart.service.ts
-│   │   └── order.service.ts
-│   ├── models/              # TypeScript interfaces
-│   │   ├── store.models.ts
-│   │   ├── product.models.ts
-│   │   └── order.models.ts
-│   ├── guards/              # Route guards
-│   ├── interceptors/        # HTTP interceptors
-│   └── pipes/               # Custom pipes
-├── src/environments/        # Environment configurations
-├── src/assets/             # Static assets
-└── tailwind.config.js      # Tailwind CSS configuration
-```
+### Frontend Stack
+- **Angular 15+** - Modern web framework
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **RxJS** - Reactive programming
+- **Angular Material** - UI components
 
-### Key Components
+### Backend Integration
+- RESTful API architecture
+- Real-time WebSocket connections
+- Microservices ready
+- Cloud-native deployment
+- Docker containerization
 
-#### Store Admin Components
-- **BulkImportComponent** - File upload with drag-and-drop, validation, and progress tracking
-- **ProductManagementComponent** - Rich product editor with image upload and attributes
-- **CategoryManagementComponent** - Hierarchical category tree with drag-and-drop reordering
-- **OrderManagementComponent** - Order processing with status updates and tracking
-- **AnalyticsDashboardComponent** - Charts and metrics for store performance
+### Performance Features
+- Lazy loading modules
+- Server-side rendering (SSR)
+- Progressive Web App (PWA)
+- Code splitting and optimization
+- CDN integration
 
-#### Customer Components
-- **ProductCatalogComponent** - Grid/list view with advanced filtering
-- **ProductDetailComponent** - Detailed product view with images, reviews, and recommendations
-- **ShoppingCartComponent** - Cart management with quantity updates and calculations
-- **CheckoutComponent** - Multi-step checkout with address and payment selection
-- **OrderTrackingComponent** - Real-time order status and delivery tracking
-
-## 🛠️ Setup & Installation
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 16+
-- Angular CLI 16+
-- npm or yarn
+- Node.js 16+ and npm
+- Angular CLI 15+
+- Git
 
-### Quick Start
+### Installation
 
-1. **Clone the repository**:
 ```bash
+# Clone the repository
 git clone https://github.com/ehsan42324232/shop-front.git
 cd shop-front
-```
 
-2. **Install dependencies**:
-```bash
+# Install dependencies
 npm install
 
-# If you encounter peer dependency issues:
-npm install --legacy-peer-deps
+# Start development server
+ng serve
+
+# Navigate to http://localhost:4200
 ```
 
-3. **Configure environment**:
-```typescript
-// src/environments/environment.ts
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:8000',
-  platformDomain: 'localhost:4200',
-  supportedLanguages: ['fa', 'en'],
-  defaultLanguage: 'fa'
-};
-```
+### Development Commands
 
-4. **Start development server**:
 ```bash
-# Standard development server
-npm start
+# Development server
+ng serve
 
-# Multi-store development (recommended)
-npm run serve:multi
+# Build for production
+ng build --prod
 
-# This will start the server with:
-# - Host: 0.0.0.0 (accessible from other devices)
-# - Disabled host check (allows custom domains)
-```
+# Run tests
+ng test
 
-### Windows Setup with VS Code
+# Run end-to-end tests
+ng e2e
 
-1. **Open project in VS Code**
-2. **Install recommended extensions**:
-   - Angular Language Service
-   - TypeScript Importer
-   - Auto Rename Tag
-   - Tailwind CSS IntelliSense
-3. **Open integrated terminal** (`Ctrl + `\``)
-4. **Run setup commands** as shown above
+# Generate component
+ng generate component component-name
 
-## 🌐 Multi-Store Development
-
-### Local Domain Setup
-
-Add these entries to your hosts file for local multi-store testing:
-
-**Windows**: `C:\Windows\System32\drivers\etc\hosts`
-**macOS/Linux**: `/etc/hosts`
-
-```
-127.0.0.1 localhost
-127.0.0.1 shop1.localhost
-127.0.0.1 shop2.localhost
-127.0.0.1 admin.localhost
-127.0.0.1 test.localhost
-```
-
-### Testing Multi-Store Setup
-
-1. **Start backend server** (port 8000)
-2. **Start frontend server** with multi-store support:
-```bash
-npm run serve:multi
-```
-3. **Access different interfaces**:
-   - Platform: http://localhost:4200
-   - Store 1: http://shop1.localhost:4200
-   - Store 2: http://shop2.localhost:4200
-   - Platform Admin: http://localhost:4200/admin
-   - Store Admin: http://shop1.localhost:4200/store-admin
-
-## 🎨 Styling & Theming
-
-### Tailwind CSS Configuration
-
-The project uses Tailwind CSS with custom configurations for Persian/RTL support:
-
-```javascript
-// tailwind.config.js
-module.exports = {
-  content: ['./src/**/*.{html,ts}'],
-  theme: {
-    extend: {
-      fontFamily: {
-        'iranian': ['IRANSans', 'Tahoma', 'sans-serif'],
-      },
-      colors: {
-        primary: {
-          50: '#eff6ff',
-          500: '#3b82f6',
-          900: '#1e3a8a',
-        }
-      }
-    },
-  },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/typography'),
-  ],
-}
-```
-
-### RTL (Right-to-Left) Support
-
-All components are designed with RTL support:
-
-```html
-<!-- Automatic RTL layout -->
-<div class="min-h-screen" dir="rtl">
-  <h1 class="text-right">عنوان فارسی</h1>
-  <p class="text-gray-600">متن فارسی با پشتیبانی کامل RTL</p>
-</div>
+# Generate service
+ng generate service service-name
 ```
 
 ## 📱 Responsive Design
 
-### Breakpoints
-```css
-/* Mobile First Approach */
-.container {
-  @apply px-4;          /* Mobile */
-  @apply sm:px-6;       /* Small tablets */
-  @apply md:px-8;       /* Tablets */
-  @apply lg:px-12;      /* Laptops */
-  @apply xl:px-16;      /* Desktops */
-  @apply 2xl:px-20;     /* Large screens */
-}
-```
+ShopSphere is built with mobile-first principles:
 
-### Component Examples
-```typescript
-// Responsive product grid
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-  <app-product-card *ngFor="let product of products" [product]="product"></app-product-card>
-</div>
+- **Mobile** (320px+) - Optimized for smartphones
+- **Tablet** (768px+) - Enhanced tablet experience
+- **Desktop** (1024px+) - Full-featured desktop interface
+- **Large Screens** (1440px+) - Maximized for large displays
 
-// Responsive navigation
-<nav class="hidden md:flex md:space-x-8">
-  <!-- Desktop navigation -->
-</nav>
-<button class="md:hidden" (click)="toggleMobileMenu()">
-  <!-- Mobile menu button -->
-</button>
-```
+## 🎨 Design System
 
-## 🚀 Key Features Implementation
+### Color Palette
+- **Primary**: Cyan to Purple gradient
+- **Secondary**: Blue to Pink gradient
+- **Background**: Dark slate with purple accents
+- **Text**: High contrast white/gray
+- **Accents**: Vibrant gradients
 
-### Bulk Import Component
+### Typography
+- **Font Family**: Inter, Segoe UI, system fonts
+- **Headings**: Bold, gradient text effects
+- **Body**: Clean, readable text
+- **Code**: Monospace fonts
 
-```typescript
-@Component({
-  selector: 'app-bulk-import',
-  template: `
-    <!-- Drag and drop file upload -->
-    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6"
-         [class.border-blue-400]="dragOver"
-         (dragover)="onDragOver($event)"
-         (drop)="onDrop($event)">
-      
-      <!-- File validation and preview -->
-      <div *ngIf="validationResult" class="mb-4">
-        <div class="p-4 rounded-lg" 
-             [class]="validationResult.is_valid ? 'bg-green-50' : 'bg-red-50'">
-          <p>{{ validationResult.message }}</p>
-        </div>
-      </div>
-      
-      <!-- Import progress -->
-      <div *ngIf="isUploading" class="mb-4">
-        <div class="bg-blue-50 p-4 rounded-lg">
-          <div class="flex items-center">
-            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-            <span class="mr-2">در حال آپلود...</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  `
-})
-export class BulkImportComponent {
-  // Implementation with file validation, progress tracking, and error handling
-}
-```
+### Components
+- Glass morphism effects
+- Smooth animations and transitions
+- Hover states and micro-interactions
+- Consistent spacing and layouts
 
-### Product Service
+## 🔧 Configuration
+
+### Environment Setup
+
+Create environment files for different stages:
 
 ```typescript
-@Injectable({ providedIn: 'root' })
-export class ProductService {
-  private apiUrl = `${environment.apiUrl}/api`;
-  
-  // CRUD operations
-  getProducts(params?: any): Observable<any> {
-    return this.http.get(`${this.apiUrl}/products/`, { params });
-  }
-  
-  createProduct(product: Product): Observable<Product> {
-    return this.http.post<Product>(`${this.apiUrl}/products/`, product);
-  }
-  
-  // Bulk import with validation
-  validateImportFile(formData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/import/validate/`, formData);
-  }
-  
-  bulkImportProducts(formData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/import/products/`, formData);
-  }
-  
-  // File download helper
-  downloadFile(blob: Blob, filename: string) {
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    window.URL.revokeObjectURL(url);
-  }
-}
+// src/environments/environment.ts
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000/api',
+  wsUrl: 'ws://localhost:3000',
+  // Add your configuration
+};
 ```
+
+### API Integration
+
+Configure backend API endpoints:
+
+```typescript
+// src/app/services/api.service.ts
+const API_ENDPOINTS = {
+  auth: '/auth',
+  products: '/products',
+  orders: '/orders',
+  users: '/users',
+  analytics: '/analytics'
+};
+```
+
+## 📦 Deployment
+
+### Docker Deployment
+
+```bash
+# Build Docker image
+docker build -t shopsphere-frontend .
+
+# Run container
+docker run -p 4200:80 shopsphere-frontend
+```
+
+### Cloud Deployment
+
+Supported platforms:
+- **Vercel** - Recommended for frontend
+- **Netlify** - Static site hosting
+- **AWS S3 + CloudFront** - Enterprise solution
+- **Google Cloud Platform** - Scalable hosting
+- **Azure Static Web Apps** - Microsoft cloud
 
 ## 🧪 Testing
 
 ### Unit Testing
 ```bash
 # Run unit tests
-npm test
+ng test
 
-# Run tests with coverage
-npm run test:coverage
-
-# Run tests in watch mode
-npm run test:watch
+# Generate coverage report
+ng test --code-coverage
 ```
 
 ### E2E Testing
 ```bash
-# Run end-to-end tests
-npm run e2e
+# Run e2e tests
+ng e2e
 
-# Run E2E tests for specific store
-npm run e2e:store
+# Run specific test suite
+ng e2e --suite=user-flows
 ```
 
-## 🚀 Production Build
+## 📈 Performance Optimization
 
-### Build Commands
+### Bundle Analysis
 ```bash
-# Development build
-npm run build
-
-# Production build
-npm run build:prod
-
 # Analyze bundle size
-npm run build:analyze
+npm run build:stats
+npx webpack-bundle-analyzer dist/stats.json
 ```
 
-### Deployment Configuration
-
-```typescript
-// environment.prod.ts
-export const environment = {
-  production: true,
-  apiUrl: 'https://api.your-domain.com',
-  platformDomain: 'your-platform.com',
-  storeDomains: {
-    // Production store mappings
-  },
-  features: {
-    enableAnalytics: true,
-    enablePWA: true,
-    enableOffline: true
-  }
-};
-```
-
-### Build Optimization
-
-```json
-// angular.json optimizations
-{
-  "configurations": {
-    "production": {
-      "fileReplacements": [...],
-      "optimization": true,
-      "outputHashing": "all",
-      "sourceMap": false,
-      "namedChunks": false,
-      "extractLicenses": true,
-      "vendorChunk": false,
-      "buildOptimizer": true,
-      "budgets": [
-        {
-          "type": "initial",
-          "maximumWarning": "2mb",
-          "maximumError": "5mb"
-        }
-      ]
-    }
-  }
-}
-```
-
-## 📱 Progressive Web App (PWA)
-
-### PWA Features
-- **Offline Support** - Cache critical resources
-- **App Install** - Add to home screen capability
-- **Push Notifications** - Order updates and promotions
-- **Background Sync** - Sync data when connection restored
-
-```bash
-# Add PWA support
-ng add @angular/pwa
-```
-
-## 🌍 Internationalization (i18n)
-
-### Multi-language Support
-```bash
-# Add Angular i18n
-ng add @angular/localize
-
-# Extract text for translation
-ng extract-i18n
-
-# Build for specific locale
-ng build --localize
-```
-
-### Persian (Farsi) Setup
-```typescript
-// app.module.ts
-import { registerLocaleData } from '@angular/common';
-import localeFa from '@angular/common/locales/fa';
-
-registerLocaleData(localeFa);
-
-@NgModule({
-  providers: [
-    { provide: LOCALE_ID, useValue: 'fa-IR' }
-  ]
-})
-export class AppModule { }
-```
-
-## 🔧 Development Tools
-
-### VS Code Extensions
-Install these recommended extensions:
-```json
-{
-  "recommendations": [
-    "angular.ng-template",
-    "ms-vscode.vscode-typescript-next",
-    "bradlc.vscode-tailwindcss",
-    "formulahendry.auto-rename-tag",
-    "ms-vscode.vscode-json",
-    "esbenp.prettier-vscode"
-  ]
-}
-```
-
-### Debug Configuration
-```json
-// .vscode/launch.json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "chrome",
-      "request": "launch",
-      "name": "Launch Chrome",
-      "url": "http://localhost:4200",
-      "webRoot": "${workspaceFolder}/src"
-    }
-  ]
-}
-```
+### Performance Tips
+- Use OnPush change detection
+- Implement virtual scrolling for large lists
+- Optimize images with WebP format
+- Enable gzip compression
+- Use lazy loading for routes
 
 ## 🤝 Contributing
 
-### Development Workflow
-1. **Fork the repository**
-2. **Create feature branch**: `git checkout -b feature/amazing-feature`
-3. **Follow coding standards**: Use Prettier and ESLint
-4. **Write tests**: Maintain test coverage above 80%
-5. **Submit pull request**: Include description and screenshots
+We welcome contributions! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ### Code Style
-```bash
-# Format code
-npm run format
-
-# Lint code
-npm run lint
-
-# Fix linting issues
-npm run lint:fix
-```
+- Use TypeScript strict mode
+- Follow Angular style guide
+- Use meaningful commit messages
+- Add unit tests for new features
+- Update documentation
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🆘 Support
+
+- **Documentation**: [Wiki](https://github.com/ehsan42324232/shop-front/wiki)
+- **Issues**: [GitHub Issues](https://github.com/ehsan42324232/shop-front/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/ehsan42324232/shop-front/discussions)
+- **Email**: support@shopsphere.com
+
+## 🗺️ Roadmap
+
+### Q1 2024
+- [ ] Advanced search and filtering
+- [ ] Wishlist functionality
+- [ ] Social media integration
+- [ ] Enhanced mobile app
+
+### Q2 2024
+- [ ] AI-powered recommendations
+- [ ] Advanced analytics dashboard
+- [ ] Multi-vendor marketplace
+- [ ] Voice commerce integration
+
+### Q3 2024
+- [ ] AR/VR product visualization
+- [ ] Blockchain integration
+- [ ] Advanced personalization
+- [ ] Global expansion features
+
 ## 🙏 Acknowledgments
 
-- Angular team for the excellent framework
-- Tailwind CSS for the utility-first CSS framework
-- Angular Material for UI components
-- All contributors who helped improve this platform
+- Angular team for the amazing framework
+- Tailwind CSS for the utility-first approach
+- Open source community for inspiration
+- Contributors and testers
 
 ---
 
-**Built with ❤️ for the Iranian e-commerce community**
+**Built with ❤️ by the ShopSphere Team**
 
-### 🔗 Related Projects
-- [Backend Repository](https://github.com/ehsan42324232/shop-back) - Django REST API
-- [Documentation](https://your-docs-site.com) - Comprehensive documentation
-- [Demo Site](https://demo.your-platform.com) - Live demonstration
+*Transform your business with ShopSphere - where innovation meets commerce.*

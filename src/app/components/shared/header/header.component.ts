@@ -1,378 +1,250 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { DomainService } from '../../../services/domain.service';
-import { User } from '../../../models';
-import { Observable } from 'rxjs';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-header',
   template: `
-    <header class="gradient-bg shadow-lg sticky top-0 z-50" dir="rtl">
-      <div class="container mx-auto px-4 py-4">
+    <header class="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/10">
+      <nav class="mx-auto max-w-7xl px-6 py-4">
         <div class="flex items-center justify-between">
-          <!-- Logo -->
-          <div class="flex items-center space-x-3 space-x-reverse">
-            <div class="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white border-opacity-30">
-              <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <!-- Toolbox icon -->
-                <path d="M20 8h-3V6a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zM9 6h6v2H9V6zm11 4v2h-4v-2h4zM8 12v2H4v-2h4zm0 4H4v2h4v-2zm2 2v-6h4v6h-4zm6 0v-2h4v2h-4z"/>
-                <!-- Tools inside -->
-                <circle cx="10" cy="15" r="0.5" opacity="0.8"/>
-                <circle cx="12" cy="13" r="0.5" opacity="0.8"/>
-                <circle cx="14" cy="15" r="0.5" opacity="0.8"/>
-                <line x1="10" y1="14" x2="14" y2="14" stroke="currentColor" stroke-width="0.3" opacity="0.6"/>
+          <!-- Modern Logo -->
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-300">
+              <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
               </svg>
             </div>
-            <div class="cursor-pointer" (click)="router.navigate(['/'])">
-              <h1 class="text-2xl font-bold text-white">
-                سایت‌ساز
-              </h1>
-              <p class="text-sm text-white text-opacity-80 font-medium">جعبه ابزار</p>
+            <div class="flex flex-col">
+              <span class="text-xl font-bold bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
+                ShopSphere
+              </span>
+              <span class="text-xs text-gray-400 font-medium">Digital Commerce Platform</span>
             </div>
           </div>
 
-          <!-- Navigation Menu -->
-          <nav class="hidden md:flex items-center space-x-8 space-x-reverse" *ngIf="currentUser$ | async">
-            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
-               (click)="router.navigate(['/store-management'])">
-              مدیریت فروشگاه
-            </a>
-            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
-               (click)="router.navigate(['/categories'])">
-              دسته‌بندی‌ها
-            </a>
-            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
-               (click)="router.navigate(['/products'])">
-              محصولات
-            </a>
-            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
-               (click)="router.navigate(['/themes'])">
-              قالب‌ها
-            </a>
-            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
-               (click)="router.navigate(['/orders'])">
-              سفارشات
-            </a>
-            <a class="text-white text-opacity-80 hover:text-white font-medium transition-colors cursor-pointer glass-morphism px-4 py-2 rounded-lg" 
-               (click)="router.navigate(['/analytics'])">
-              آمار و گزارش
-            </a>
-          </nav>
-
-          <!-- User Menu -->
-          <div *ngIf="currentUser$ | async as user; else authButtons" class="relative">
-            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer glass-morphism p-3 rounded-xl hover:bg-white hover:bg-opacity-20 transition-all duration-200" (click)="toggleUserMenu()">
-              <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-white text-sm font-semibold border border-white border-opacity-30">
-                {{ user.username.charAt(0).toUpperCase() }}
-              </div>
-              <div class="hidden md:block">
-                <p class="text-white font-medium">{{ user.username }}</p>
-                <p class="text-white text-opacity-70 text-xs">خوش آمدید!</p>
-              </div>
-              <svg class="w-4 h-4 text-white text-opacity-70 transition-transform duration-200" [class.rotate-180]="showUserMenu" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
-            
-            <!-- Dropdown Menu -->
-            <div *ngIf="showUserMenu" class="absolute left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl py-2 z-50 border border-gray-100">
-              <a class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer" 
-                 (click)="router.navigate(['/store-management']); toggleUserMenu()">
-                <svg class="w-4 h-4 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                </svg>
-                مدیریت فروشگاه
-              </a>
-              <a class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer" 
-                 (click)="router.navigate(['/categories']); toggleUserMenu()">
-                <svg class="w-4 h-4 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5m14 14H5"></path>
-                </svg>
-                دسته‌بندی‌ها
-              </a>
-              <a class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer" 
-                 (click)="router.navigate(['/themes']); toggleUserMenu()">
-                <svg class="w-4 h-4 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
-                </svg>
-                قالب‌ها و طراحی
-              </a>
-              <a class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer" 
-                 (click)="router.navigate(['/orders']); toggleUserMenu()">
-                <svg class="w-4 h-4 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                سفارشات
-              </a>
-              <a class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 cursor-pointer" 
-                 (click)="router.navigate(['/analytics']); toggleUserMenu()">
-                <svg class="w-4 h-4 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-                آمار و گزارش
-              </a>
-              <hr class="my-2 border-gray-100">
-              <a class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200 cursor-pointer" 
-                 (click)="logout()">
-                <svg class="w-4 h-4 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                </svg>
-                خروج
-              </a>
-            </div>
+          <!-- Desktop Navigation -->
+          <div class="hidden lg:flex items-center space-x-8">
+            <a href="#" class="nav-link text-gray-300 hover:text-white font-medium transition-colors duration-300">Dashboard</a>
+            <a href="#" class="nav-link text-gray-300 hover:text-white font-medium transition-colors duration-300">Products</a>
+            <a href="#" class="nav-link text-gray-300 hover:text-white font-medium transition-colors duration-300">Analytics</a>
+            <a href="#" class="nav-link text-gray-300 hover:text-white font-medium transition-colors duration-300">Orders</a>
+            <a href="#" class="nav-link text-gray-300 hover:text-white font-medium transition-colors duration-300">Settings</a>
           </div>
 
-          <!-- Auth Buttons -->
-          <ng-template #authButtons>
-            <div class="flex items-center space-x-3 space-x-reverse">
-              <button class="px-6 py-2.5 text-white text-opacity-80 hover:text-white font-medium transition-colors duration-200 glass-morphism rounded-xl" 
-                      (click)="router.navigate(['/login'])">
-                ورود
-              </button>
-              <button class="px-6 py-2.5 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-medium rounded-xl transition-all duration-200 border border-white border-opacity-30 backdrop-blur-sm" 
-                      (click)="showRequestForm = true">
-                درخواست فروشگاه
-              </button>
+          <!-- Right Side Actions -->
+          <div class="flex items-center space-x-4">
+            <!-- Search -->
+            <div class="hidden md:flex items-center">
+              <div class="relative">
+                <input 
+                  type="text" 
+                  placeholder="Search..."
+                  class="w-64 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400 transition-all duration-300">
+                <svg class="absolute right-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
             </div>
-          </ng-template>
-        </div>
-      </div>
-      
-      <!-- Request Form Modal -->
-      <div *ngIf="showRequestForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">درخواست ساخت فروشگاه</h2>
-            <button (click)="showRequestForm = false" class="text-gray-400 hover:text-gray-600">
+
+            <!-- Notifications -->
+            <button class="relative p-2 text-gray-400 hover:text-white transition-colors duration-300">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5-5 5-5h-5m-6 10v-2a6 6 0 10-12 0v2a2 2 0 01-2 2h16a2 2 0 01-2-2z"></path>
+              </svg>
+              <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+            </button>
+
+            <!-- Live Chat Toggle -->
+            <button 
+              (click)="toggleLiveChat()"
+              class="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+              <span class="hidden sm:inline">Live Chat</span>
+            </button>
+
+            <!-- User Profile Dropdown -->
+            <div class="relative" (click)="toggleUserMenu()">
+              <button class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/10 transition-colors duration-300">
+                <div class="w-8 h-8 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full flex items-center justify-center">
+                  <span class="text-white text-sm font-semibold">{{ getUserInitials() }}</span>
+                </div>
+                <div class="hidden md:block text-left">
+                  <p class="text-white text-sm font-medium">{{ getCurrentUser()?.name || 'User' }}</p>
+                  <p class="text-gray-400 text-xs">{{ getCurrentUser()?.role || 'Member' }}</p>
+                </div>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+
+              <!-- Dropdown Menu -->
+              <div 
+                *ngIf="showUserMenu" 
+                [@slideDown]
+                class="absolute right-0 mt-2 w-64 bg-slate-800/95 backdrop-blur-md border border-white/10 rounded-lg shadow-xl py-2">
+                <div class="px-4 py-3 border-b border-white/10">
+                  <p class="text-white font-medium">{{ getCurrentUser()?.name || 'User Account' }}</p>
+                  <p class="text-gray-400 text-sm">{{ getCurrentUser()?.email || 'user@example.com' }}</p>
+                </div>
+                
+                <a href="#" class="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 transition-colors duration-300">
+                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  Profile Settings
+                </a>
+                
+                <a href="#" class="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 transition-colors duration-300">
+                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                  </svg>
+                  Payment Methods
+                </a>
+                
+                <a href="#" class="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 transition-colors duration-300">
+                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  Account Settings
+                </a>
+                
+                <div class="border-t border-white/10 my-2"></div>
+                
+                <button 
+                  (click)="logout()" 
+                  class="flex items-center w-full px-4 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors duration-300">
+                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg>
+                  Sign Out
+                </button>
+              </div>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button 
+              (click)="toggleMobileMenu()"
+              class="lg:hidden p-2 text-gray-400 hover:text-white transition-colors duration-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
               </svg>
             </button>
           </div>
-          
-          <div class="bg-green-50 border border-green-200 p-4 rounded-lg mb-6">
-            <div class="flex items-center">
-              <svg class="w-5 h-5 text-green-600 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div 
+          *ngIf="showMobileMenu" 
+          [@slideDown]
+          class="lg:hidden mt-4 p-4 bg-slate-800/50 backdrop-blur-sm rounded-lg border border-white/10">
+          <div class="flex flex-col space-y-4">
+            <!-- Mobile Search -->
+            <div class="relative">
+              <input 
+                type="text" 
+                placeholder="Search..."
+                class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50">
+              <svg class="absolute right-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
-              <p class="text-green-800 text-sm font-medium">
-                پس از ارسال فرم، کارشناسان ما خیلی زود با شما تماس خواهند گرفت
-              </p>
-            </div>
-          </div>
-          
-          <form (ngSubmit)="submitRequest()" #requestForm="ngForm">
-            <div class="space-y-4">
-              <!-- Store Name -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">نام فروشگاه</label>
-                <input 
-                  type="text" 
-                  [(ngModel)]="storeRequest.storeName"
-                  name="storeName"
-                  required
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="مثال: فروشگاه جعبه ابزار">
-              </div>
-              
-              <!-- Phone Number -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">شماره تماس</label>
-                <input 
-                  type="tel" 
-                  [(ngModel)]="storeRequest.phoneNumber"
-                  name="phoneNumber"
-                  required
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="09123456789">
-              </div>
-              
-              <!-- Product Type -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">نوع محصولات</label>
-                <input 
-                  type="text" 
-                  [(ngModel)]="storeRequest.productType"
-                  name="productType"
-                  required
-                  list="productTypes"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="پوشاک، لوازم خانگی، الکترونیک، ...">
-                <datalist id="productTypes">
-                  <option value="پوشاک">
-                  <option value="کفش و کیف">
-                  <option value="لوازم خانگی">
-                  <option value="الکترونیک">
-                  <option value="کتاب و لوازم التحریر">
-                  <option value="زیبایی و بهداشت">
-                  <option value="ورزش و سرگرمی">
-                  <option value="خودرو و موتور">
-                  <option value="مواد غذایی">
-                  <option value="صنایع دستی">
-                  <option value="سایر">
-                </datalist>
-              </div>
-
-              <!-- Custom Domain Option -->
-              <div>
-                <label class="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    [(ngModel)]="storeRequest.wantCustomDomain"
-                    name="wantCustomDomain"
-                    class="rounded border-gray-300 text-blue-600 focus:border-blue-500 focus:ring-blue-500">
-                  <span class="mr-2 text-sm text-gray-700">می‌خواهم دامنه .ir اختصاصی داشته باشم</span>
-                </label>
-              </div>
-
-              <!-- Custom Domain Input -->
-              <div *ngIf="storeRequest.wantCustomDomain">
-                <label class="block text-sm font-medium text-gray-700 mb-2">دامنه دلخواه</label>
-                <div class="flex">
-                  <input 
-                    type="text" 
-                    [(ngModel)]="storeRequest.customDomain"
-                    name="customDomain"
-                    (input)="checkDomainAvailability()"
-                    class="flex-1 px-4 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    placeholder="mystore">
-                  <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                    .ir
-                  </span>
-                </div>
-                
-                <!-- Domain Status -->
-                <div class="mt-2" *ngIf="domainCheckResult">
-                  <div *ngIf="domainCheckResult.available" class="flex items-center text-green-600 text-sm">
-                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    دامنه {{ storeRequest.customDomain }}.ir در دسترس است
-                  </div>
-                  <div *ngIf="!domainCheckResult.available" class="flex items-center text-red-600 text-sm">
-                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    دامنه {{ storeRequest.customDomain }}.ir در دسترس نیست
-                    <span *ngIf="domainCheckResult.suggestion" class="mr-2">
-                      (پیشنهاد: {{ domainCheckResult.suggestion }}.ir)
-                    </span>
-                  </div>
-                </div>
-                
-                <!-- Domain checking -->
-                <div *ngIf="checkingDomain" class="mt-2 flex items-center text-gray-500 text-sm">
-                  <svg class="animate-spin w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  در حال بررسی دامنه...
-                </div>
-              </div>
             </div>
             
-            <div class="flex space-x-3 space-x-reverse mt-8">
-              <button 
-                type="submit" 
-                [disabled]="!requestForm.form.valid || (storeRequest.wantCustomDomain && (!domainCheckResult || !domainCheckResult.available))"
-                class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                ارسال درخواست
-              </button>
-              <button 
-                type="button" 
-                (click)="showRequestForm = false"
-                class="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
-                انصراف
-              </button>
-            </div>
-          </form>
+            <!-- Mobile Navigation Links -->
+            <a href="#" class="text-gray-300 hover:text-white font-medium transition-colors duration-300 py-2">Dashboard</a>
+            <a href="#" class="text-gray-300 hover:text-white font-medium transition-colors duration-300 py-2">Products</a>
+            <a href="#" class="text-gray-300 hover:text-white font-medium transition-colors duration-300 py-2">Analytics</a>
+            <a href="#" class="text-gray-300 hover:text-white font-medium transition-colors duration-300 py-2">Orders</a>
+            <a href="#" class="text-gray-300 hover:text-white font-medium transition-colors duration-300 py-2">Settings</a>
+          </div>
         </div>
-      </div>
+      </nav>
     </header>
   `,
   styles: [`
-    :host {
-      direction: rtl;
+    .nav-link {
+      position: relative;
     }
-    .container {
-      max-width: 1280px;
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+      transition: width 0.3s ease;
     }
-  `]
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+  `],
+  animations: [
+    trigger('slideDown', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-10px)' }),
+        animate('200ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ opacity: 0, transform: 'translateY(-10px)' }))
+      ])
+    ])
+  ]
 })
 export class HeaderComponent implements OnInit {
-  currentUser$: Observable<User | null>;
   showUserMenu = false;
-  showRequestForm = false;
-  
-  checkingDomain = false;
-  domainCheckResult: { available: boolean; suggestion?: string } | null = null;
-  
-  storeRequest = {
-    storeName: '',
-    phoneNumber: '',
-    productType: '',
-    wantCustomDomain: false,
-    customDomain: ''
-  };
+  showMobileMenu = false;
 
   constructor(
-    public router: Router,
-    private authService: AuthService,
-    private domainService: DomainService
-  ) {
-    this.currentUser$ = this.authService.currentUser$;
-  }
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Initialize component
+  }
 
   toggleUserMenu(): void {
     this.showUserMenu = !this.showUserMenu;
+    if (this.showUserMenu) {
+      this.showMobileMenu = false;
+    }
+  }
+
+  toggleMobileMenu(): void {
+    this.showMobileMenu = !this.showMobileMenu;
+    if (this.showMobileMenu) {
+      this.showUserMenu = false;
+    }
+  }
+
+  toggleLiveChat(): void {
+    // Emit event to parent component or service to show live chat
+    // This could be handled by a global service
+    console.log('Toggle live chat');
+  }
+
+  getCurrentUser() {
+    // Return current user from auth service
+    return this.authService.getCurrentUser();
+  }
+
+  getUserInitials(): string {
+    const user = this.getCurrentUser();
+    if (user && user.name) {
+      return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+    }
+    return 'U';
   }
 
   logout(): void {
     this.authService.logout();
-    this.showUserMenu = false;
-  }
-
-  checkDomainAvailability(): void {
-    if (!this.storeRequest.customDomain || this.storeRequest.customDomain.length < 3) {
-      this.domainCheckResult = null;
-      return;
-    }
-
-    this.checkingDomain = true;
-    this.domainService.checkIrDomainAvailability(this.storeRequest.customDomain).subscribe({
-      next: (result) => {
-        this.domainCheckResult = result;
-        this.checkingDomain = false;
-      },
-      error: () => {
-        this.checkingDomain = false;
-        this.domainCheckResult = null;
-      }
-    });
-  }
-  
-  submitRequest(): void {
-    console.log('Store Request Submitted:', this.storeRequest);
-    
-    const requestData = {
-      ...this.storeRequest,
-      customDomain: this.storeRequest.wantCustomDomain ? 
-        `${this.storeRequest.customDomain}.ir` : null
-    };
-    
-    // TODO: Send request to backend API
-    alert('درخواست شما با موفقیت ارسال شد! کارشناسان ما خیلی زود با شما تماس خواهند گرفت.');
-    this.showRequestForm = false;
-    this.storeRequest = {
-      storeName: '',
-      phoneNumber: '',
-      productType: '',
-      wantCustomDomain: false,
-      customDomain: ''
-    };
-    this.domainCheckResult = null;
+    this.router.navigate(['/']);
   }
 }
