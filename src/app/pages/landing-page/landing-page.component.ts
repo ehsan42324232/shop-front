@@ -1,362 +1,364 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { trigger, state, style, transition, animate, stagger, query } from '@angular/animations';
-
-interface Feature {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  image?: string;
-  video?: string;
-  benefits: string[];
-}
-
-interface PricingPlan {
-  id: string;
-  name: string;
-  price: number;
-  duration: string;
-  originalPrice?: number;
-  features: string[];
-  highlighted?: boolean;
-  badge?: string;
-}
 
 @Component({
   selector: 'app-landing-page',
-  templateUrl: './landing-page.component.html',
-  styleUrls: ['./landing-page.component.scss'],
+  template: `
+    <div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
+      <!-- Animated Background -->
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="floating-shapes">
+          <div class="shape shape-1"></div>
+          <div class="shape shape-2"></div>
+          <div class="shape shape-3"></div>
+          <div class="shape shape-4"></div>
+          <div class="shape shape-5"></div>
+        </div>
+      </div>
+
+      <!-- Modern Header -->
+      <header class="relative z-50 px-6 py-4">
+        <nav class="mx-auto max-w-7xl flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <!-- Modern Logo -->
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center shadow-lg">
+                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
+                </svg>
+              </div>
+              <span class="text-2xl font-bold bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
+                ShopSphere
+              </span>
+            </div>
+          </div>
+          
+          <!-- Navigation -->
+          <div class="hidden md:flex items-center space-x-8">
+            <a href="#features" class="text-gray-300 hover:text-white transition-colors duration-300">Features</a>
+            <a href="#pricing" class="text-gray-300 hover:text-white transition-colors duration-300">Pricing</a>
+            <a href="#contact" class="text-gray-300 hover:text-white transition-colors duration-300">Contact</a>
+            <button 
+              (click)="navigateToLogin()"
+              class="px-4 py-2 text-white bg-transparent border border-white/20 rounded-lg hover:bg-white/10 transition-all duration-300">
+              Sign In
+            </button>
+          </div>
+
+          <!-- Mobile Menu Button -->
+          <button class="md:hidden text-white" (click)="toggleMobileMenu()">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div *ngIf="mobileMenuOpen" class="md:hidden mt-4 p-4 bg-black/20 backdrop-blur-sm rounded-lg">
+          <div class="flex flex-col space-y-4">
+            <a href="#features" class="text-gray-300 hover:text-white transition-colors duration-300">Features</a>
+            <a href="#pricing" class="text-gray-300 hover:text-white transition-colors duration-300">Pricing</a>
+            <a href="#contact" class="text-gray-300 hover:text-white transition-colors duration-300">Contact</a>
+            <button 
+              (click)="navigateToLogin()"
+              class="px-4 py-2 text-white bg-transparent border border-white/20 rounded-lg hover:bg-white/10 transition-all duration-300 w-full">
+              Sign In
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Hero Section -->
+      <main class="relative z-10 px-6 pt-20 pb-32">
+        <div class="mx-auto max-w-7xl text-center">
+          <div [@fadeInUp]="animationState" class="space-y-8">
+            <!-- Hero Badge -->
+            <div class="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-sm text-white">
+              <span class="w-2 h-2 bg-green-400 rounded-full mr-3 animate-pulse"></span>
+              New: Advanced Analytics Dashboard Available
+            </div>
+
+            <!-- Hero Title -->
+            <h1 class="text-5xl md:text-7xl font-bold text-white leading-tight">
+              Build Your
+              <span class="bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                Digital Empire
+              </span>
+              Today
+            </h1>
+
+            <!-- Hero Subtitle -->
+            <p class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              Transform your business with our cutting-edge e-commerce platform. 
+              Create stunning online stores, manage inventory, and scale globally with zero technical complexity.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
+              <button 
+                (click)="startFreeTrial()"
+                class="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                <span class="relative z-10 flex items-center">
+                  Start Free Trial
+                  <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                  </svg>
+                </span>
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </button>
+              
+              <button 
+                (click)="watchDemo()"
+                class="px-8 py-4 text-white border border-white/30 rounded-xl hover:bg-white/10 transition-all duration-300 flex items-center group">
+                <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                </svg>
+                Watch Demo
+              </button>
+            </div>
+
+            <!-- Trust Indicators -->
+            <div class="pt-16">
+              <p class="text-gray-400 text-sm mb-8">Trusted by over 50,000+ businesses worldwide</p>
+              <div class="flex flex-wrap justify-center items-center gap-8 opacity-60">
+                <div class="px-6 py-3 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+                  <span class="text-white font-semibold">TechCorp</span>
+                </div>
+                <div class="px-6 py-3 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+                  <span class="text-white font-semibold">InnovateX</span>
+                </div>
+                <div class="px-6 py-3 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+                  <span class="text-white font-semibold">GlobalTrade</span>
+                </div>
+                <div class="px-6 py-3 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+                  <span class="text-white font-semibold">FutureStore</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Contact Section -->
+      <section id="contact" class="relative z-10 px-6 py-32 bg-black/20 backdrop-blur-sm">
+        <div class="mx-auto max-w-4xl text-center">
+          <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+            Ready to Get
+            <span class="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">Started?</span>
+          </h2>
+          <p class="text-xl text-gray-300 mb-12">
+            Join thousands of businesses already using ShopSphere to grow their online presence
+          </p>
+          
+          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button 
+              (click)="startFreeTrial()"
+              class="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold rounded-xl hover:scale-105 transition-all duration-300">
+              Start Your Free Trial
+            </button>
+            <button 
+              (click)="openLiveChat()"
+              class="px-8 py-4 text-white border border-white/30 rounded-xl hover:bg-white/10 transition-all duration-300 flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+              Chat with Sales
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="relative z-10 px-6 py-16 border-t border-white/10">
+        <div class="mx-auto max-w-7xl">
+          <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-3 mb-8 md:mb-0">
+              <div class="w-8 h-8 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
+                </svg>
+              </div>
+              <span class="text-xl font-bold text-white">ShopSphere</span>
+            </div>
+            
+            <div class="flex space-x-6 text-gray-400">
+              <a href="#" class="hover:text-white transition-colors duration-300">Privacy</a>
+              <a href="#" class="hover:text-white transition-colors duration-300">Terms</a>
+              <a href="#" class="hover:text-white transition-colors duration-300">Support</a>
+            </div>
+          </div>
+          
+          <div class="mt-8 pt-8 border-t border-white/10 text-center text-gray-400">
+            <p>&copy; 2025 ShopSphere. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Live Chat Component -->
+    <app-live-chat *ngIf="showLiveChat" (onClose)="closeLiveChat()"></app-live-chat>
+  `,
+  styles: [`
+    .floating-shapes {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      background: linear-gradient(45deg, rgba(6, 182, 212, 0.1), rgba(168, 85, 247, 0.1));
+      animation: float 20s infinite linear;
+    }
+
+    .shape-1 {
+      width: 300px;
+      height: 300px;
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .shape-2 {
+      width: 200px;
+      height: 200px;
+      top: 70%;
+      right: 20%;
+      animation-delay: -5s;
+    }
+
+    .shape-3 {
+      width: 400px;
+      height: 400px;
+      top: 30%;
+      right: 10%;
+      animation-delay: -10s;
+    }
+
+    .shape-4 {
+      width: 150px;
+      height: 150px;
+      bottom: 20%;
+      left: 30%;
+      animation-delay: -15s;
+    }
+
+    .shape-5 {
+      width: 250px;
+      height: 250px;
+      top: 50%;
+      left: 50%;
+      animation-delay: -7s;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.5;
+      }
+      50% {
+        transform: translateY(-100px) rotate(180deg);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(0px) rotate(360deg);
+        opacity: 0.5;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .shape {
+        display: none;
+      }
+    }
+  `],
   animations: [
     trigger('fadeInUp', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(30px)' }),
-        animate('600ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
-      ])
-    ]),
-    trigger('slideInLeft', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(-50px)' }),
-        animate('800ms ease-out', style({ opacity: 1, transform: 'translateX(0)' }))
-      ])
-    ]),
-    trigger('slideInRight', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(50px)' }),
-        animate('800ms ease-out', style({ opacity: 1, transform: 'translateX(0)' }))
-      ])
-    ]),
-    trigger('staggerAnimation', [
-      transition('* => *', [
-        query(':enter', [
-          style({ opacity: 0, transform: 'translateY(20px)' }),
-          stagger(100, animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })))
-        ], { optional: true })
+      state('in', style({opacity: 1, transform: 'translateY(0)'})),
+      transition('void => *', [
+        style({opacity: 0, transform: 'translateY(30px)'}),
+        animate(1000)
       ])
     ])
   ]
 })
-export class LandingPageComponent implements OnInit {
-  @ViewChild('videoPlayer') videoPlayer!: ElementRef<HTMLVideoElement>;
+export class LandingPageComponent implements OnInit, AfterViewInit {
+  mobileMenuOpen = false;
+  showLiveChat = false;
+  animationState = 'in';
 
-  currentVideoIndex = 0;
-  autoplayInterval: any;
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
-  features: Feature[] = [
-    {
-      id: 'social-integration',
-      title: 'هوشمند‌ترین ادغام شبکه‌های اجتماعی',
-      description: 'دیگر نیازی نیست وقت خود را صرف پر کردن فیلدهای ناآشنا کنید. ما آخرین پست‌ها و استوری‌های شما را می‌خوانیم و تمام متن‌ها، عکس‌ها و ویدیوها را جداسازی می‌کنیم.',
-      icon: 'pi pi-share-alt',
-      image: '/assets/images/social-integration-demo.png',
-      video: '/assets/videos/social-integration-demo.mp4',
-      benefits: [
-        'خودکارسازی کامل وارد کردن محتوا',
-        'جداسازی هوشمند تصاویر، ویدیوها و متن',
-        'پشتیبانی از اینستاگرام، تلگرام و سایر پلتفرم‌ها',
-        'ذخیره‌سازی خودکار در کیفیت اصلی'
-      ]
-    },
-    {
-      id: 'custom-domain',
-      title: 'آدرس اختصاصی کاملاً شخصی',
-      description: 'وب‌سایت شما آدرس انتخابی خودتان را خواهد داشت، نه یک کلمه کمتر و نه یک کلمه بیشتر. کاملاً اختصاصی و حرفه‌ای.',
-      icon: 'pi pi-globe',
-      image: '/assets/images/custom-domain-demo.png',
-      video: '/assets/videos/custom-domain-demo.mp4',
-      benefits: [
-        'آدرس کاملاً اختصاصی (yourstore.com)',
-        'گواهی SSL رایگان برای امنیت',
-        'پیکربندی DNS خودکار',
-        'امکان تغییر آدرس در آینده'
-      ]
-    },
-    {
-      id: 'themes',
-      title: 'قالب‌ها و طرح‌های متنوع',
-      description: 'قالب‌های مختلف وب‌سایت در دسترس شما قرار دارد. می‌توانید سبکی را انتخاب کنید که بیشترین ارتباط را با آن احساس می‌کنید. نگران نباشید، می‌توانید هر زمان با کمترین تلاش آن را تغییر دهید.',
-      icon: 'pi pi-palette',
-      image: '/assets/images/themes-demo.png',
-      video: '/assets/videos/themes-demo.mp4',
-      benefits: [
-        '۱۵+ قالب آماده و مدرن',
-        'تغییر قالب با یک کلیک',
-        'سفارشی‌سازی رنگ‌ها و فونت‌ها',
-        'طراحی ریسپانسیو برای همه دستگاه‌ها'
-      ]
-    },
-    {
-      id: 'categories-attributes',
-      title: 'دسته‌بندی و ویژگی‌های هوشمند',
-      description: 'می‌توانید دسته‌بندی‌ها و زیردسته‌ها و ویژگی‌های محصول خودتان را تعریف کنید. ما همه آن‌ها را به شکل زیبایی در صفحه داده محصول به کاربران شما نشان می‌دهیم.',
-      icon: 'pi pi-sitemap',
-      image: '/assets/images/categories-demo.png',
-      video: '/assets/videos/categories-demo.mp4',
-      benefits: [
-        'دسته‌بندی نامحدود با ساختار درختی',
-        'ویژگی‌های سفارشی برای هر دسته',
-        'فیلترهای پیشرفته برای مشتریان',
-        'نمایش بهینه در صفحه محصول'
-      ]
-    },
-    {
-      id: 'seo-optimization',
-      title: 'بهینه‌سازی هوشمند SEO',
-      description: 'متن‌های شما از سیستم هوشمند ما عبور می‌کند تا بدون تغییر محتوا، برای موتورهای جستجو بهینه شود. علاوه بر شبکه‌های اجتماعی، در جستجوهای عمومی گوگل نیز پیدا می‌شوید.',
-      icon: 'pi pi-search',
-      image: '/assets/images/seo-demo.png',
-      video: '/assets/videos/seo-demo.mp4',
-      benefits: [
-        'بهینه‌سازی خودکار کلمات کلیدی',
-        'تولید متا تگ‌های بهینه',
-        'ساختار URL دوستدار SEO',
-        'نقشه سایت XML خودکار'
-      ]
-    },
-    {
-      id: 'customer-management',
-      title: 'مدیریت مشتریان و پیامک',
-      description: 'مشتریان شما می‌توانند با شماره موبایل خود در وب‌سایت حساب کاربری ایجاد کنند و شما سپس پیامک‌های تبلیغاتی شخصی‌سازی شده برای آن‌ها ارسال کنید.',
-      icon: 'pi pi-users',
-      image: '/assets/images/customer-management-demo.png',
-      video: '/assets/videos/customer-management-demo.mp4',
-      benefits: [
-        'ثبت‌نام ساده با شماره موبایل',
-        'پنل مدیریت مشتریان کامل',
-        'ارسال پیامک تبلیغاتی هدفمند',
-        'پروفایل مشتری با تاریخچه خرید'
-      ]
-    },
-    {
-      id: 'promotions',
-      title: 'تخفیف‌ها و پیشنهادات ویژه',
-      description: 'می‌توانید دسته‌های مختلف محصولات خود را بر اساس ویژگی‌های متنوع انتخاب کرده و تخفیف‌های سفارشی روی آن‌ها تعریف کنید.',
-      icon: 'pi pi-percentage',
-      image: '/assets/images/promotions-demo.png',
-      video: '/assets/videos/promotions-demo.mp4',
-      benefits: [
-        'تخفیف‌های درصدی و مقداری',
-        'کوپن‌های تخفیف شخصی',
-        'تخفیف‌های زمان‌دار',
-        'تخفیف بر اساس مقدار خرید'
-      ]
-    },
-    {
-      id: 'excel-import',
-      title: 'وارد کردن انبوه با اکسل',
-      description: 'می‌توانید دسته‌بندی‌ها و محصولات خود را یکی یکی از طریق پنل کاربرپسند تعریف کنید، یا فقط یک اکسل منطبق با قالب‌های ما آپلود کنید و ما خودمان همه دسته‌بندی‌ها و محصولات و ویژگی‌ها را می‌سازیم.',
-      icon: 'pi pi-file-excel',
-      image: '/assets/images/excel-import-demo.png',
-      video: '/assets/videos/excel-import-demo.mp4',
-      benefits: [
-        'قالب اکسل استاندارد آماده',
-        'وارد کردن هزاران محصول با یک فایل',
-        'تشخیص خودکار دسته‌بندی‌ها',
-        'گزارش کامل از عملیات import'
-      ]
-    },
-    {
-      id: 'analytics',
-      title: 'گزارش‌های تحلیلی پیشرفته',
-      description: 'می‌توانید گزارش‌های آموزنده‌ای درباره فروش خود مشاهده کنید. از فروش روزانه تا تحلیل رفتار مشتریان، همه چیز در دسترس شماست.',
-      icon: 'pi pi-chart-line',
-      image: '/assets/images/analytics-demo.png',
-      video: '/assets/videos/analytics-demo.mp4',
-      benefits: [
-        'گزارش‌های فروش در بازه‌های زمانی',
-        'تحلیل محبوب‌ترین محصولات',
-        'آمار بازدید و تبدیل مشتری',
-        'گزارش‌گیری PDF و Excel'
-      ]
-    },
-    {
-      id: 'payment-logistics',
-      title: 'پرداخت و ارسال یکپارچه',
-      description: 'وب‌سایت شما دارای سبد خرید است و با درگاه‌های پرداخت معتبر مختلف و ارائه‌دهندگان خدمات حمل‌ونقل یکپارچه شده است. بنابراین نگرانی از پردازش سفارش‌ها نداشته باشید.',
-      icon: 'pi pi-credit-card',
-      image: '/assets/images/payment-logistics-demo.png',
-      video: '/assets/videos/payment-logistics-demo.mp4',
-      benefits: [
-        'درگاه‌های پرداخت معتبر (زرین‌پال، ملت، پارسیان)',
-        'ارسال با پست، اسنپ‌باکس، تیپاکس',
-        'محاسبه خودکار هزینه ارسال',
-        'پیگیری کامل مرحله‌ای سفارش'
-      ]
-    }
-  ];
-
-  pricingPlans: PricingPlan[] = [
-    {
-      id: 'monthly',
-      name: 'ماهانه',
-      price: 200000,
-      duration: 'ماه',
-      features: [
-        'تمام امکانات پلتفرم',
-        'آدرس اختصاصی',
-        'پشتیبانی ۲۴/۷',
-        'بک‌آپ روزانه',
-        'گواهی SSL رایگان'
-      ]
-    },
-    {
-      id: 'quarterly',
-      name: 'سه‌ماهه',
-      price: 500000,
-      duration: '۳ ماه',
-      originalPrice: 600000,
-      highlighted: true,
-      badge: 'محبوب‌ترین',
-      features: [
-        'تمام امکانات پلتفرم',
-        'آدرس اختصاصی',
-        'پشتیبانی ۲۴/۷',
-        'بک‌آپ روزانه',
-        'گواهی SSL رایگان',
-        '۱۷% تخفیف'
-      ]
-    },
-    {
-      id: 'biannual',
-      name: 'شش‌ماهه',
-      price: 1000000,
-      duration: '۶ ماه',
-      originalPrice: 1200000,
-      badge: 'بیشترین صرفه‌جویی',
-      features: [
-        'تمام امکانات پلتفرم',
-        'آدرس اختصاصی',
-        'پشتیبانی ۲۴/۷',
-        'بک‌آپ روزانه',
-        'گواهی SSL رایگان',
-        '۱۷% تخفیف',
-        'مشاوره رایگان طراحی'
-      ]
-    }
-  ];
-
-  testimonials = [
-    {
-      name: 'سارا احمدی',
-      business: 'فروشگاه لباس آنلاین',
-      image: '/assets/images/testimonial-1.jpg',
-      text: 'با این پلتفرم، فروش آنلاین‌ام را به راحتی راه‌اندازی کردم. ادغام با اینستاگرام فوق‌العاده است!',
-      rating: 5
-    },
-    {
-      name: 'محمد رضایی',
-      business: 'فروشگاه لوازم خانگی',
-      image: '/assets/images/testimonial-2.jpg',
-      text: 'پشتیبانی عالی و امکانات کامل. واقعاً متفاوت از سایر پلتفرم‌هاست.',
-      rating: 5
-    },
-    {
-      name: 'مریم کریمی',
-      business: 'فروشگاه زیورآلات',
-      image: '/assets/images/testimonial-3.jpg',
-      text: 'قیمت‌ها بسیار مناسب و کیفیت عالی. حتماً پیشنهاد می‌کنم!',
-      rating: 5
-    }
-  ];
-
-  stats = [
-    { value: '1000+', label: 'فروشگاه فعال' },
-    { value: '50000+', label: 'سفارش پردازش شده' },
-    { value: '24/7', label: 'پشتیبانی' },
-    { value: '99.9%', label: 'آپتایم سرور' }
-  ];
-
-  constructor(private router: Router) {}
-
-  ngOnInit() {
-    this.startVideoAutoplay();
+  ngOnInit(): void {
+    // Component initialization logic
   }
 
-  ngOnDestroy() {
-    if (this.autoplayInterval) {
-      clearInterval(this.autoplayInterval);
-    }
+  ngAfterViewInit(): void {
+    // Add smooth scrolling for navigation links
+    this.setupSmoothScrolling();
   }
 
-  startVideoAutoplay() {
-    this.autoplayInterval = setInterval(() => {
-      this.nextVideo();
-    }, 10000); // Change video every 10 seconds
+  private setupSmoothScrolling(): void {
+    const links = document.querySelectorAll('a[href^="#"]');
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const href = link.getAttribute('href');
+        if (href) {
+          const target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        }
+      });
+    });
   }
 
-  nextVideo() {
-    this.currentVideoIndex = (this.currentVideoIndex + 1) % this.features.length;
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
   }
 
-  previousVideo() {
-    this.currentVideoIndex = this.currentVideoIndex === 0 
-      ? this.features.length - 1 
-      : this.currentVideoIndex - 1;
+  navigateToLogin(): void {
+    this.router.navigate(['/auth/login']);
   }
 
-  selectPlan(plan: PricingPlan) {
+  startFreeTrial(): void {
+    // Navigate to registration with free trial
+    this.router.navigate(['/auth/register'], { 
+      queryParams: { plan: 'starter', trial: 'true' }
+    });
+  }
+
+  watchDemo(): void {
+    // Open demo video or navigate to demo page
+    window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+  }
+
+  selectPlan(plan: string): void {
     // Navigate to registration with selected plan
-    this.router.navigate(['/register'], { 
-      queryParams: { plan: plan.id } 
+    this.router.navigate(['/auth/register'], { 
+      queryParams: { plan: plan }
     });
   }
 
-  startFreeTrial() {
-    this.router.navigate(['/register'], { 
-      queryParams: { trial: true } 
-    });
+  openLiveChat(): void {
+    this.showLiveChat = true;
   }
 
-  scrollToSection(sectionId: string) {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  }
-
-  formatPrice(price: number): string {
-    return new Intl.NumberFormat('fa-IR').format(price);
-  }
-
-  openDemo(feature: Feature) {
-    // Open demo modal or navigate to demo page
-    console.log('Opening demo for:', feature.title);
-  }
-
-  openLiveChat() {
-    // Open live chat widget
-    console.log('Opening live chat');
-  }
-
-  callSupport() {
-    window.open('tel:+989123456789');
-  }
-
-  sendSMS() {
-    window.open('sms:+989123456789');
-  }
-
-  sendEmail() {
-    window.open('mailto:support@yourplatform.com');
+  closeLiveChat(): void {
+    this.showLiveChat = false;
   }
 }
