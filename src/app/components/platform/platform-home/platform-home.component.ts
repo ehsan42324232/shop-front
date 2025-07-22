@@ -79,6 +79,7 @@ export class PlatformHomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Component State
   showSignupModal = false;
+  showLiveChat = false;
   isSubmitting = false;
   
   // Form Data
@@ -167,10 +168,10 @@ export class PlatformHomeComponent implements OnInit, OnDestroy, AfterViewInit {
     },
     {
       id: 'cart-payment',
-      title: 'سبد خرید و پرداخت',
-      description: 'وب‌سایت شما سبد خرید داره و با درگاه‌های پرداخت معتبر مختلف و ارائه‌دهندگان خدمات لجستیک ادغام شده. هیچ نگرانی نداشته باشید.',
+      title: 'سبد خرید و پرداخت آنلاین',
+      description: 'وب‌سایت شما سبد خرید داره و با درگاه‌های پرداخت آنلاین معتبر مختلف و ارائه‌دهندگان خدمات لجستیک ادغام شده. هیچ نگرانی نداشته باشید.',
       icon: '🛒',
-      demo: '<div class="flex gap-2 items-center justify-center text-xs"><span>💳</span><span>درگاه‌های پرداخت امن</span></div>',
+      demo: '<div class="flex gap-2 items-center justify-center text-xs"><span>💳</span><span>درگاه‌های پرداخت آنلاین</span></div>',
       benefits: ['درگاه‌های معتبر', 'سبد خرید پیشرفته', 'محاسبه خودکار', 'پیگیری سفارش']
     },
     {
@@ -364,13 +365,24 @@ export class PlatformHomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Modal Methods
   startFreeTrial() {
-    this.showSignupModal = true;
-    document.body.style.overflow = 'hidden';
+    // Navigate to registration page
+    this.router.navigate(['/register'], { 
+      queryParams: { trial: 'free', duration: '14days' }
+    });
   }
 
   closeSignupModal() {
     this.showSignupModal = false;
     document.body.style.overflow = 'auto';
+  }
+
+  // Live Chat Methods
+  openLiveChat() {
+    this.showLiveChat = true;
+  }
+
+  closeLiveChat() {
+    this.showLiveChat = false;
   }
 
   // Form Submission
@@ -418,10 +430,6 @@ export class PlatformHomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // Support Methods
-  openLiveChat() {
-    alert('چت آنلاین راه‌اندازی می‌شود...\n\nدر چت آنلاین می‌توانید:\n• سوالات فنی بپرسید\n• درباره قیمت‌ها مشاوره بگیرید\n• راهنمایی نحوه استفاده دریافت کنید\n• مشکلات خود را گزارش دهید');
-  }
-
   callSupport() {
     window.open('tel:+989123456789');
   }
