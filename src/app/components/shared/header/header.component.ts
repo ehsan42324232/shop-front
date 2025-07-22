@@ -73,7 +73,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
                   <span class="text-white text-sm font-semibold">{{ getUserInitials() }}</span>
                 </div>
                 <div class="hidden md:block text-left">
-                  <p class="text-white text-sm font-medium">{{ getCurrentUser()?.name || 'User' }}</p>
+                  <p class="text-white text-sm font-medium">{{ getUserDisplayName() }}</p>
                   <p class="text-gray-400 text-xs">{{ getCurrentUser()?.role || 'Member' }}</p>
                 </div>
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +87,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
                 [@slideDown]
                 class="absolute right-0 mt-2 w-64 bg-slate-800/95 backdrop-blur-md border border-white/10 rounded-lg shadow-xl py-2">
                 <div class="px-4 py-3 border-b border-white/10">
-                  <p class="text-white font-medium">{{ getCurrentUser()?.name || 'User Account' }}</p>
+                  <p class="text-white font-medium">{{ getUserDisplayName() }}</p>
                   <p class="text-gray-400 text-sm">{{ getCurrentUser()?.email || 'user@example.com' }}</p>
                 </div>
                 
@@ -235,10 +235,50 @@ export class HeaderComponent implements OnInit {
     return this.authService.getCurrentUser();
   }
 
+  getUserDisplayName(): string {
+    const user = this.getCurrentUser();
+    if (user) {
+      // Handle new User model with firstName and lastName
+      if ('firstName' in user && 'lastName' in user) {
+        const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ');
+        return fullName || user.username || user.email || 'User';
+      }
+      // Handle legacy user format with first_name and last_name
+      if ('first_name' in user && 'last_name' in user) {
+        const legacyUser = user as any;
+        const fullName = [legacyUser.first_name, legacyUser.last_name].filter(Boolean).join(' ');
+        return fullName || legacyUser.username || legacyUser.email || 'User';
+      }
+      // Fallback to username or email
+      return user.username || user.email || 'User';
+    }
+    return 'User';
+  }
+
   getUserInitials(): string {
     const user = this.getCurrentUser();
-    if (user && user.name) {
-      return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+    if (user) {
+      // Handle new User model with firstName and lastName
+      if ('firstName' in user && 'lastName' in user) {
+        const initials = [user.firstName, user.lastName]
+          .filter(Boolean)
+          .map(name => name!.charAt(0))
+          .join('')
+          .toUpperCase();
+        return initials || user.username?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U';
+      }
+      // Handle legacy user format with first_name and last_name
+      if ('first_name' in user && 'last_name' in user) {
+        const legacyUser = user as any;
+        const initials = [legacyUser.first_name, legacyUser.last_name]
+          .filter(Boolean)
+          .map((name: string) => name.charAt(0))
+          .join('')
+          .toUpperCase();
+        return initials || legacyUser.username?.charAt(0).toUpperCase() || legacyUser.email?.charAt(0).toUpperCase() || 'U';
+      }
+      // Fallback to username or email
+      return user.username?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U';
     }
     return 'U';
   }
