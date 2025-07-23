@@ -1,0 +1,197 @@
+<!-- Store Products Browsing Page -->
+<div class="min-h-screen bg-gray-50">
+  
+  <!-- Header with Search -->
+  <div class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        
+        <!-- Search Bar -->
+        <div class="flex-1 max-w-lg">
+          <div class="relative">
+            <input type="text" 
+                   [(ngModel)]="searchQuery"
+                   (keyup.enter)="onFilterChange()"
+                   placeholder="جستجو در محصولات..."
+                   class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <i class="fas fa-search absolute right-4 top-3.5 text-gray-400"></i>
+            <button (click)="onFilterChange()" 
+                    class="absolute left-2 top-2 bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 transition-colors">
+              جستجو
+            </button>
+          </div>
+        </div>
+        
+        <!-- Sort Dropdown -->
+        <div class="flex items-center gap-4">
+          <label class="text-sm font-medium text-gray-700">مرتب‌سازی:</label>
+          <select [(ngModel)]="sortBy" 
+                  (change)="onFilterChange()"
+                  class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option *ngFor="let option of sortOptions" [value]="option.value">
+              {{option.label}}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid lg:grid-cols-4 gap-8">
+      
+      <!-- Sidebar Filters -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-sm p-6 sticky top-4">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">فیلترها</h3>
+          
+          <!-- Categories Filter -->
+          <div class="mb-6">
+            <h4 class="text-sm font-medium text-gray-700 mb-3">دسته‌بندی</h4>
+            <div class="space-y-2">
+              <label class="flex items-center">
+                <input type="radio" 
+                       [(ngModel)]="selectedCategory" 
+                       value=""
+                       (change)="onFilterChange()"
+                       class="ml-2 text-blue-600">
+                <span class="text-sm text-gray-700">همه دسته‌بندی‌ها</span>
+              </label>
+              
+              <label *ngFor="let category of categories" class="flex items-center">
+                <input type="radio" 
+                       [(ngModel)]="selectedCategory" 
+                       [value]="category.id"
+                       (change)="onFilterChange()"
+                       class="ml-2 text-blue-600">
+                <span class="text-sm text-gray-700">{{category.name}}</span>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Clear Filters -->
+          <button (click)="clearFilters()" 
+                  class="w-full text-sm text-blue-600 hover:text-blue-800 font-medium">
+            پاک کردن فیلترها
+          </button>
+        </div>
+      </div>
+      
+      <!-- Products Grid -->
+      <div class="lg:col-span-3">
+        
+        <!-- Results Info -->
+        <div class="flex justify-between items-center mb-6" *ngIf="pagination">
+          <div class="text-sm text-gray-600">
+            نمایش {{(pagination.page - 1) * pagination.per_page + 1}} تا 
+            {{Math.min(pagination.page * pagination.per_page, pagination.total)}} 
+            از {{pagination.total}} محصول
+          </div>
+        </div>
+        
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex justify-center items-center py-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+        
+        <!-- Products Grid -->
+        <div *ngIf="!loading" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div *ngFor="let product of products" 
+               class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
+            
+            <!-- Product Image -->
+            <div class="relative aspect-square bg-gray-100">
+              <img *ngIf="product.images.length > 0" 
+                   [src]="product.images[0]" 
+                   [alt]="product.name"
+                   class="w-full h-full object-cover">
+              
+              <div *ngIf="product.images.length === 0" 
+                   class="w-full h-full flex items-center justify-center">
+                <i class="fas fa-image text-4xl text-gray-400"></i>
+              </div>
+              
+              <!-- Sale Badge -->
+              <div *ngIf="product.is_on_sale" 
+                   class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
+                {{product.discount_percentage}}% تخفیف
+              </div>
+            </div>
+            
+            <!-- Product Info -->
+            <div class="p-4">
+              <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                {{product.name}}
+              </h3>
+              
+              <div class="text-sm text-gray-600 mb-3" *ngIf="product.category">
+                {{product.category}}
+              </div>
+              
+              <!-- Price -->
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <span class="text-lg font-bold text-gray-900">
+                    {{formatPrice(product.price)}}
+                  </span>
+                  
+                  <span *ngIf="product.compare_price" 
+                        class="text-sm text-gray-500 line-through">
+                    {{formatPrice(product.compare_price)}}
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Add to Cart Button -->
+              <button (click)="addToCart(product.id)" 
+                      class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <i class="fas fa-shopping-cart ml-2"></i>
+                افزودن به سبد
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div *ngIf="!loading && products.length === 0" 
+             class="text-center py-12">
+          <i class="fas fa-box-open text-6xl text-gray-400 mb-4"></i>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">محصولی یافت نشد</h3>
+          <p class="text-gray-600 mb-4">فیلترهای خود را تغییر دهید یا جستجوی دیگری امتحان کنید</p>
+          <button (click)="clearFilters()" 
+                  class="text-blue-600 hover:text-blue-800 font-medium">
+            پاک کردن فیلترها
+          </button>
+        </div>
+        
+        <!-- Pagination -->
+        <div *ngIf="pagination && pagination.pages > 1" 
+             class="flex justify-center items-center mt-8 gap-2">
+          
+          <!-- Previous Button -->
+          <button (click)="onPageChange(pagination.page - 1)" 
+                  [disabled]="pagination.page <= 1"
+                  class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          
+          <!-- Page Numbers -->
+          <button *ngFor="let page of getPageNumbers()" 
+                  (click)="onPageChange(page)"
+                  [class]="page === pagination.page ? 
+                    'px-4 py-2 bg-blue-600 text-white rounded-lg' : 
+                    'px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50'">
+            {{page}}
+          </button>
+          
+          <!-- Next Button -->
+          <button (click)="onPageChange(pagination.page + 1)" 
+                  [disabled]="pagination.page >= pagination.pages"
+                  class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
