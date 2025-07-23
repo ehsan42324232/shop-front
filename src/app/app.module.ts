@@ -27,6 +27,7 @@ import { AppRoutingModule } from './app-routing.module';
 // Platform Components (Store Management Focus)
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/shared/header/header.component';
+import { FooterComponent } from './components/shared/footer/footer.component';
 import { LoadingComponent } from './components/shared/loading/loading.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
@@ -47,6 +48,7 @@ import { AuthGuard } from './guards/auth.guard';
   declarations: [
     AppComponent,
     HeaderComponent,
+    FooterComponent,
     LoadingComponent,
     LoginComponent,
     RegisterComponent,
