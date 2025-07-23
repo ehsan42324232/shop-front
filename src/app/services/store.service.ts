@@ -1,259 +1,362 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { 
-  Store, 
-  StoreSettings, 
-  StoreTheme, 
-  StoreTemplate, 
-  StoreAnalytics,
-  THEME_PRESETS,
-  PLAN_LIMITS
-} from '../models/store.models';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+
+export interface StoreRequest {
+  store_name: string;
+  store_name_en: string;
+  subdomain: string;
+  business_type: string;
+  description: string;
+  business_license?: string;
+  national_id: string;
+  address: string;
+  contact_phone: string;
+  contact_email?: string;
+  website_url?: string;
+  estimated_products?: number;
+  monthly_sales_estimate?: string;
+}
+
+export interface StoreRequestStatus {
+  id: number;
+  store_name: string;
+  subdomain: string;
+  status: string;
+  status_display: string;
+  created_at: string;
+  reviewed_at?: string;
+  rejection_reason?: string;
+}
+
+export interface Store {
+  id: number;
+  name: string;
+  name_en: string;
+  domain: string;
+  description: string;
+  email: string;
+  phone: string;
+  address: string;
+  logo?: string;
+  is_active: boolean;
+  is_approved: boolean;
+  created_at: string;
+}
+
+export interface StoreTheme {
+  theme_name: string;
+  color_scheme: string;
+  primary_color: string;
+  secondary_color: string;
+  background_color: string;
+  text_color: string;
+  layout_type: string;
+  logo?: File | string;
+  banner_image?: File | string;
+  show_search: boolean;
+  show_categories: boolean;
+  show_cart: boolean;
+  show_wishlist: boolean;
+  show_reviews: boolean;
+}
+
+export interface StoreSettings {
+  meta_title: string;
+  meta_description: string;
+  free_shipping_threshold?: number;
+  shipping_cost: number;
+  min_order_amount?: number;
+  accept_cash_on_delivery: boolean;
+  accept_online_payment: boolean;
+  email_notifications: boolean;
+  sms_notifications: boolean;
+  instagram_url?: string;
+  telegram_url?: string;
+  whatsapp_number?: string;
+}
+
+export interface StoreDashboard {
+  store: Store;
+  today_visitors: number;
+  today_orders: number;
+  today_revenue: number;
+  month_visitors: number;
+  month_orders: number;
+  month_revenue: number;
+  total_products: number;
+  active_products: number;
+  out_of_stock_products: number;
+  weekly_sales_chart: any[];
+  popular_products: any[];
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data?: T;
+  errors?: any;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class StoreService {
-  private apiUrl = environment.apiUrl;
+  private apiUrl = environment.apiUrl + '/api/store/';
+  
   private currentStoreSubject = new BehaviorSubject<Store | null>(null);
   public currentStore$ = this.currentStoreSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    this.loadCurrentStore();
+  private httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    })
+  };
+
+  constructor(private http: HttpClient) { }
+
+  /**
+   * Create store request
+   */
+  createStoreRequest(data: StoreRequest): Observable<ApiResponse<StoreRequestStatus>> {
+    return this.http.post<ApiResponse<StoreRequestStatus>>(
+      `${this.apiUrl}request/create/`, 
+      data, 
+      this.getAuthHeaders()
+    ).pipe(catchError(this.handleError));
   }
 
-  // Store Management
-  getCurrentStore(): Observable<Store> {
-    return this.http.get<Store>(`${this.apiUrl}/stores/current`).pipe(
-      tap(store => this.currentStoreSubject.next(store))
+  /**
+   * Get my store request status
+   */
+  getMyStoreRequest(): Observable<ApiResponse<StoreRequestStatus>> {
+    return this.http.get<ApiResponse<StoreRequestStatus>>(
+      `${this.apiUrl}request/my/`, 
+      this.getAuthHeaders()
+    ).pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Check subdomain availability
+   */
+  checkSubdomainAvailability(subdomain: string): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}subdomain/check/`, 
+      { subdomain }, 
+      this.getAuthHeaders()
+    ).pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Get store creation wizard data
+   */
+  getWizardData(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(
+      `${this.apiUrl}request/wizard-data/`
+    ).pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Get my store
+   */
+  getMyStore(): Observable<ApiResponse<Store>> {
+    return this.http.get<ApiResponse<Store>>(
+      `${this.apiUrl}my-store/`, 
+      this.getAuthHeaders()
+    ).pipe(
+      tap(response => {
+        if (response.success && response.store) {
+          this.currentStoreSubject.next(response.store);
+        }
+      }),
+      catchError(this.handleError)
     );
   }
 
-  createStore(storeData: Partial<Store>): Observable<Store> {
-    return this.http.post<Store>(`${this.apiUrl}/stores`, storeData).pipe(
-      tap(store => this.currentStoreSubject.next(store))
-    );
+  /**
+   * Get store dashboard
+   */
+  getStoreDashboard(): Observable<ApiResponse<StoreDashboard>> {
+    return this.http.get<ApiResponse<StoreDashboard>>(
+      `${this.apiUrl}dashboard/`, 
+      this.getAuthHeaders()
+    ).pipe(catchError(this.handleError));
   }
 
-  updateStore(storeId: string, updates: Partial<Store>): Observable<Store> {
-    return this.http.put<Store>(`${this.apiUrl}/stores/${storeId}`, updates).pipe(
-      tap(store => this.currentStoreSubject.next(store))
-    );
+  /**
+   * Get store theme
+   */
+  getStoreTheme(): Observable<ApiResponse<StoreTheme>> {
+    return this.http.get<ApiResponse<StoreTheme>>(
+      `${this.apiUrl}theme/`, 
+      this.getAuthHeaders()
+    ).pipe(catchError(this.handleError));
   }
 
-  updateStoreSettings(storeId: string, settings: StoreSettings): Observable<Store> {
-    return this.http.put<Store>(`${this.apiUrl}/stores/${storeId}/settings`, settings).pipe(
-      tap(store => this.currentStoreSubject.next(store))
-    );
-  }
-
-  deleteStore(storeId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/stores/${storeId}`);
-  }
-
-  // Theme Management
-  getAvailableThemes(): Observable<StoreTheme[]> {
-    return this.http.get<StoreTheme[]>(`${this.apiUrl}/themes`);
-  }
-
-  getThemePresets(): { [key: string]: Partial<StoreTheme> } {
-    return THEME_PRESETS;
-  }
-
-  updateTheme(storeId: string, theme: StoreTheme): Observable<Store> {
-    return this.http.put<Store>(`${this.apiUrl}/stores/${storeId}/theme`, theme).pipe(
-      tap(store => this.currentStoreSubject.next(store))
-    );
-  }
-
-  previewTheme(storeId: string, theme: StoreTheme): Observable<string> {
-    return this.http.post<{ previewUrl: string }>(`${this.apiUrl}/stores/${storeId}/theme/preview`, theme)
-      .pipe(map(response => response.previewUrl));
-  }
-
-  saveCustomTheme(storeId: string, theme: StoreTheme): Observable<StoreTheme> {
-    return this.http.post<StoreTheme>(`${this.apiUrl}/stores/${storeId}/themes/custom`, theme);
-  }
-
-  // Store Templates
-  getStoreTemplates(): Observable<StoreTemplate[]> {
-    return this.http.get<StoreTemplate[]>(`${this.apiUrl}/store-templates`);
-  }
-
-  applyStoreTemplate(storeId: string, templateId: string): Observable<Store> {
-    return this.http.post<Store>(`${this.apiUrl}/stores/${storeId}/apply-template`, { templateId }).pipe(
-      tap(store => this.currentStoreSubject.next(store))
-    );
-  }
-
-  // Analytics
-  getStoreAnalytics(storeId: string, period: 'day' | 'week' | 'month' | 'year'): Observable<StoreAnalytics> {
-    return this.http.get<StoreAnalytics>(`${this.apiUrl}/stores/${storeId}/analytics`, {
-      params: { period }
-    });
-  }
-
-  // Domain Management
-  checkDomainAvailability(subdomain: string): Observable<boolean> {
-    return this.http.get<{ available: boolean }>(`${this.apiUrl}/domains/check`, {
-      params: { subdomain }
-    }).pipe(map(response => response.available));
-  }
-
-  setCustomDomain(storeId: string, domain: string): Observable<Store> {
-    return this.http.post<Store>(`${this.apiUrl}/stores/${storeId}/custom-domain`, { domain }).pipe(
-      tap(store => this.currentStoreSubject.next(store))
-    );
-  }
-
-  verifyCustomDomain(storeId: string): Observable<{ verified: boolean; error?: string }> {
-    return this.http.post<{ verified: boolean; error?: string }>(`${this.apiUrl}/stores/${storeId}/verify-domain`, {});
-  }
-
-  // Subscription Management
-  getAvailablePlans(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/subscription/plans`);
-  }
-
-  upgradePlan(storeId: string, planId: string): Observable<Store> {
-    return this.http.post<Store>(`${this.apiUrl}/stores/${storeId}/upgrade`, { planId }).pipe(
-      tap(store => this.currentStoreSubject.next(store))
-    );
-  }
-
-  getPlanLimits(): typeof PLAN_LIMITS {
-    return PLAN_LIMITS;
-  }
-
-  checkPlanLimits(storeId: string): Observable<{
-    products: { current: number; max: number; exceeded: boolean };
-    categories: { current: number; max: number; exceeded: boolean };
-    attributes: { current: number; max: number; exceeded: boolean };
-    storage: { current: number; max: number; exceeded: boolean };
-  }> {
-    return this.http.get<any>(`${this.apiUrl}/stores/${storeId}/limits`);
-  }
-
-  // Store Status
-  activateStore(storeId: string): Observable<Store> {
-    return this.http.post<Store>(`${this.apiUrl}/stores/${storeId}/activate`, {}).pipe(
-      tap(store => this.currentStoreSubject.next(store))
-    );
-  }
-
-  deactivateStore(storeId: string): Observable<Store> {
-    return this.http.post<Store>(`${this.apiUrl}/stores/${storeId}/deactivate`, {}).pipe(
-      tap(store => this.currentStoreSubject.next(store))
-    );
-  }
-
-  // Store Export/Backup
-  exportStoreData(storeId: string, includeProducts = true, includeOrders = false): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/stores/${storeId}/export`, {
-      params: { includeProducts: includeProducts.toString(), includeOrders: includeOrders.toString() },
-      responseType: 'blob'
-    });
-  }
-
-  importStoreData(storeId: string, file: File): Observable<{
-    success: boolean;
-    importedCategories: number;
-    importedProducts: number;
-    errors: any[];
-  }> {
+  /**
+   * Update store theme
+   */
+  updateStoreTheme(theme: Partial<StoreTheme>): Observable<ApiResponse<StoreTheme>> {
     const formData = new FormData();
-    formData.append('file', file);
     
-    return this.http.post<any>(`${this.apiUrl}/stores/${storeId}/import`, formData);
-  }
-
-  // Store Preview
-  getStorePreviewUrl(storeId: string): Observable<string> {
-    return this.http.get<{ previewUrl: string }>(`${this.apiUrl}/stores/${storeId}/preview`)
-      .pipe(map(response => response.previewUrl));
-  }
-
-  // Store Search & Discovery
-  searchStores(query: string, filters?: any): Observable<Store[]> {
-    const params: any = { query };
-    if (filters) {
-      Object.assign(params, filters);
-    }
-    return this.http.get<Store[]>(`${this.apiUrl}/stores/search`, { params });
-  }
-
-  // Helper Methods
-  private loadCurrentStore(): void {
-    const storeId = localStorage.getItem('currentStoreId');
-    if (storeId) {
-      this.getCurrentStore().subscribe();
-    }
-  }
-
-  setCurrentStoreId(storeId: string): void {
-    localStorage.setItem('currentStoreId', storeId);
-  }
-
-  clearCurrentStore(): void {
-    localStorage.removeItem('currentStoreId');
-    this.currentStoreSubject.next(null);
-  }
-
-  // Validation Helpers
-  validateStoreName(name: string): { valid: boolean; errors: string[] } {
-    const errors: string[] = [];
-    
-    if (!name || name.trim().length === 0) {
-      errors.push('نام فروشگاه الزامی است');
-    } else if (name.length < 2) {
-      errors.push('نام فروشگاه باید حداقل ۲ کاراکتر باشد');
-    } else if (name.length > 100) {
-      errors.push('نام فروشگاه باید حداکثر ۱۰۰ کاراکتر باشد');
-    }
-    
-    return { valid: errors.length === 0, errors };
-  }
-
-  validateSubdomain(subdomain: string): { valid: boolean; errors: string[] } {
-    const errors: string[] = [];
-    const subdomainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?$/;
-    
-    if (!subdomain || subdomain.trim().length === 0) {
-      errors.push('نام زیردامنه الزامی است');
-    } else if (subdomain.length < 3) {
-      errors.push('نام زیردامنه باید حداقل ۳ کاراکتر باشد');
-    } else if (subdomain.length > 63) {
-      errors.push('نام زیردامنه باید حداکثر ۶۳ کاراکتر باشد');
-    } else if (!subdomainRegex.test(subdomain)) {
-      errors.push('نام زیردامنه فقط می‌تواند شامل حروف انگلیسی، اعداد و خط تیره باشد');
-    }
-    
-    // Reserved subdomains
-    const reserved = ['www', 'api', 'admin', 'app', 'mail', 'ftp', 'localhost', 'test', 'staging'];
-    if (reserved.includes(subdomain.toLowerCase())) {
-      errors.push('این نام زیردامنه رزرو شده است');
-    }
-    
-    return { valid: errors.length === 0, errors };
-  }
-
-  // Currency and formatting helpers
-  formatCurrency(amount: number, currency: string = 'IRR'): string {
-    const currencyFormats: { [key: string]: { symbol: string; decimals: number } } = {
-      'IRR': { symbol: 'تومان', decimals: 0 },
-      'USD': { symbol: '$', decimals: 2 },
-      'EUR': { symbol: '€', decimals: 2 }
-    };
-    
-    const format = currencyFormats[currency] || currencyFormats['IRR'];
-    const formatted = amount.toLocaleString('fa-IR', {
-      minimumFractionDigits: format.decimals,
-      maximumFractionDigits: format.decimals
+    Object.keys(theme).forEach(key => {
+      const value = (theme as any)[key];
+      if (value !== null && value !== undefined) {
+        if (value instanceof File) {
+          formData.append(key, value);
+        } else if (typeof value === 'boolean') {
+          formData.append(key, value.toString());
+        } else {
+          formData.append(key, value);
+        }
+      }
     });
+
+    return this.http.patch<ApiResponse<StoreTheme>>(
+      `${this.apiUrl}theme/`, 
+      formData, 
+      this.getAuthHeadersForFormData()
+    ).pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Get store settings
+   */
+  getStoreSettings(): Observable<ApiResponse<StoreSettings>> {
+    return this.http.get<ApiResponse<StoreSettings>>(
+      `${this.apiUrl}settings/`, 
+      this.getAuthHeaders()
+    ).pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Update store settings
+   */
+  updateStoreSettings(settings: Partial<StoreSettings>): Observable<ApiResponse<StoreSettings>> {
+    return this.http.patch<ApiResponse<StoreSettings>>(
+      `${this.apiUrl}settings/`, 
+      settings, 
+      this.getAuthHeaders()
+    ).pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Get store analytics
+   */
+  getStoreAnalytics(startDate?: string, endDate?: string): Observable<ApiResponse<any>> {
+    let url = `${this.apiUrl}analytics/`;
+    const params = [];
     
-    return currency === 'IRR' ? `${formatted} ${format.symbol}` : `${format.symbol}${formatted}`;
+    if (startDate) params.push(`start_date=${startDate}`);
+    if (endDate) params.push(`end_date=${endDate}`);
+    
+    if (params.length > 0) {
+      url += `?${params.join('&')}`;
+    }
+
+    return this.http.get<ApiResponse<any>>(url, this.getAuthHeaders())
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Get current store
+   */
+  getCurrentStore(): Store | null {
+    return this.currentStoreSubject.value;
+  }
+
+  /**
+   * Get authentication headers
+   */
+  private getAuthHeaders() {
+    const token = localStorage.getItem('auth_token');
+    return {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      })
+    };
+  }
+
+  /**
+   * Get auth headers for form data
+   */
+  private getAuthHeadersForFormData() {
+    const token = localStorage.getItem('auth_token');
+    return {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      })
+    };
+  }
+
+  /**
+   * Handle HTTP errors
+   */
+  private handleError(error: any): Observable<never> {
+    let errorMessage = 'خطایی رخ داده است. لطفاً مجدداً تلاش کنید.';
+    
+    if (error.error?.message) {
+      errorMessage = error.error.message;
+    } else if (error.status === 0) {
+      errorMessage = 'خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید.';
+    } else if (error.status === 401) {
+      errorMessage = 'دسترسی غیرمجاز. لطفاً مجدداً وارد شوید.';
+    } else if (error.status === 404) {
+      errorMessage = 'سرویس درخواستی یافت نشد.';
+    } else if (error.status === 500) {
+      errorMessage = 'خطای سرور. لطفاً بعداً تلاش کنید.';
+    }
+
+    console.error('Store API Error:', error);
+    return throwError(() => new Error(errorMessage));
+  }
+
+  /**
+   * Format currency (Toman)
+   */
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('fa-IR').format(amount) + ' تومان';
+  }
+
+  /**
+   * Get business type display name
+   */
+  getBusinessTypeDisplay(type: string): string {
+    const businessTypes: { [key: string]: string } = {
+      'clothing': 'پوشاک',
+      'electronics': 'لوازم الکترونیکی',
+      'home': 'لوازم خانه',
+      'food': 'مواد غذایی',
+      'beauty': 'زیبایی و سلامت',
+      'books': 'کتاب و نشریات',
+      'sports': 'ورزش و تفریح',
+      'automotive': 'خودرو و موتورسیکلت',
+      'toys': 'اسباب بازی',
+      'handmade': 'دست‌ساز',
+      'other': 'سایر'
+    };
+    return businessTypes[type] || type;
+  }
+
+  /**
+   * Validate Iranian national ID
+   */
+  validateNationalId(nationalId: string): boolean {
+    if (!/^\d{10}$/.test(nationalId)) {
+      return false;
+    }
+    
+    const check = parseInt(nationalId[9]);
+    const sum = nationalId.split('').slice(0, 9)
+      .reduce((acc, digit, index) => acc + parseInt(digit) * (10 - index), 0);
+    const remainder = sum % 11;
+    
+    return remainder < 2 ? check === remainder : check === 11 - remainder;
   }
 }
