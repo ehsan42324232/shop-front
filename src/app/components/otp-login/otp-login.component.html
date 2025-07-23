@@ -1,0 +1,83 @@
+<!-- OTP Login Component -->
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+  <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+    
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <img src="/assets/mall-logo.svg" alt="Mall Logo" class="h-16 w-auto mx-auto mb-4">
+      <h2 class="text-2xl font-bold text-gray-900">ورود به مال</h2>
+      <p class="text-gray-600 mt-2">با شماره تلفن خود وارد شوید</p>
+    </div>
+
+    <!-- Step 1: Phone Number Input -->
+    <div *ngIf="step === 1">
+      <form (ngSubmit)="sendOTP()">
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            شماره تلفن
+          </label>
+          <input type="tel" 
+                 [(ngModel)]="phoneNumber" 
+                 name="phoneNumber"
+                 placeholder="09123456789"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-left"
+                 dir="ltr">
+        </div>
+        
+        <button type="submit" 
+                [disabled]="loading"
+                class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all disabled:opacity-50">
+          <span *ngIf="!loading">ارسال کد تایید</span>
+          <span *ngIf="loading">در حال ارسال...</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Step 2: OTP Verification -->
+    <div *ngIf="step === 2">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-sms text-2xl text-green-600"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">کد تایید ارسال شد</h3>
+        <p class="text-gray-600">کد ۶ رقمی ارسال شده به شماره {{phoneNumber}} را وارد کنید</p>
+      </div>
+      
+      <form (ngSubmit)="verifyOTP()">
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            کد تایید
+          </label>
+          <input type="text" 
+                 [(ngModel)]="otpCode" 
+                 name="otpCode"
+                 placeholder="123456"
+                 maxlength="6"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-2xl tracking-widest"
+                 dir="ltr">
+        </div>
+        
+        <button type="submit" 
+                [disabled]="loading"
+                class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all disabled:opacity-50 mb-4">
+          <span *ngIf="!loading">تایید و ورود</span>
+          <span *ngIf="loading">در حال تایید...</span>
+        </button>
+        
+        <button type="button" 
+                (click)="goBack()"
+                class="w-full text-gray-600 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
+          بازگشت به مرحله قبل
+        </button>
+      </form>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-triangle text-red-500 ml-2"></i>
+        <span class="text-red-700">{{error}}</span>
+      </div>
+    </div>
+  </div>
+</div>
