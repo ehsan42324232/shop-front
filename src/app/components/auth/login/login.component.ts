@@ -1,139 +1,282 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService, OTPRequest, OTPVerification } from '../../services/auth.service';
+import { Subject, interval } from 'rxjs';
+import { takeUntil, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
-  template: `
-    <div class="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
-      <div class="max-w-md w-full space-y-8">
-        <div class="text-center">
-          <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-            </svg>
-          </div>
-          <h2 class="text-3xl font-extrabold text-gray-900">
-            ورود به پلتفرم فروشگاه‌ساز
-          </h2>
-          <p class="mt-2 text-gray-600">
-            وارد حساب کاربری خود شوید و فروشگاه‌تان را مدیریت کنید
-          </p>
-        </div>
-        
-        <div class="bg-white py-8 px-6 shadow-lg rounded-lg">
-          <form class="space-y-6" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-            <div>
-              <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-                نام کاربری
-              </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                formControlName="username"
-                required
-                class="w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="نام کاربری خود را وارد کنید"
-              />
-              <div *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.errors" class="mt-2 text-sm text-red-600">
-                <div *ngIf="loginForm.get('username')?.errors?.['required']">نام کاربری الزامی است</div>
-              </div>
-            </div>
-            
-            <div>
-              <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                رمز عبور
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                formControlName="password"
-                required
-                class="w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="رمز عبور خود را وارد کنید"
-              />
-              <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors" class="mt-2 text-sm text-red-600">
-                <div *ngIf="loginForm.get('password')?.errors?.['required']">رمز عبور الزامی است</div>
-              </div>
-            </div>
-
-            <div *ngIf="errorMessage" class="text-sm text-red-600 text-center bg-red-50 p-3 rounded-lg">
-              {{ errorMessage }}
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                [disabled]="loginForm.invalid || isLoading"
-                class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              >
-                <span *ngIf="isLoading" class="ml-2">
-                  <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                </span>
-                {{ isLoading ? 'در حال ورود...' : 'ورود' }}
-              </button>
-            </div>
-
-            <div class="text-center">
-              <span class="text-sm text-gray-600">
-                حساب کاربری ندارید؟
-                <a class="font-medium text-blue-600 hover:text-blue-500 cursor-pointer mr-1" (click)="router.navigate(['/register'])">
-                  درخواست فروشگاه
-                </a>
-              </span>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    :host {
-      direction: rtl;
-    }
-  `]
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
-  loginForm: FormGroup;
+export class LoginComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  
+  // Form state
+  step: 'phone' | 'otp' = 'phone';
   isLoading = false;
-  errorMessage = '';
-
+  
+  // Form data
+  phone = '';
+  otpCode = '';
+  
+  // Validation and messages
+  phoneError = '';
+  otpError = '';
+  successMessage = '';
+  
+  // OTP countdown
+  otpCountdown = 0;
+  canResendOTP = true;
+  
   constructor(
-    private fb: FormBuilder,
     private authService: AuthService,
-    public router: Router
-  ) {
-    this.loginForm = this.fb.group({
-      username: ['', [Validators.required]],
-      password: ['', [Validators.required]]
-    });
+    private router: Router
+  ) { }
+
+  ngOnInit(): void {
+    // Redirect if already authenticated
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/platform']);
+    }
   }
 
-  onSubmit(): void {
-    if (this.loginForm.valid) {
-      this.isLoading = true;
-      this.errorMessage = '';
-      
-      const { username, password } = this.loginForm.value;
-      
-      this.authService.login(username, password).subscribe({
-        next: () => {
-          this.router.navigate(['/my-store']);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Send OTP to phone number
+   */
+  sendOTP(): void {
+    if (!this.validatePhone()) {
+      return;
+    }
+
+    this.isLoading = true;
+    this.phoneError = '';
+    
+    const cleanPhone = this.authService.cleanPhoneNumber(this.phone);
+    const otpRequest: OTPRequest = {
+      phone: cleanPhone,
+      purpose: 'login'
+    };
+
+    this.authService.sendOTP(otpRequest)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response.success) {
+            this.step = 'otp';
+            this.startOTPCountdown();
+            this.successMessage = response.message;
+          } else {
+            this.phoneError = response.message;
+          }
         },
         error: (error) => {
-          this.errorMessage = error.error?.error || 'ورود ناموفق بود. لطفاً دوباره تلاش کنید.';
           this.isLoading = false;
-        },
-        complete: () => {
-          this.isLoading = false;
+          this.phoneError = error.message;
         }
       });
+  }
+
+  /**
+   * Verify OTP code
+   */
+  verifyOTP(): void {
+    if (!this.validateOTP()) {
+      return;
+    }
+
+    this.isLoading = true;
+    this.otpError = '';
+    
+    const cleanPhone = this.authService.cleanPhoneNumber(this.phone);
+    const otpVerification: OTPVerification = {
+      phone: cleanPhone,
+      otp_code: this.otpCode,
+      purpose: 'login'
+    };
+
+    this.authService.verifyOTP(otpVerification)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response.success) {
+            this.successMessage = response.message;
+            // Redirect based on user type
+            if (response.user?.is_store_owner) {
+              this.router.navigate(['/platform']);
+            } else {
+              this.router.navigate(['/']);
+            }
+          } else {
+            this.otpError = response.message;
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.otpError = error.message;
+        }
+      });
+  }
+
+  /**
+   * Resend OTP code
+   */
+  resendOTP(): void {
+    if (!this.canResendOTP) {
+      return;
+    }
+
+    this.otpCode = '';
+    this.otpError = '';
+    this.sendOTP();
+  }
+
+  /**
+   * Go back to phone step
+   */
+  goBackToPhone(): void {
+    this.step = 'phone';
+    this.otpCode = '';
+    this.otpError = '';
+    this.successMessage = '';
+    this.otpCountdown = 0;
+    this.canResendOTP = true;
+  }
+
+  /**
+   * Navigate to register
+   */
+  goToRegister(): void {
+    this.router.navigate(['/register']);
+  }
+
+  /**
+   * Validate phone number
+   */
+  private validatePhone(): boolean {
+    this.phoneError = '';
+    
+    if (!this.phone.trim()) {
+      this.phoneError = 'شماره تلفن الزامی است.';
+      return false;
+    }
+
+    if (!this.authService.validateIranianPhone(this.phone)) {
+      this.phoneError = 'شماره تلفن باید به فرمت 09xxxxxxxxx باشد.';
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Validate OTP code
+   */
+  private validateOTP(): boolean {
+    this.otpError = '';
+    
+    if (!this.otpCode.trim()) {
+      this.otpError = 'کد تایید الزامی است.';
+      return false;
+    }
+
+    if (this.otpCode.length !== 6) {
+      this.otpError = 'کد تایید باید 6 رقم باشد.';
+      return false;
+    }
+
+    if (!/^\d+$/.test(this.otpCode)) {
+      this.otpError = 'کد تایید باید عددی باشد.';
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Start OTP countdown timer
+   */
+  private startOTPCountdown(): void {
+    this.otpCountdown = 120; // 2 minutes
+    this.canResendOTP = false;
+    
+    interval(1000)
+      .pipe(
+        take(this.otpCountdown),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: () => {
+          this.otpCountdown--;
+          if (this.otpCountdown <= 0) {
+            this.canResendOTP = true;
+          }
+        }
+      });
+  }
+
+  /**
+   * Format countdown time
+   */
+  getCountdownText(): string {
+    const minutes = Math.floor(this.otpCountdown / 60);
+    const seconds = this.otpCountdown % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  /**
+   * Handle phone input formatting
+   */
+  onPhoneInput(event: any): void {
+    let value = event.target.value.replace(/\D/g, ''); // Remove non-digits
+    
+    // Format as user types
+    if (value.length > 0) {
+      if (value.startsWith('98')) {
+        value = '0' + value.substring(2);
+      }
+      if (!value.startsWith('0')) {
+        value = '0' + value;
+      }
+      if (value.length > 11) {
+        value = value.substring(0, 11);
+      }
+    }
+    
+    this.phone = value;
+    event.target.value = this.authService.formatIranianPhone(value);
+  }
+
+  /**
+   * Handle OTP input (digits only)
+   */
+  onOTPInput(event: any): void {
+    let value = event.target.value.replace(/\D/g, ''); // Remove non-digits
+    if (value.length > 6) {
+      value = value.substring(0, 6);
+    }
+    this.otpCode = value;
+    event.target.value = value;
+  }
+
+  /**
+   * Auto-submit when OTP is complete
+   */
+  onOTPChange(): void {
+    if (this.otpCode.length === 6) {
+      // Auto-verify after a short delay
+      setTimeout(() => {
+        if (this.otpCode.length === 6) {
+          this.verifyOTP();
+        }
+      }, 500);
     }
   }
 }
