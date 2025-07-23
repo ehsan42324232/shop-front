@@ -7,15 +7,19 @@ import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
 import { PlatformHomeComponent } from './components/platform/platform-home/platform-home.component';
 import { StoreManagementComponent } from './components/store-management/store-management.component';
+import { HomepageComponent } from './pages/homepage/homepage.component';
 
 const routes: Routes = [
+  // Public homepage route
+  { path: '', component: HomepageComponent },
+  { path: 'home', component: HomepageComponent },
+  
   // Auth routes
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   
   // Platform routes (for store owners)
-  { path: '', component: PlatformHomeComponent },
-  { path: 'home', component: PlatformHomeComponent },
+  { path: 'platform', component: PlatformHomeComponent, canActivate: [AuthGuard] },
   
   // Store Management (protected routes)
   { 
