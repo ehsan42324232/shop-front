@@ -1,0 +1,122 @@
+<nav class="fixed top-0 w-full bg-white bg-opacity-95 backdrop-blur-sm shadow-lg z-50 transition-all duration-300">
+  <div class="container mx-auto px-6">
+    <div class="flex justify-between items-center h-16">
+      
+      <!-- Logo -->
+      <div class="flex items-center">
+        <a routerLink="/" class="flex items-center">
+          <div class="text-3xl font-bold bg-gradient-to-r from-red-500 via-blue-500 to-red-500 bg-clip-text text-transparent">
+            مال
+          </div>
+          <span class="text-gray-700 text-sm mr-2 hidden md:block">فروشگاه‌ساز</span>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center space-x-8 space-x-reverse">
+        <a (click)="scrollToSection('features')" 
+           class="text-gray-700 hover:text-blue-600 cursor-pointer transition-colors duration-200">
+          ویژگی‌ها
+        </a>
+        <a (click)="scrollToSection('pricing')" 
+           class="text-gray-700 hover:text-blue-600 cursor-pointer transition-colors duration-200">
+          قیمت‌ها
+        </a>
+        <a href="#support" 
+           class="text-gray-700 hover:text-blue-600 cursor-pointer transition-colors duration-200">
+          پشتیبانی
+        </a>
+        <a href="#about" 
+           class="text-gray-700 hover:text-blue-600 cursor-pointer transition-colors duration-200">
+          درباره ما
+        </a>
+      </div>
+
+      <!-- Auth Buttons -->
+      <div class="hidden md:flex items-center space-x-4 space-x-reverse">
+        <ng-container *ngIf="!isLoggedIn">
+          <button (click)="navigateToLogin()" 
+                  class="text-gray-700 hover:text-blue-600 px-4 py-2 rounded-lg transition-colors duration-200">
+            ورود
+          </button>
+          <button (click)="navigateToRegister()" 
+                  class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200">
+            ثبت نام
+          </button>
+        </ng-container>
+        
+        <ng-container *ngIf="isLoggedIn">
+          <button (click)="navigateToPlatform()" 
+                  class="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200">
+            <i class="material-icons text-sm ml-2">dashboard</i>
+            پنل مدیریت
+          </button>
+          <button (click)="logout()" 
+                  class="text-red-600 hover:text-red-700 px-4 py-2 rounded-lg transition-colors duration-200">
+            <i class="material-icons text-sm ml-2">logout</i>
+            خروج
+          </button>
+        </ng-container>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <div class="md:hidden">
+        <button (click)="toggleMenu()" 
+                class="text-gray-700 hover:text-blue-600 transition-colors duration-200">
+          <i class="material-icons text-2xl">{{ isMenuOpen ? 'close' : 'menu' }}</i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="md:hidden" [class.hidden]="!isMenuOpen">
+      <div class="pb-4 space-y-2">
+        <a (click)="scrollToSection('features')" 
+           class="block text-gray-700 hover:text-blue-600 py-2 px-4 rounded-lg transition-colors duration-200 cursor-pointer">
+          ویژگی‌ها
+        </a>
+        <a (click)="scrollToSection('pricing')" 
+           class="block text-gray-700 hover:text-blue-600 py-2 px-4 rounded-lg transition-colors duration-200 cursor-pointer">
+          قیمت‌ها
+        </a>
+        <a href="#support" 
+           class="block text-gray-700 hover:text-blue-600 py-2 px-4 rounded-lg transition-colors duration-200">
+          پشتیبانی
+        </a>
+        <a href="#about" 
+           class="block text-gray-700 hover:text-blue-600 py-2 px-4 rounded-lg transition-colors duration-200">
+          درباره ما
+        </a>
+        
+        <div class="border-t pt-4 mt-4">
+          <ng-container *ngIf="!isLoggedIn">
+            <button (click)="navigateToLogin()" 
+                    class="block w-full text-right text-gray-700 hover:text-blue-600 py-2 px-4 rounded-lg transition-colors duration-200">
+              ورود
+            </button>
+            <button (click)="navigateToRegister()" 
+                    class="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 px-4 rounded-lg mt-2 hover:shadow-lg transition-all duration-200">
+              ثبت نام
+            </button>
+          </ng-container>
+          
+          <ng-container *ngIf="isLoggedIn">
+            <button (click)="navigateToPlatform()" 
+                    class="block w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-2 px-4 rounded-lg hover:shadow-lg transition-all duration-200">
+              <i class="material-icons text-sm ml-2">dashboard</i>
+              پنل مدیریت
+            </button>
+            <button (click)="logout()" 
+                    class="block w-full text-right text-red-600 hover:text-red-700 py-2 px-4 rounded-lg mt-2 transition-colors duration-200">
+              <i class="material-icons text-sm ml-2">logout</i>
+              خروج
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Spacer to prevent content overlap -->
+<div class="h-16"></div>
