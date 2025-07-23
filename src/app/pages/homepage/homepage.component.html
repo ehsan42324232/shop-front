@@ -1,0 +1,260 @@
+<!-- Hero Section -->
+<section class="hero-section relative min-h-screen flex items-center justify-center bg-gradient-to-bl from-blue-900 via-purple-900 to-red-900 overflow-hidden">
+  <!-- Background Animation -->
+  <div class="absolute inset-0 opacity-20">
+    <div class="absolute top-10 left-10 w-32 h-32 bg-white rounded-full animate-pulse"></div>
+    <div class="absolute top-32 right-20 w-20 h-20 bg-red-400 rounded-full animate-bounce"></div>
+    <div class="absolute bottom-20 left-1/4 w-16 h-16 bg-blue-400 rounded-full animate-ping"></div>
+  </div>
+
+  <div class="container mx-auto px-6 text-center text-white relative z-10">
+    <!-- Logo -->
+    <div class="mb-8">
+      <h1 class="text-6xl md:text-8xl font-bold bg-gradient-to-r from-red-400 via-white to-blue-400 bg-clip-text text-transparent animate-fade-in">
+        مــال
+      </h1>
+      <p class="text-xl md:text-2xl mt-4 text-gray-200">فروشگاه‌ساز آنلاین</p>
+    </div>
+
+    <!-- Main Heading -->
+    <h2 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+      فروشگاه آنلاین خود را
+      <span class="bg-gradient-to-r from-yellow-400 to-red-400 bg-clip-text text-transparent">
+        امروز راه‌اندازی کنید
+      </span>
+    </h2>
+
+    <!-- Subtitle -->
+    <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+      با پلتفرم پیشرفته مال، فروشگاه آنلاین حرفه‌ای خود را در کمتر از ۱۰ دقیقه راه‌اندازی کنید.
+      همه‌چیز برای شروع کسب‌وکار آنلاین شما آماده است.
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-12">
+      <button (click)="openRequestForm()" 
+              class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 rounded-full text-lg font-bold transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+        <i class="material-icons ml-2">rocket_launch</i>
+        شروع رایگان
+      </button>
+      <button (click)="scrollToFeatures()" 
+              class="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-full text-lg font-bold transform hover:scale-105 transition-all duration-300">
+        <i class="material-icons ml-2">play_arrow</i>
+        مشاهده ویژگی‌ها
+      </button>
+    </div>
+
+    <!-- Stats Preview -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+      <div *ngFor="let stat of stats" class="text-center">
+        <div class="text-2xl md:text-3xl font-bold text-yellow-400 counter-value">{{stat.value}}</div>
+        <div class="text-sm text-gray-300">{{stat.label}}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll Down Indicator -->
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <i class="material-icons text-white text-3xl">keyboard_arrow_down</i>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-20 bg-gray-50">
+  <div class="container mx-auto px-6">
+    <!-- Section Header -->
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+        ویژگی‌های 
+        <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">پیشرفته</span>
+      </h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+        همه‌چیزی که برای راه‌اندازی فروشگاه آنلاین موفق نیاز دارید
+      </p>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div *ngFor="let feature of features; let i = index" 
+           class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 border-t-4 border-blue-500">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="material-icons text-white text-2xl">{{feature.icon}}</i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">{{feature.title}}</h3>
+          <p class="text-gray-600">{{feature.description}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Product Management Section -->
+<section class="py-20 bg-white">
+  <div class="container mx-auto px-6">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">
+          مدیریت محصولات
+          <span class="bg-gradient-to-r from-green-500 to-blue-500 bg-clip-text text-transparent">هوشمند</span>
+        </h2>
+        <p class="text-lg text-gray-600 mb-8">
+          سیستم پیشرفته مدیریت محصولات با قابلیت‌های منحصر به فرد:
+        </p>
+        <ul class="space-y-4">
+          <li class="flex items-center">
+            <i class="material-icons text-green-500 ml-3">check_circle</i>
+            <span>دسته‌بندی چندسطحی محصولات</span>
+          </li>
+          <li class="flex items-center">
+            <i class="material-icons text-green-500 ml-3">check_circle</i>
+            <span>ویژگی‌های قابل تنظیم (رنگ، سایز، ...)</span>
+          </li>
+          <li class="flex items-center">
+            <i class="material-icons text-green-500 ml-3">check_circle</i>
+            <span>مدیریت موجودی هوشمند</span>
+          </li>
+          <li class="flex items-center">
+            <i class="material-icons text-green-500 ml-3">check_circle</i>
+            <span>اتصال به شبکه‌های اجتماعی</span>
+          </li>
+        </ul>
+      </div>
+      <div class="relative">
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-8 text-white">
+          <div class="bg-white bg-opacity-10 rounded-xl p-6">
+            <h3 class="text-2xl font-bold mb-4">نمونه محصول</h3>
+            <div class="grid grid-cols-3 gap-4 mb-4">
+              <div class="bg-red-500 h-12 rounded"></div>
+              <div class="bg-yellow-500 h-12 rounded"></div>
+              <div class="bg-green-500 h-12 rounded"></div>
+            </div>
+            <p class="text-sm">تیشرت یقه گرد نخی - ترکی اصل</p>
+            <p class="text-xs opacity-75">رنگ‌ها: قرمز، زرد، سبز</p>
+            <p class="text-xs opacity-75">سایزها: XL, XXL</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Social Integration Section -->
+<section class="py-20 bg-gradient-to-r from-purple-600 to-pink-600">
+  <div class="container mx-auto px-6 text-center text-white">
+    <h2 class="text-4xl font-bold mb-6">
+      اتصال به شبکه‌های اجتماعی
+    </h2>
+    <p class="text-xl mb-12 max-w-3xl mx-auto">
+      محتوای تصاویر، ویدیوها و توضیحات محصولات خود را مستقیماً از اینستاگرام و تلگرام وارد کنید
+    </p>
+    
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="bg-white bg-opacity-10 rounded-xl p-6">
+        <i class="material-icons text-4xl mb-4">photo_library</i>
+        <h3 class="text-xl font-bold mb-2">تصاویر خودکار</h3>
+        <p>وارد کردن تصاویر از آخرین پست‌ها</p>
+      </div>
+      <div class="bg-white bg-opacity-10 rounded-xl p-6">
+        <i class="material-icons text-4xl mb-4">videocam</i>
+        <h3 class="text-xl font-bold mb-2">ویدیوهای تبلیغاتی</h3>
+        <p>استفاده از ویدیوهای استوری‌ها</p>
+      </div>
+      <div class="bg-white bg-opacity-10 rounded-xl p-6">
+        <i class="material-icons text-4xl mb-4">description</i>
+        <h3 class="text-xl font-bold mb-2">توضیحات هوشمند</h3>
+        <p>استخراج متن از کپشن‌ها</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-20 bg-gray-50">
+  <div class="container mx-auto px-6">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold text-gray-800 mb-4">
+        نظرات 
+        <span class="bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">مشتریان</span>
+      </h2>
+      <p class="text-xl text-gray-600">چه کسانی از پلتفرم مال استفاده می‌کنند</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      <div *ngFor="let testimonial of testimonials" 
+           class="bg-white rounded-2xl p-8 shadow-lg">
+        <div class="flex items-center mb-6">
+          <div class="w-16 h-16 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full flex items-center justify-center ml-4">
+            <span class="text-white font-bold text-xl">{{testimonial.name.charAt(0)}}</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-gray-800">{{testimonial.name}}</h4>
+            <p class="text-gray-600 text-sm">{{testimonial.business}}</p>
+          </div>
+        </div>
+        <p class="text-gray-700 italic">"{{testimonial.content}}"</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-gradient-to-r from-red-600 to-blue-600">
+  <div class="container mx-auto px-6 text-center text-white">
+    <h2 class="text-4xl font-bold mb-6">
+      آماده شروع هستید؟
+    </h2>
+    <p class="text-xl mb-8 max-w-2xl mx-auto">
+      فروشگاه آنلاین خود را همین امروز راه‌اندازی کنید و درآمد خود را افزایش دهید
+    </p>
+    <button (click)="openRequestForm()" 
+            class="bg-white text-blue-600 hover:bg-gray-100 px-12 py-4 rounded-full text-xl font-bold transform hover:scale-105 transition-all duration-300 shadow-lg">
+      <i class="material-icons ml-2">store</i>
+      شروع فروشگاه من
+    </button>
+  </div>
+</section>
+
+<!-- Request Demo Modal -->
+<div id="requestModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50" style="display: none;">
+  <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-2xl font-bold text-gray-800">درخواست مشاوره رایگان</h3>
+      <button (click)="closeRequestForm()" class="text-gray-400 hover:text-gray-600">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+    
+    <form #requestForm="ngForm" (ngSubmit)="submitRequest(requestForm)" class="space-y-4">
+      <div>
+        <label class="block text-gray-700 text-sm font-bold mb-2">نام و نام خانوادگی</label>
+        <input type="text" name="name" ngModel required 
+               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      
+      <div>
+        <label class="block text-gray-700 text-sm font-bold mb-2">شماره تماس</label>
+        <input type="tel" name="phone" ngModel required 
+               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      
+      <div>
+        <label class="block text-gray-700 text-sm font-bold mb-2">نوع کسب‌وکار</label>
+        <select name="business_type" ngModel required 
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option value="">انتخاب کنید</option>
+          <option value="clothing">پوشاک</option>
+          <option value="electronics">لوازم الکترونیکی</option>
+          <option value="home">لوازم خانه</option>
+          <option value="food">مواد غذایی</option>
+          <option value="other">سایر</option>
+        </select>
+      </div>
+      
+      <button type="submit" 
+              class="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-lg font-bold hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+        ارسال درخواست
+      </button>
+    </form>
+  </div>
+</div>
