@@ -33,6 +33,9 @@ import { RegisterComponent } from './components/auth/register/register.component
 import { PlatformHomeComponent } from './components/platform/platform-home/platform-home.component';
 import { StoreManagementComponent } from './components/store-management/store-management.component';
 
+// New Homepage Component
+import { HomepageComponent } from './pages/homepage/homepage.component';
+
 // Interceptors
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
@@ -48,19 +51,18 @@ import { AuthGuard } from './guards/auth.guard';
     LoginComponent,
     RegisterComponent,
     PlatformHomeComponent,
-    StoreManagementComponent
-    // Removed: ProductListComponent, ProductDetailComponent, BasketComponent, CheckoutComponent
-    // These are now for individual store websites, not the platform
+    StoreManagementComponent,
+    HomepageComponent
   ],
   imports: [
     BrowserModule,
-    CommonModule, // Added CommonModule for number pipe and slice pipe support
+    CommonModule,
     BrowserAnimationsModule,
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
     AppRoutingModule,
-    // PrimeNG Modules - Re-added after adding to package.json
+    // PrimeNG Modules
     ButtonModule,
     AccordionModule,
     CardModule,
