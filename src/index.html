@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <title>فروشگاه‌ساز جعبه‌ابزار</title>
+  <title>مال - فروشگاه‌ساز آنلاین</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -12,6 +12,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <!-- Meta Tags for SEO -->
+  <meta name="description" content="پلتفرم مال - راه‌اندازی فروشگاه آنلاین در ایران با ویژگی‌های پیشرفته">
+  <meta name="keywords" content="فروشگاه آنلاین, ایران, تجارت الکترونیک, مال, فروشگاه‌ساز">
+  <meta name="author" content="Mall Platform">
+  
+  <!-- Open Graph Tags -->
+  <meta property="og:title" content="مال - فروشگاه‌ساز آنلاین">
+  <meta property="og:description" content="فروشگاه آنلاین خود را با پلتفرم مال راه‌اندازی کنید">
+  <meta property="og:type" content="website">
+  
   <style>
     * {
       font-family: 'Vazirmatn', 'Tahoma', 'Arial', sans-serif !important;
@@ -20,10 +33,39 @@
     body {
       direction: rtl;
       font-family: 'Vazirmatn', 'Tahoma', 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Loading Spinner */
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
-  <app-root></app-root>
+  <app-root>
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+    </div>
+  </app-root>
 </body>
 </html>
