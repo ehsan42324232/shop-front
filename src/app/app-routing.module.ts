@@ -5,26 +5,40 @@ import { AuthGuard } from './guards/auth.guard';
 // Platform Components
 import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
+import { OtpLoginComponent } from './components/otp-login/otp-login.component';
 import { PlatformHomeComponent } from './components/platform/platform-home/platform-home.component';
 import { StoreManagementComponent } from './components/store-management/store-management.component';
+import { ProductManagementComponent } from './components/product/product-management.component';
 import { HomepageComponent } from './pages/homepage/homepage.component';
+import { MallHomepageComponent } from './components/home/mall-homepage.component';
 
 const routes: Routes = [
-  // Public homepage route
-  { path: '', component: HomepageComponent },
-  { path: 'home', component: HomepageComponent },
+  // Public homepage route - Mall Platform Landing Page
+  { path: '', component: MallHomepageComponent },
+  { path: 'home', component: MallHomepageComponent },
+  
+  // Original homepage (for reference)
+  { path: 'homepage', component: HomepageComponent },
   
   // Auth routes
-  { path: 'login', component: LoginComponent },
+  { path: 'login', component: OtpLoginComponent },
+  { path: 'otp-login', component: OtpLoginComponent },
   { path: 'register', component: RegisterComponent },
   
   // Platform routes (for store owners)
   { path: 'platform', component: PlatformHomeComponent, canActivate: [AuthGuard] },
   
-  // Store Management (protected routes)
+  // Store Management Dashboard (main dashboard for store owners)
   { 
     path: 'store-management', 
     component: StoreManagementComponent, 
+    canActivate: [AuthGuard] 
+  },
+  
+  // Product Management (comprehensive product hierarchy management)
+  { 
+    path: 'product-management', 
+    component: ProductManagementComponent, 
     canActivate: [AuthGuard] 
   },
   
@@ -45,8 +59,23 @@ const routes: Routes = [
     canActivate: [AuthGuard] 
   },
   { 
+    path: 'customers', 
+    loadChildren: () => import('./modules/customer-management/customer-management.module').then(m => m.CustomerManagementModule), 
+    canActivate: [AuthGuard] 
+  },
+  { 
     path: 'analytics', 
     loadChildren: () => import('./modules/analytics/analytics.module').then(m => m.AnalyticsModule), 
+    canActivate: [AuthGuard] 
+  },
+  { 
+    path: 'settings', 
+    loadChildren: () => import('./modules/store-settings/store-settings.module').then(m => m.StoreSettingsModule), 
+    canActivate: [AuthGuard] 
+  },
+  { 
+    path: 'messages', 
+    loadChildren: () => import('./modules/messaging/messaging.module').then(m => m.MessagingModule), 
     canActivate: [AuthGuard] 
   },
   
@@ -57,11 +86,21 @@ const routes: Routes = [
     canActivate: [AuthGuard] 
   },
   
+  // Storefront routes (public store pages)
+  { 
+    path: 'store/:domain', 
+    loadChildren: () => import('./modules/storefront/storefront.module').then(m => m.StorefrontModule)
+  },
+  
+  // Catch all - redirect to homepage
   { path: '**', redirectTo: '' }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {
+    scrollPositionRestoration: 'top',
+    anchorScrolling: 'enabled'
+  })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
