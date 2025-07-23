@@ -1,0 +1,138 @@
+<footer class="bg-gray-900 text-white">
+  <!-- Main Footer Content -->
+  <div class="container mx-auto px-6 py-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      
+      <!-- Brand Section -->
+      <div class="space-y-6">
+        <div class="flex items-center">
+          <div class="text-4xl font-bold bg-gradient-to-r from-red-400 via-blue-400 to-red-400 bg-clip-text text-transparent">
+            مال
+          </div>
+          <span class="text-gray-300 text-sm mr-2">فروشگاه‌ساز</span>
+        </div>
+        <p class="text-gray-300 leading-relaxed">
+          پلتفرم پیشرفته ایجاد و مدیریت فروشگاه‌های آنلاین. 
+          با مال، کسب‌وکار خود را به راحتی آنلاین کنید.
+        </p>
+        
+        <!-- Newsletter Subscription -->
+        <div class="space-y-3">
+          <h4 class="text-lg font-semibold">عضویت در خبرنامه</h4>
+          <div class="flex">
+            <input 
+              type="email" 
+              [(ngModel)]="newsletterEmail"
+              placeholder="ایمیل شما"
+              class="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400"
+            >
+            <button 
+              (click)="subscribeNewsletter()"
+              [disabled]="isSubscribing"
+              class="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-6 py-2 rounded-l-lg transition-all duration-200 disabled:opacity-50">
+              <span *ngIf="!isSubscribing">عضویت</span>
+              <span *ngIf="isSubscribing">...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Platform Links -->
+      <div class="space-y-6">
+        <h3 class="text-xl font-bold text-white">پلتفرم</h3>
+        <ul class="space-y-3">
+          <li *ngFor="let link of footerLinks.platform">
+            <a (click)="scrollToSection(link.href)" 
+               class="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer">
+              {{ link.title }}
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Support Links -->
+      <div class="space-y-6">
+        <h3 class="text-xl font-bold text-white">پشتیبانی</h3>
+        <ul class="space-y-3">
+          <li *ngFor="let link of footerLinks.support">
+            <a (click)="scrollToSection(link.href)" 
+               class="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer">
+              {{ link.title }}
+            </a>
+          </li>
+        </ul>
+        
+        <!-- Contact Info -->
+        <div class="space-y-2 mt-6">
+          <div class="flex items-center text-gray-300">
+            <i class="material-icons text-sm ml-2">phone</i>
+            <span>021-12345678</span>
+          </div>
+          <div class="flex items-center text-gray-300">
+            <i class="material-icons text-sm ml-2">email</i>
+            <span>support@mall.ir</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Company & Legal -->
+      <div class="space-y-6">
+        <h3 class="text-xl font-bold text-white">شرکت</h3>
+        <ul class="space-y-3">
+          <li *ngFor="let link of footerLinks.legal">
+            <a (click)="scrollToSection(link.href)" 
+               class="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer">
+              {{ link.title }}
+            </a>
+          </li>
+        </ul>
+        
+        <!-- Social Media -->
+        <div class="space-y-4 mt-6">
+          <h4 class="text-lg font-semibold">شبکه‌های اجتماعی</h4>
+          <div class="flex space-x-4 space-x-reverse">
+            <a *ngFor="let social of socialLinks" 
+               (click)="openExternalLink(social.url)"
+               class="w-10 h-10 bg-gray-800 hover:bg-gray-700 rounded-full flex items-center justify-center transition-colors duration-200 cursor-pointer">
+              <i class="material-icons text-lg">{{ social.icon }}</i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Footer -->
+  <div class="border-t border-gray-800">
+    <div class="container mx-auto px-6 py-6">
+      <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        
+        <!-- Copyright -->
+        <div class="text-gray-400 text-sm text-center md:text-right">
+          © {{ currentYear }} پلتفرم مال. تمامی حقوق محفوظ است.
+        </div>
+        
+        <!-- Quick Links -->
+        <div class="flex flex-wrap justify-center md:justify-start space-x-6 space-x-reverse text-sm">
+          <a href="#terms" class="text-gray-400 hover:text-white transition-colors duration-200">
+            قوانین و مقررات
+          </a>
+          <a href="#privacy" class="text-gray-400 hover:text-white transition-colors duration-200">
+            حریم خصوصی
+          </a>
+          <a href="#cookies" class="text-gray-400 hover:text-white transition-colors duration-200">
+            کوکی‌ها
+          </a>
+        </div>
+        
+        <!-- Badge/Certification -->
+        <div class="flex items-center space-x-4 space-x-reverse">
+          <div class="text-xs text-gray-400">
+            <i class="material-icons text-green-400 text-sm ml-1">verified</i>
+            گواهی نامه امنیت
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
