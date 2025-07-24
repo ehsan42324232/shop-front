@@ -22,7 +22,8 @@
           
           <!-- Action Buttons -->
           <div class="nav-actions">
-            <button class="btn btn-outline" (click)="navigateToLogin()">ورود</button>
+            <button class="btn btn-outline" (click)="navigateToLogin()" *ngIf="!isUserAuthenticated()">ورود</button>
+            <button class="btn btn-outline" (click)="navigateToDashboard()" *ngIf="isUserAuthenticated()">پنل مدیریت</button>
             <button class="btn btn-primary" (click)="openRequestModal()">شروع کنید</button>
           </div>
         </div>
@@ -100,11 +101,15 @@
   <!-- Stats Section -->
   <section class="stats-section">
     <div class="container">
-      <div class="stats-grid">
+      <div class="stats-grid" *ngIf="!isLoadingStats">
         <div class="stat-item" *ngFor="let stat of stats" data-aos="fade-up">
           <div class="stat-number">{{ stat.number }}</div>
           <div class="stat-label">{{ stat.label }}</div>
         </div>
+      </div>
+      <div class="stats-loading" *ngIf="isLoadingStats">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>در حال بارگذاری آمار...</span>
       </div>
     </div>
   </section>
@@ -205,9 +210,13 @@
             <i class="fas fa-rocket"></i>
             شروع رایگان
           </button>
-          <button class="btn btn-outline btn-large" (click)="navigateToLogin()">
+          <button class="btn btn-outline btn-large" (click)="navigateToLogin()" *ngIf="!isUserAuthenticated()">
             <i class="fas fa-sign-in-alt"></i>
             ورود به پنل
+          </button>
+          <button class="btn btn-outline btn-large" (click)="navigateToDashboard()" *ngIf="isUserAuthenticated()">
+            <i class="fas fa-tachometer-alt"></i>
+            پنل مدیریت
           </button>
         </div>
       </div>
@@ -244,7 +253,7 @@
             <ul class="footer-list">
               <li><a href="#" class="footer-link">راهنمای استفاده</a></li>
               <li><a href="#" class="footer-link">سوالات متداول</a></li>
-              <li><a href="#" class="footer-link">تماس با ما</a></li>
+              <li><a href="#" class="footer-link" (click)="openContactModal()">تماس با ما</a></li>
               <li><a href="#" class="footer-link">گزارش مشکل</a></li>
             </ul>
           </div>
@@ -286,26 +295,76 @@
       </button>
     </div>
     <div class="modal-body">
-      <form (ngSubmit)="submitContactForm()">
+      <form (ngSubmit)="submitContactForm()" (keypress)="onFormKeyPress($event, 'contact')">
         <div class="form-group">
-          <label class="form-label">نام</label>
-          <input type="text" [(ngModel)]="contactForm.name" name="name" class="form-input" required>
+          <label class="form-label">نام *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="contactForm.name" 
+            name="name" 
+            class="form-input"
+            [class.error]="contactFormErrors.name"
+            required
+            placeholder="نام خود را وارد کنید">
+          <div class="form-error" *ngIf="contactFormErrors.name">
+            {{ contactFormErrors.name }}
+          </div>
         </div>
+
         <div class="form-group">
-          <label class="form-label">شماره تلفن</label>
-          <input type="tel" [(ngModel)]="contactForm.phone" name="phone" class="form-input" required>
+          <label class="form-label">شماره تلفن *</label>
+          <input 
+            type="tel" 
+            [(ngModel)]="contactForm.phone" 
+            name="phone" 
+            class="form-input"
+            [class.error]="contactFormErrors.phone"
+            (input)="formatPhoneNumber($event, 'contact')"
+            placeholder="۰۹۱۲ ۳۴۵ ۶۷۸۹"
+            required>
+          <div class="form-error" *ngIf="contactFormErrors.phone">
+            {{ contactFormErrors.phone }}
+          </div>
         </div>
+
         <div class="form-group">
           <label class="form-label">ایمیل (اختیاری)</label>
-          <input type="email" [(ngModel)]="contactForm.email" name="email" class="form-input">
+          <input 
+            type="email" 
+            [(ngModel)]="contactForm.email" 
+            name="email" 
+            class="form-input"
+            [class.error]="contactFormErrors.email"
+            placeholder="your@email.com">
+          <div class="form-error" *ngIf="contactFormErrors.email">
+            {{ contactFormErrors.email }}
+          </div>
         </div>
+
         <div class="form-group">
-          <label class="form-label">پیام</label>
-          <textarea [(ngModel)]="contactForm.message" name="message" class="form-textarea" rows="4" required></textarea>
+          <label class="form-label">پیام *</label>
+          <textarea 
+            [(ngModel)]="contactForm.message" 
+            name="message" 
+            class="form-textarea" 
+            rows="4" 
+            [class.error]="contactFormErrors.message"
+            placeholder="پیام خود را بنویسید..."
+            required></textarea>
+          <div class="form-error" *ngIf="contactFormErrors.message">
+            {{ contactFormErrors.message }}
+          </div>
         </div>
+
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" (click)="closeContactModal()">انصراف</button>
-          <button type="submit" class="btn btn-primary">ارسال پیام</button>
+          <button type="button" class="btn btn-secondary" (click)="closeContactModal()" [disabled]="isLoadingContact">
+            انصراف
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="isLoadingContact">
+            <i class="fas fa-spinner fa-spin" *ngIf="isLoadingContact"></i>
+            <i class="fas fa-paper-plane" *ngIf="!isLoadingContact"></i>
+            {{ isLoadingContact ? 'در حال ارسال...' : 'ارسال پیام' }}
+          </button>
         </div>
       </form>
     </div>
@@ -322,34 +381,117 @@
       </button>
     </div>
     <div class="modal-body">
-      <form (ngSubmit)="submitRequestForm()">
-        <div class="form-group">
-          <label class="form-label">نام کسب‌وکار</label>
-          <input type="text" [(ngModel)]="requestForm.businessName" name="businessName" class="form-input" required>
+      <form (ngSubmit)="submitRequestForm()" (keypress)="onFormKeyPress($event, 'request')">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">نام کسب‌وکار *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="requestForm.businessName" 
+              name="businessName" 
+              class="form-input"
+              [class.error]="requestFormErrors.businessName"
+              placeholder="مثال: فروشگاه پوشاک آرا"
+              required>
+            <div class="form-error" *ngIf="requestFormErrors.businessName">
+              {{ requestFormErrors.businessName }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">نام مالک *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="requestForm.ownerName" 
+              name="ownerName" 
+              class="form-input"
+              [class.error]="requestFormErrors.ownerName"
+              placeholder="نام و نام خانوادگی"
+              required>
+            <div class="form-error" *ngIf="requestFormErrors.ownerName">
+              {{ requestFormErrors.ownerName }}
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">نام مالک</label>
-          <input type="text" [(ngModel)]="requestForm.ownerName" name="ownerName" class="form-input" required>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">شماره تلفن *</label>
+            <input 
+              type="tel" 
+              [(ngModel)]="requestForm.phone" 
+              name="phone" 
+              class="form-input"
+              [class.error]="requestFormErrors.phone"
+              (input)="formatPhoneNumber($event, 'request')"
+              placeholder="۰۹۱۲ ۳۴۵ ۶۷۸۹"
+              required>
+            <div class="form-error" *ngIf="requestFormErrors.phone">
+              {{ requestFormErrors.phone }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">نوع کسب‌وکار *</label>
+            <select 
+              [(ngModel)]="requestForm.businessType" 
+              name="businessType" 
+              class="form-select"
+              [class.error]="requestFormErrors.businessType"
+              required>
+              <option value="">انتخاب کنید</option>
+              <option *ngFor="let type of businessTypes" [value]="type.value">
+                {{ type.label }}
+              </option>
+            </select>
+            <div class="form-error" *ngIf="requestFormErrors.businessType">
+              {{ requestFormErrors.businessType }}
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">شماره تلفن</label>
-          <input type="tel" [(ngModel)]="requestForm.phone" name="phone" class="form-input" required>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">تعداد تقریبی محصولات</label>
+            <input 
+              type="number" 
+              [(ngModel)]="requestForm.estimatedProducts" 
+              name="estimatedProducts" 
+              class="form-input"
+              placeholder="مثال: ۵۰"
+              min="1">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">وب‌سایت فعلی (اختیاری)</label>
+            <input 
+              type="url" 
+              [(ngModel)]="requestForm.website" 
+              name="website" 
+              class="form-input"
+              placeholder="https://example.com">
+          </div>
         </div>
+
         <div class="form-group">
-          <label class="form-label">نوع کسب‌وکار</label>
-          <select [(ngModel)]="requestForm.businessType" name="businessType" class="form-select">
-            <option value="">انتخاب کنید</option>
-            <option value="clothing">پوشاک</option>
-            <option value="electronics">الکترونیک</option>
-            <option value="food">مواد غذایی</option>
-            <option value="cosmetics">آرایشی و بهداشتی</option>
-            <option value="home">خانه و آشپزخانه</option>
-            <option value="other">سایر</option>
-          </select>
+          <label class="form-label">توضیحات اضافی</label>
+          <textarea 
+            [(ngModel)]="requestForm.message" 
+            name="message" 
+            class="form-textarea" 
+            rows="3"
+            placeholder="توضیحات بیشتر در مورد کسب‌وکار و نیازهایتان..."></textarea>
         </div>
+
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" (click)="closeRequestModal()">انصراف</button>
-          <button type="submit" class="btn btn-primary">ارسال درخواست</button>
+          <button type="button" class="btn btn-secondary" (click)="closeRequestModal()" [disabled]="isLoadingRequest">
+            انصراف
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="isLoadingRequest">
+            <i class="fas fa-spinner fa-spin" *ngIf="isLoadingRequest"></i>
+            <i class="fas fa-rocket" *ngIf="!isLoadingRequest"></i>
+            {{ isLoadingRequest ? 'در حال ثبت...' : 'ارسال درخواست' }}
+          </button>
         </div>
       </form>
     </div>
@@ -360,5 +502,6 @@
 <div class="chat-widget">
   <button class="chat-toggle" (click)="toggleChat()">
     <i class="fas fa-comments"></i>
+    <span class="chat-badge">آنلاین</span>
   </button>
 </div>
