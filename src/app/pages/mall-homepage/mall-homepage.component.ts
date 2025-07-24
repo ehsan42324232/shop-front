@@ -1,12 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
+import { HomepageService, ContactRequest, PlatformStats } from '../../services/homepage.service';
+import { AuthService } from '../../services/auth.service';
+import { Subscription } from 'rxjs';
+
+declare let AOS: any;
+
+interface NotificationService {
+  success(message: string): void;
+  error(message: string): void;
+}
 
 @Component({
   selector: 'app-mall-homepage',
   templateUrl: './mall-homepage.component.html',
   styleUrls: ['./mall-homepage.component.css']
 })
-export class MallHomepageComponent implements OnInit {
+export class MallHomepageComponent implements OnInit, OnDestroy {
   
   // Feature data for homepage sections
   features = [
@@ -25,7 +36,7 @@ export class MallHomepageComponent implements OnInit {
     {
       title: 'اتصال به شبکه‌های اجتماعی',
       description: 'واردات خودکار محتوا از تلگرام و اینستاگرام',
-      icon: 'fa-share-alt',
+      icon: 'fa-share-alt',  
       image: '/assets/images/feature-social.jpg'
     },
     {
@@ -48,7 +59,7 @@ export class MallHomepageComponent implements OnInit {
     }
   ];
 
-  // Stats for homepage
+  // Stats for homepage (will be loaded from API)
   stats = [
     { number: '۱۰,۰۰۰+', label: 'فروشگاه فعال' },
     { number: '۵۰۰,۰۰۰+', label: 'محصول ثبت شده' },
@@ -68,30 +79,142 @@ export class MallHomepageComponent implements OnInit {
     businessName: '',
     ownerName: '',
     phone: '',
-    businessType: ''
+    businessType: '',
+    estimatedProducts: null as number | null,
+    website: '',
+    message: ''
   };
+
+  // Loading states
+  isLoadingContact = false;
+  isLoadingRequest = false;
+  isLoadingStats = false;
 
   // Modal states
   showContactModal = false;
   showRequestModal = false;
   showLoginModal = false;
 
-  constructor(private router: Router) { }
+  // Form validation
+  contactFormErrors: any = {};
+  requestFormErrors: any = {};
+
+  // Component subscriptions
+  private subscriptions: Subscription[] = [];
+
+  // Business type options
+  businessTypes = [
+    { value: 'clothing', label: 'پوشاک' },
+    { value: 'electronics', label: 'لوازم الکترونیکی' },
+    { value: 'home', label: 'لوازم خانه' },
+    { value: 'food', label: 'مواد غذایی' },
+    { value: 'beauty', label: 'زیبایی و سلامت' },
+    { value: 'books', label: 'کتاب و نشریات' },
+    { value: 'sports', label: 'ورزش و تفریح' },
+    { value: 'other', label: 'سایر' }
+  ];
+
+  constructor(
+    private router: Router,
+    private homepageService: HomepageService,
+    private authService: AuthService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) { }
 
   ngOnInit(): void {
-    // Initialize AOS animations if available
+    // Initialize AOS animations only in browser
+    if (isPlatformBrowser(this.platformId)) {
+      this.initializeAOS();
+    }
+
+    // Load platform statistics
+    this.loadPlatformStats();
+
+    // Load homepage data
+    this.loadHomepageData();
+  }
+
+  ngOnDestroy(): void {
+    // Clean up subscriptions
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  /**
+   * Initialize AOS animations
+   */
+  private initializeAOS(): void {
     if (typeof AOS !== 'undefined') {
       AOS.init({
         duration: 1000,
         easing: 'ease-in-out',
-        once: true
+        once: true,
+        offset: 100
       });
     }
+  }
+
+  /**
+   * Load platform statistics from API
+   */
+  private loadPlatformStats(): void {
+    this.isLoadingStats = true;
+    const statsSub = this.homepageService.getPlatformStats().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.updateStatsDisplay(response.data);
+        }
+        this.isLoadingStats = false;
+      },
+      error: (error) => {
+        console.error('Error loading stats:', error);
+        this.isLoadingStats = false;
+        // Keep default stats on error
+      }
+    });
+    this.subscriptions.push(statsSub);
+  }
+
+  /**
+   * Load complete homepage data
+   */
+  private loadHomepageData(): void {
+    const homepageSub = this.homepageService.getHomepageData().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          if (response.data.stats) {
+            this.updateStatsDisplay(response.data.stats);
+          }
+          if (response.data.features) {
+            this.features = response.data.features.map((feature, index) => ({
+              ...feature,
+              image: this.features[index]?.image || '/assets/images/feature-default.jpg'
+            }));
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Error loading homepage data:', error);
+      }
+    });
+    this.subscriptions.push(homepageSub);
+  }
+
+  /**
+   * Update stats display with API data
+   */
+  private updateStatsDisplay(stats: PlatformStats): void {
+    this.stats = [
+      { number: stats.active_stores || '۱۰,۰۰۰+', label: 'فروشگاه فعال' },
+      { number: stats.daily_sales || '۵۰۰,۰۰۰+', label: 'فروش روزانه' },
+      { number: stats.customer_satisfaction || '۹۹.۹%', label: 'رضایت مشتریان' },
+      { number: stats.years_experience || '۵+', label: 'سال تجربه' }
+    ];
   }
 
   // Modal handlers
   openContactModal(): void {
     this.showContactModal = true;
+    this.resetContactForm();
   }
 
   closeContactModal(): void {
@@ -101,6 +224,7 @@ export class MallHomepageComponent implements OnInit {
 
   openRequestModal(): void {
     this.showRequestModal = true;
+    this.resetRequestForm();
   }
 
   closeRequestModal(): void {
@@ -118,23 +242,70 @@ export class MallHomepageComponent implements OnInit {
 
   // Form handlers
   submitContactForm(): void {
-    if (this.isContactFormValid()) {
-      // Send contact form data
-      console.log('Contact form submitted:', this.contactForm);
-      // TODO: Implement API call
-      this.closeContactModal();
-      this.showSuccessMessage('پیام شما با موفقیت ارسال شد');
+    if (!this.validateContactForm()) {
+      return;
     }
+
+    this.isLoadingContact = true;
+    const contactData = {
+      name: this.contactForm.name,
+      phone: this.homepageService.toEnglishNumbers(this.contactForm.phone),
+      email: this.contactForm.email || undefined,
+      business_type: 'general',
+      message: this.contactForm.message
+    };
+
+    const contactSub = this.homepageService.submitContactRequest(contactData).subscribe({
+      next: (response) => {
+        this.isLoadingContact = false;
+        if (response.success) {
+          this.showSuccessMessage('پیام شما با موفقیت ارسال شد. همکاران ما در اسرع وقت با شما تماس خواهند گرفت.');
+          this.closeContactModal();
+        } else {
+          this.showErrorMessage(response.message || 'خطایی در ارسال پیام رخ داد');
+        }
+      },
+      error: (error) => {
+        this.isLoadingContact = false;
+        this.showErrorMessage(error.message || 'خطایی در ارسال پیام رخ داد');
+      }
+    });
+    this.subscriptions.push(contactSub);
   }
 
   submitRequestForm(): void {
-    if (this.isRequestFormValid()) {
-      // Send request form data
-      console.log('Request form submitted:', this.requestForm);
-      // TODO: Implement API call
-      this.closeRequestModal();
-      this.showSuccessMessage('درخواست شما ثبت شد. همکاران ما با شما تماس می‌گیرند');
+    if (!this.validateRequestForm()) {
+      return;
     }
+
+    this.isLoadingRequest = true;
+    const requestData: ContactRequest = {
+      name: this.requestForm.ownerName,
+      phone: this.homepageService.toEnglishNumbers(this.requestForm.phone),
+      business_type: this.requestForm.businessType,
+      company_name: this.requestForm.businessName,
+      website_url: this.requestForm.website || undefined,
+      estimated_products: this.requestForm.estimatedProducts || undefined,
+      message: this.requestForm.message || undefined,
+      source: 'homepage_request'
+    };
+
+    const requestSub = this.homepageService.submitContactRequest(requestData).subscribe({
+      next: (response) => {
+        this.isLoadingRequest = false;
+        if (response.success) {
+          this.showSuccessMessage('درخواست شما با موفقیت ثبت شد. تیم فروش ما در کمترین زمان با شما تماس خواهد گرفت.');
+          this.closeRequestModal();
+        } else {
+          this.showErrorMessage(response.message || 'خطایی در ثبت درخواست رخ داد');
+        }
+      },
+      error: (error) => {
+        this.isLoadingRequest = false;
+        this.showErrorMessage(error.message || 'خطایی در ثبت درخواست رخ داد');
+      }
+    });
+    this.subscriptions.push(requestSub);
   }
 
   // Navigation methods
@@ -147,27 +318,86 @@ export class MallHomepageComponent implements OnInit {
   }
 
   navigateToDemo(): void {
-    this.router.navigate(['/demo']);
+    // Open demo in new tab
+    window.open('/demo', '_blank');
+  }
+
+  navigateToDashboard(): void {
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/dashboard']);
+    } else {
+      this.navigateToLogin();
+    }
   }
 
   scrollToSection(sectionId: string): void {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (isPlatformBrowser(this.platformId)) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   }
 
   // Form validation
-  private isContactFormValid(): boolean {
-    return !!(this.contactForm.name && 
-              this.contactForm.phone && 
-              this.contactForm.message);
+  private validateContactForm(): boolean {
+    this.contactFormErrors = {};
+    let isValid = true;
+
+    if (!this.contactForm.name.trim()) {
+      this.contactFormErrors.name = 'نام الزامی است';
+      isValid = false;
+    }
+
+    if (!this.contactForm.phone.trim()) {
+      this.contactFormErrors.phone = 'شماره تلفن الزامی است';
+      isValid = false;
+    } else if (!this.homepageService.validateIranianPhone(this.contactForm.phone)) {
+      this.contactFormErrors.phone = 'شماره تلفن معتبر نیست';
+      isValid = false;
+    }
+
+    if (this.contactForm.email && !this.homepageService.validateEmail(this.contactForm.email)) {
+      this.contactFormErrors.email = 'ایمیل معتبر نیست';
+      isValid = false;
+    }
+
+    if (!this.contactForm.message.trim()) {
+      this.contactFormErrors.message = 'پیام الزامی است';
+      isValid = false;
+    }
+
+    return isValid;
   }
 
-  private isRequestFormValid(): boolean {
-    return !!(this.requestForm.businessName && 
-              this.requestForm.ownerName && 
-              this.requestForm.phone);
+  private validateRequestForm(): boolean {
+    this.requestFormErrors = {};
+    let isValid = true;
+
+    if (!this.requestForm.businessName.trim()) {
+      this.requestFormErrors.businessName = 'نام کسب‌وکار الزامی است';
+      isValid = false;
+    }
+
+    if (!this.requestForm.ownerName.trim()) {
+      this.requestFormErrors.ownerName = 'نام مالک الزامی است';
+      isValid = false;
+    }
+
+    if (!this.requestForm.phone.trim()) {
+      this.requestFormErrors.phone = 'شماره تلفن الزامی است';
+      isValid = false;
+    } else if (!this.homepageService.validateIranianPhone(this.requestForm.phone)) {
+      this.requestFormErrors.phone = 'شماره تلفن معتبر نیست';
+      isValid = false;
+    }
+
+    if (!this.requestForm.businessType) {
+      this.requestFormErrors.businessType = 'نوع کسب‌وکار الزامی است';
+      isValid = false;
+    }
+
+    return isValid;
   }
 
   // Form reset methods
@@ -178,6 +408,7 @@ export class MallHomepageComponent implements OnInit {
       email: '',
       message: ''
     };
+    this.contactFormErrors = {};
   }
 
   private resetRequestForm(): void {
@@ -185,19 +416,80 @@ export class MallHomepageComponent implements OnInit {
       businessName: '',
       ownerName: '',
       phone: '',
-      businessType: ''
+      businessType: '',
+      estimatedProducts: null,
+      website: '',
+      message: ''
     };
+    this.requestFormErrors = {};
   }
 
   // Utility methods
   private showSuccessMessage(message: string): void {
-    // TODO: Implement toast notification
-    alert(message);
+    // TODO: Implement proper toast notification service
+    if (isPlatformBrowser(this.platformId)) {
+      alert(message);
+    }
+  }
+
+  private showErrorMessage(message: string): void {
+    // TODO: Implement proper toast notification service
+    if (isPlatformBrowser(this.platformId)) {
+      alert(message);
+    }
+  }
+
+  // Phone number formatting
+  formatPhoneNumber(event: any, formType: 'contact' | 'request'): void {
+    const input = event.target;
+    let value = input.value.replace(/\D/g, '');
+    
+    if (value.length > 11) {
+      value = value.substring(0, 11);
+    }
+
+    if (value.length >= 4) {
+      if (value.length >= 7) {
+        value = `${value.substring(0, 4)} ${value.substring(4, 7)} ${value.substring(7)}`;
+      } else {
+        value = `${value.substring(0, 4)} ${value.substring(4)}`;
+      }
+    }
+
+    if (formType === 'contact') {
+      this.contactForm.phone = value;
+    } else {
+      this.requestForm.phone = value;
+    }
   }
 
   // Chat widget toggle
   toggleChat(): void {
-    // TODO: Implement chat widget
-    console.log('Toggle chat widget');
+    // TODO: Implement chat widget integration
+    console.log('Toggle chat widget - to be implemented');
+    this.showSuccessMessage('چت آنلاین به زودی راه‌اندازی خواهد شد');
+  }
+
+  // Check if user is authenticated
+  isUserAuthenticated(): boolean {
+    return this.authService.isAuthenticated();
+  }
+
+  // Get business type label
+  getBusinessTypeLabel(value: string): string {
+    const type = this.businessTypes.find(t => t.value === value);
+    return type ? type.label : value;
+  }
+
+  // Handle keyboard events for forms
+  onFormKeyPress(event: KeyboardEvent, formType: 'contact' | 'request'): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      if (formType === 'contact') {
+        this.submitContactForm();
+      } else {
+        this.submitRequestForm();
+      }
+    }
   }
 }
