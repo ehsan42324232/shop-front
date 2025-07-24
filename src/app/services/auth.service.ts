@@ -239,6 +239,13 @@ export class AuthService {
     );
   }
 
+  // Check if user is authenticated (synchronous method)
+  isAuthenticated(): boolean {
+    const user = this.currentUserSubject.value;
+    const token = this.tokenSubject.value;
+    return !!(user && token);
+  }
+
   // Check if user is store owner
   isStoreOwner(): boolean {
     const user = this.currentUserSubject.value;
@@ -310,7 +317,7 @@ export class AuthService {
     );
   }
 
-  // Check authentication status
+  // Check authentication status with server verification
   checkAuthStatus(): Observable<boolean> {
     const token = this.getTokenValue();
     if (!token) {
