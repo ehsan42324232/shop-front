@@ -3,6 +3,13 @@ import { HomepageService, ContactRequest, PlatformStats } from '../../services/h
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
+interface Feature {
+  title: string;
+  description: string;
+  icon: string;
+  image?: string;
+}
+
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.component.html',
@@ -23,7 +30,7 @@ export class HomepageComponent implements OnInit, OnDestroy {
     years_experience: '5+'
   };
   
-  features = [
+  features: Feature[] = [
     {
       title: 'فروشگاه آنلاین حرفه‌ای',
       description: 'با چند کلیک فروشگاه آنلاین خود را راه‌اندازی کنید',
@@ -106,8 +113,16 @@ export class HomepageComponent implements OnInit, OnDestroy {
         next: (response) => {
           if (response.success && response.data) {
             this.stats = response.data.stats;
-            this.features = response.data.features;
-            // Can also load settings, FAQs etc.
+            
+            // Handle features with optional image property
+            if (response.data.features) {
+              this.features = response.data.features.map((feature: any, index: number) => ({
+                title: feature.title,
+                description: feature.description,
+                icon: feature.icon,
+                image: feature.image || this.features[index]?.image || '/assets/images/feature-default.jpg'
+              }));
+            }
           }
           this.isLoading = false;
         },
@@ -185,7 +200,7 @@ export class HomepageComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Submit contact request form
+   * Submit contact request form (fixed to accept no parameters)
    */
   submitRequest(): void {
     if (this.validateForm()) {
