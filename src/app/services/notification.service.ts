@@ -83,9 +83,9 @@ export class NotificationService {
   show(notification: Omit<Notification, 'id'>): void {
     const id = this.generateId();
     const fullNotification: Notification = {
+      ...notification,
       id,
-      duration: 5000,
-      ...notification
+      duration: notification.duration || 5000
     };
 
     const currentNotifications = this.notifications.value;
@@ -120,13 +120,16 @@ export class NotificationService {
    */
   showLoading(message: string, title?: string): string {
     const id = this.generateId();
-    this.show({
+    const currentNotifications = this.notifications.value;
+    const loadingNotification: Notification = {
       id,
       type: 'info',
       title,
       message,
       persistent: true
-    });
+    };
+    
+    this.notifications.next([...currentNotifications, loadingNotification]);
     return id;
   }
 
@@ -256,7 +259,7 @@ export class NotificationService {
    * Show validation errors
    */
   showValidationErrors(errors: { [key: string]: string[] }): void {
-    const errorMessages = Object.values(errors).flat();
+    const errorMessages = Object.values(errors).flatMap(arr => arr);
     const message = errorMessages.join('\n');
     this.error(message, 'خطای اعتبارسنجی');
   }
