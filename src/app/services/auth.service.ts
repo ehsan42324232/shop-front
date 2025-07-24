@@ -1,344 +1,369 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { map, catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-
-export interface AuthUser {
-  id: number;
-  username: string;
-  phone: string;
-  email?: string;
-  first_name: string;
-  last_name: string;
-  full_name: string;
-  business_name?: string;
-  is_store_owner: boolean;
-  is_phone_verified: boolean;
-  is_approved: boolean;
-}
 
 export interface OTPRequest {
   phone: string;
-  purpose?: 'login' | 'register' | 'password_reset' | 'phone_verify';
 }
 
 export interface OTPVerification {
   phone: string;
-  otp_code: string;
-  purpose?: 'login' | 'register' | 'password_reset' | 'phone_verify';
+  code: string;
 }
 
-export interface RegisterRequest {
+export interface User {
+  id: number;
   phone: string;
-  otp_code: string;
-  first_name: string;
-  last_name: string;
-  business_name?: string;
-  national_id?: string;
-  is_store_owner?: boolean;
-  password?: string;
+  name?: string;
+  email?: string;
+  store?: any;
+  is_store_owner: boolean;
+  is_customer: boolean;
+  is_active: boolean;
+  created_at: string;
 }
 
 export interface AuthResponse {
   success: boolean;
   message: string;
-  user?: AuthUser;
+  user?: User;
   token?: string;
-  expires_at?: string;
-  errors?: any;
+  expires_in?: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl + '/api/auth/';
-  private currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  private apiUrl = `${environment.apiUrl}/auth`;
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private tokenSubject = new BehaviorSubject<string | null>(null);
   
   public currentUser$ = this.currentUserSubject.asObservable();
-  public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  public token$ = this.tokenSubject.asObservable();
+  public isAuthenticated$ = this.currentUser$.pipe(
+    map(user => !!user)
+  );
 
-  private httpOptions = {
-    headers: new HttpHeaders({
+  constructor(private http: HttpClient) {
+    // Check for existing token on service initialization
+    this.loadStoredAuth();
+  }
+
+  // Load stored authentication data
+  private loadStoredAuth(): void {
+    const token = localStorage.getItem('mall_token');
+    const userString = localStorage.getItem('mall_user');
+    
+    if (token && userString) {
+      try {
+        const user = JSON.parse(userString);
+        this.tokenSubject.next(token);
+        this.currentUserSubject.next(user);
+      } catch (error) {
+        console.error('Error parsing stored user data:', error);
+        this.clearStoredAuth();
+      }
+    }
+  }
+
+  // Store authentication data
+  private storeAuth(token: string, user: User): void {
+    localStorage.setItem('mall_token', token);
+    localStorage.setItem('mall_user', JSON.stringify(user));
+    this.tokenSubject.next(token);
+    this.currentUserSubject.next(user);
+  }
+
+  // Clear stored authentication data
+  private clearStoredAuth(): void {
+    localStorage.removeItem('mall_token');
+    localStorage.removeItem('mall_user');
+    this.tokenSubject.next(null);
+    this.currentUserSubject.next(null);
+  }
+
+  // Get HTTP headers with authorization
+  private getHeaders(): HttpHeaders {
+    const token = this.tokenSubject.value;
+    return new HttpHeaders({
       'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    })
-  };
-
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {
-    this.checkAuthStatus();
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    });
   }
 
-  /**
-   * Send OTP to phone number
-   */
-  sendOTP(data: OTPRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}send-otp/`, data, this.httpOptions)
-      .pipe(catchError(this.handleError));
+  // Request OTP for phone number
+  requestOTP(phoneData: OTPRequest): Observable<AuthResponse> {
+    const formattedPhone = this.formatPhoneNumber(phoneData.phone);
+    
+    return this.http.post<AuthResponse>(
+      `${this.apiUrl}/request-otp/`,
+      { phone: formattedPhone },
+      { headers: this.getHeaders() }
+    ).pipe(
+      tap(response => {
+        if (response.success) {
+          console.log('OTP sent successfully to:', formattedPhone);
+        }
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  /**
-   * Verify OTP code
-   */
-  verifyOTP(data: OTPVerification): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}verify-otp/`, data, this.httpOptions)
-      .pipe(
-        tap(response => {
-          if (response.success && response.user && response.token) {
-            this.setAuthData(response.user, response.token);
-          }
-        }),
-        catchError(this.handleError)
-      );
+  // Verify OTP and authenticate user
+  verifyOTP(verificationData: OTPVerification): Observable<AuthResponse> {
+    const formattedPhone = this.formatPhoneNumber(verificationData.phone);
+    
+    return this.http.post<AuthResponse>(
+      `${this.apiUrl}/verify-otp/`,
+      { 
+        phone: formattedPhone,
+        code: verificationData.code 
+      },
+      { headers: this.getHeaders() }
+    ).pipe(
+      tap(response => {
+        if (response.success && response.user && response.token) {
+          this.storeAuth(response.token, response.user);
+          console.log('User authenticated successfully:', response.user);
+        }
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  /**
-   * Register new user
-   */
-  register(data: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}register/`, data, this.httpOptions)
-      .pipe(
-        tap(response => {
-          if (response.success && response.user && response.token) {
-            this.setAuthData(response.user, response.token);
-          }
-        }),
-        catchError(this.handleError)
-      );
+  // Register new store owner
+  registerStoreOwner(registrationData: {
+    phone: string;
+    name: string;
+    business_name: string;
+    business_type?: string;
+  }): Observable<AuthResponse> {
+    const formattedPhone = this.formatPhoneNumber(registrationData.phone);
+    
+    return this.http.post<AuthResponse>(
+      `${this.apiUrl}/register-store-owner/`,
+      {
+        ...registrationData,
+        phone: formattedPhone
+      },
+      { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  /**
-   * Logout user
-   */
+  // Register new customer
+  registerCustomer(registrationData: {
+    phone: string;
+    name: string;
+    email?: string;
+  }): Observable<AuthResponse> {
+    const formattedPhone = this.formatPhoneNumber(registrationData.phone);
+    
+    return this.http.post<AuthResponse>(
+      `${this.apiUrl}/register-customer/`,
+      {
+        ...registrationData,
+        phone: formattedPhone
+      },
+      { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Get current user profile
+  getCurrentUser(): Observable<User> {
+    return this.http.get<{ user: User }>(
+      `${this.apiUrl}/profile/`,
+      { headers: this.getHeaders() }
+    ).pipe(
+      map(response => response.user),
+      tap(user => this.currentUserSubject.next(user)),
+      catchError(this.handleError)
+    );
+  }
+
+  // Update user profile
+  updateProfile(profileData: Partial<User>): Observable<AuthResponse> {
+    return this.http.put<AuthResponse>(
+      `${this.apiUrl}/profile/`,
+      profileData,
+      { headers: this.getHeaders() }
+    ).pipe(
+      tap(response => {
+        if (response.success && response.user) {
+          this.currentUserSubject.next(response.user);
+          localStorage.setItem('mall_user', JSON.stringify(response.user));
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  // Refresh authentication token
+  refreshToken(): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(
+      `${this.apiUrl}/refresh-token/`,
+      {},
+      { headers: this.getHeaders() }
+    ).pipe(
+      tap(response => {
+        if (response.success && response.token && response.user) {
+          this.storeAuth(response.token, response.user);
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  // Logout user
   logout(): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}logout/`, {}, this.getAuthHeaders())
-      .pipe(
-        tap(() => {
-          this.clearAuthData();
-        }),
-        catchError(this.handleError)
-      );
+    return this.http.post<AuthResponse>(
+      `${this.apiUrl}/logout/`,
+      {},
+      { headers: this.getHeaders() }
+    ).pipe(
+      tap(() => {
+        this.clearStoredAuth();
+        console.log('User logged out successfully');
+      }),
+      catchError(error => {
+        // Even if logout fails on server, clear local data
+        this.clearStoredAuth();
+        return throwError(error);
+      })
+    );
   }
 
-  /**
-   * Get user profile
-   */
-  getProfile(): Observable<AuthUser> {
-    return this.http.get<AuthUser>(`${this.apiUrl}profile/`, this.getAuthHeaders())
-      .pipe(catchError(this.handleError));
+  // Check if user is store owner
+  isStoreOwner(): boolean {
+    const user = this.currentUserSubject.value;
+    return user?.is_store_owner ?? false;
   }
 
-  /**
-   * Update user profile
-   */
-  updateProfile(data: Partial<AuthUser>): Observable<AuthUser> {
-    return this.http.patch<AuthUser>(`${this.apiUrl}profile/`, data, this.getAuthHeaders())
-      .pipe(
-        tap(user => {
-          this.currentUserSubject.next(user);
-          this.saveUserToStorage(user);
-        }),
-        catchError(this.handleError)
-      );
+  // Check if user is customer
+  isCustomer(): boolean {
+    const user = this.currentUserSubject.value;
+    return user?.is_customer ?? false;
   }
 
-  /**
-   * Check authentication status
-   */
-  checkAuthStatus(): Observable<any> {
-    const token = this.getStoredToken();
+  // Get current user value (synchronous)
+  getCurrentUserValue(): User | null {
+    return this.currentUserSubject.value;
+  }
+
+  // Get current token value (synchronous)
+  getTokenValue(): string | null {
+    return this.tokenSubject.value;
+  }
+
+  // Format Iranian phone number
+  private formatPhoneNumber(phone: string): string {
+    // Remove all non-digit characters
+    const digits = phone.replace(/\D/g, '');
+    
+    // Handle different Iranian phone number formats
+    if (digits.startsWith('0')) {
+      // Convert 09xxxxxxxxx to +989xxxxxxxxx
+      return '+98' + digits.substring(1);
+    } else if (digits.startsWith('98')) {
+      // Already in international format
+      return '+' + digits;
+    } else if (digits.startsWith('9') && digits.length === 10) {
+      // 9xxxxxxxxx format
+      return '+98' + digits;
+    } else if (digits.length === 11 && digits.startsWith('09')) {
+      // 09xxxxxxxxx format
+      return '+98' + digits.substring(1);
+    }
+    
+    // Default: assume it needs +98 prefix
+    return '+98' + digits;
+  }
+
+  // Validate Iranian phone number
+  isValidPhoneNumber(phone: string): boolean {
+    const formatted = this.formatPhoneNumber(phone);
+    // Iranian mobile numbers: +989xxxxxxxxx (13 digits total)
+    const iranianMobileRegex = /^\+989[0-9]{9}$/;
+    return iranianMobileRegex.test(formatted);
+  }
+
+  // Validate OTP code
+  isValidOTPCode(code: string): boolean {
+    const digits = code.replace(/\D/g, '');
+    return digits.length >= 4 && digits.length <= 6;
+  }
+
+  // Request password reset (fallback for non-OTP scenarios)
+  requestPasswordReset(email: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(
+      `${this.apiUrl}/request-password-reset/`,
+      { email },
+      { headers: this.getHeaders() }
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Check authentication status
+  checkAuthStatus(): Observable<boolean> {
+    const token = this.getTokenValue();
     if (!token) {
       return new Observable(observer => {
-        observer.next({ authenticated: false });
+        observer.next(false);
         observer.complete();
       });
     }
 
-    return this.http.get(`${this.apiUrl}status/`, this.getAuthHeaders())
-      .pipe(
-        tap((response: any) => {
-          if (response.authenticated && response.user) {
-            this.setAuthData(response.user, token);
-          } else {
-            this.clearAuthData();
-          }
-        }),
-        catchError(() => {
-          this.clearAuthData();
-          return new Observable(observer => {
-            observer.next({ authenticated: false });
-            observer.complete();
-          });
-        })
-      );
-  }
-
-  /**
-   * Change password
-   */
-  changePassword(currentPassword: string, newPassword: string): Observable<AuthResponse> {
-    const data = {
-      current_password: currentPassword,
-      new_password: newPassword,
-      confirm_password: newPassword
-    };
-    
-    return this.http.post<AuthResponse>(`${this.apiUrl}change-password/`, data, this.getAuthHeaders())
-      .pipe(catchError(this.handleError));
-  }
-
-  /**
-   * Get current user
-   */
-  getCurrentUser(): AuthUser | null {
-    return this.currentUserSubject.value;
-  }
-
-  /**
-   * Check if user is authenticated
-   */
-  isAuthenticated(): boolean {
-    return this.isAuthenticatedSubject.value;
-  }
-
-  /**
-   * Check if user is store owner
-   */
-  isStoreOwner(): boolean {
-    const user = this.getCurrentUser();
-    return user ? user.is_store_owner : false;
-  }
-
-  /**
-   * Force logout (clear local data)
-   */
-  forceLogout(): void {
-    this.clearAuthData();
-    this.router.navigate(['/']);
-  }
-
-  /**
-   * Set authentication data
-   */
-  private setAuthData(user: AuthUser, token: string): void {
-    this.currentUserSubject.next(user);
-    this.isAuthenticatedSubject.next(true);
-    this.saveTokenToStorage(token);
-    this.saveUserToStorage(user);
-  }
-
-  /**
-   * Clear authentication data
-   */
-  private clearAuthData(): void {
-    this.currentUserSubject.next(null);
-    this.isAuthenticatedSubject.next(false);
-    this.removeFromStorage();
-  }
-
-  /**
-   * Get authentication headers
-   */
-  private getAuthHeaders() {
-    const token = this.getStoredToken();
-    return {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
+    return this.getCurrentUser().pipe(
+      map(user => !!user),
+      catchError(() => {
+        this.clearStoredAuth();
+        return new Observable(observer => {
+          observer.next(false);
+          observer.complete();
+        });
       })
-    };
+    );
   }
 
-  /**
-   * Save token to storage
-   */
-  private saveTokenToStorage(token: string): void {
-    localStorage.setItem('auth_token', token);
-  }
-
-  /**
-   * Save user to storage
-   */
-  private saveUserToStorage(user: AuthUser): void {
-    localStorage.setItem('auth_user', JSON.stringify(user));
-  }
-
-  /**
-   * Get token from storage
-   */
-  private getStoredToken(): string | null {
-    return localStorage.getItem('auth_token');
-  }
-
-  /**
-   * Get user from storage
-   */
-  private getStoredUser(): AuthUser | null {
-    const userStr = localStorage.getItem('auth_user');
-    return userStr ? JSON.parse(userStr) : null;
-  }
-
-  /**
-   * Remove data from storage
-   */
-  private removeFromStorage(): void {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_user');
-  }
-
-  /**
-   * Handle HTTP errors
-   */
-  private handleError(error: any): Observable<never> {
-    let errorMessage = 'خطایی رخ داده است. لطفاً مجدداً تلاش کنید.';
+  // Handle HTTP errors
+  private handleError = (error: any) => {
+    console.error('Auth Service Error:', error);
+    
+    let errorMessage = 'خطایی رخ داد. لطفاً دوباره تلاش کنید.';
     
     if (error.error?.message) {
       errorMessage = error.error.message;
+    } else if (error.error?.detail) {
+      errorMessage = error.error.detail;
     } else if (error.status === 0) {
-      errorMessage = 'خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید.';
+      errorMessage = 'عدم اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید.';
     } else if (error.status === 401) {
-      errorMessage = 'دسترسی غیرمجاز. لطفاً مجدداً وارد شوید.';
-      this.forceLogout();
+      errorMessage = 'احراز هویت ناموفق. لطفاً دوباره وارد شوید.';
+      this.clearStoredAuth();
+    } else if (error.status === 403) {
+      errorMessage = 'شما اجازه دسترسی به این بخش را ندارید.';
     } else if (error.status === 404) {
-      errorMessage = 'سرویس درخواستی یافت نشد.';
-    } else if (error.status === 500) {
+      errorMessage = 'منبع مورد نظر یافت نشد.';
+    } else if (error.status >= 500) {
       errorMessage = 'خطای سرور. لطفاً بعداً تلاش کنید.';
     }
 
-    console.error('Auth API Error:', error);
-    return throwError(() => new Error(errorMessage));
-  }
+    return throwError({
+      ...error,
+      message: errorMessage
+    });
+  };
 
-  /**
-   * Validate Iranian phone number
-   */
-  validateIranianPhone(phone: string): boolean {
-    const phoneRegex = /^(\+98|0)?9\d{9}$/;
-    return phoneRegex.test(phone.replace(/\s/g, ''));
-  }
-
-  /**
-   * Format Iranian phone number
-   */
-  formatIranianPhone(phone: string): string {
-    const cleanPhone = phone.replace(/\s/g, '').replace('+98', '0');
-    if (cleanPhone.length === 11 && cleanPhone.startsWith('09')) {
-      return `${cleanPhone.substr(0, 4)} ${cleanPhone.substr(4, 3)} ${cleanPhone.substr(7)}`;
-    }
-    return phone;
-  }
-
-  /**
-   * Clean phone number for API
-   */
-  cleanPhoneNumber(phone: string): string {
-    return phone.replace(/\s/g, '').replace('+98', '0');
+  // Clean up service
+  destroy(): void {
+    this.currentUserSubject.complete();
+    this.tokenSubject.complete();
   }
 }
