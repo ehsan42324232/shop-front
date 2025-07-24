@@ -3,14 +3,10 @@ import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { HomepageService, ContactRequest, PlatformStats } from '../../services/homepage.service';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 import { Subscription } from 'rxjs';
 
 declare let AOS: any;
-
-interface NotificationService {
-  success(message: string): void;
-  error(message: string): void;
-}
 
 @Component({
   selector: 'app-mall-homepage',
@@ -118,6 +114,7 @@ export class MallHomepageComponent implements OnInit, OnDestroy {
     private router: Router,
     private homepageService: HomepageService,
     private authService: AuthService,
+    private notificationService: NotificationService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
@@ -168,7 +165,7 @@ export class MallHomepageComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('Error loading stats:', error);
         this.isLoadingStats = false;
-        // Keep default stats on error
+        // Keep default stats on error - no notification needed for background operation
       }
     });
     this.subscriptions.push(statsSub);
@@ -194,6 +191,7 @@ export class MallHomepageComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading homepage data:', error);
+        // Keep default data on error - no notification needed for background operation
       }
     });
     this.subscriptions.push(homepageSub);
@@ -259,15 +257,21 @@ export class MallHomepageComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.isLoadingContact = false;
         if (response.success) {
-          this.showSuccessMessage('پیام شما با موفقیت ارسال شد. همکاران ما در اسرع وقت با شما تماس خواهند گرفت.');
+          this.notificationService.success(
+            'پیام شما با موفقیت ارسال شد. همکاران ما در اسرع وقت با شما تماس خواهند گرفت.',
+            'پیام ارسال شد'
+          );
           this.closeContactModal();
         } else {
-          this.showErrorMessage(response.message || 'خطایی در ارسال پیام رخ داد');
+          this.notificationService.error(
+            response.message || 'خطایی در ارسال پیام رخ داد',
+            'خطا در ارسال'
+          );
         }
       },
       error: (error) => {
         this.isLoadingContact = false;
-        this.showErrorMessage(error.message || 'خطایی در ارسال پیام رخ داد');
+        this.notificationService.showApiError(error);
       }
     });
     this.subscriptions.push(contactSub);
@@ -294,15 +298,21 @@ export class MallHomepageComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.isLoadingRequest = false;
         if (response.success) {
-          this.showSuccessMessage('درخواست شما با موفقیت ثبت شد. تیم فروش ما در کمترین زمان با شما تماس خواهد گرفت.');
+          this.notificationService.success(
+            'درخواست شما با موفقیت ثبت شد. تیم فروش ما در کمترین زمان با شما تماس خواهد گرفت.',
+            'درخواست ثبت شد'
+          );
           this.closeRequestModal();
         } else {
-          this.showErrorMessage(response.message || 'خطایی در ثبت درخواست رخ داد');
+          this.notificationService.error(
+            response.message || 'خطایی در ثبت درخواست رخ داد',
+            'خطا در ثبت درخواست'
+          );
         }
       },
       error: (error) => {
         this.isLoadingRequest = false;
-        this.showErrorMessage(error.message || 'خطایی در ثبت درخواست رخ داد');
+        this.notificationService.showApiError(error);
       }
     });
     this.subscriptions.push(requestSub);
@@ -424,21 +434,6 @@ export class MallHomepageComponent implements OnInit, OnDestroy {
     this.requestFormErrors = {};
   }
 
-  // Utility methods
-  private showSuccessMessage(message: string): void {
-    // TODO: Implement proper toast notification service
-    if (isPlatformBrowser(this.platformId)) {
-      alert(message);
-    }
-  }
-
-  private showErrorMessage(message: string): void {
-    // TODO: Implement proper toast notification service
-    if (isPlatformBrowser(this.platformId)) {
-      alert(message);
-    }
-  }
-
   // Phone number formatting
   formatPhoneNumber(event: any, formType: 'contact' | 'request'): void {
     const input = event.target;
@@ -465,9 +460,7 @@ export class MallHomepageComponent implements OnInit, OnDestroy {
 
   // Chat widget toggle
   toggleChat(): void {
-    // TODO: Implement chat widget integration
-    console.log('Toggle chat widget - to be implemented');
-    this.showSuccessMessage('چت آنلاین به زودی راه‌اندازی خواهد شد');
+    this.notificationService.showFeatureUnavailable('چت آنلاین');
   }
 
   // Check if user is authenticated
