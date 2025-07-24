@@ -321,7 +321,7 @@ export class AuthService {
   checkAuthStatus(): Observable<boolean> {
     const token = this.getTokenValue();
     if (!token) {
-      return new Observable(observer => {
+      return new Observable<boolean>(observer => {
         observer.next(false);
         observer.complete();
       });
@@ -331,7 +331,7 @@ export class AuthService {
       map(user => !!user),
       catchError(() => {
         this.clearStoredAuth();
-        return new Observable(observer => {
+        return new Observable<boolean>(observer => {
           observer.next(false);
           observer.complete();
         });
