@@ -1,468 +1,396 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 interface ChatMessage {
-  id: string;
-  sender: 'customer' | 'agent' | 'system';
+  id: number;
+  sender_type: 'customer' | 'store_owner';
+  sender_name: string;
   message: string;
-  timestamp: Date;
-  isRead: boolean;
-  messageType: 'text' | 'image' | 'file' | 'system';
+  message_type: 'text' | 'image' | 'file';
+  timestamp: string;
+  is_read: boolean;
 }
 
-interface ChatAgent {
-  id: string;
-  name: string;
-  avatar: string;
-  status: 'online' | 'busy' | 'offline';
-  department: string;
+interface ChatRoom {
+  id: number;
+  customer_name: string;
+  customer_phone: string;
+  status: 'active' | 'closed' | 'transferred';
+  last_activity: string;
+  unread_count: number;
 }
 
 @Component({
   selector: 'app-live-chat',
   templateUrl: './live-chat.component.html',
-  styleUrls: ['./live-chat.component.scss']
+  styleUrls: ['./live-chat.component.css']
 })
-export class LiveChatComponent implements OnInit, OnDestroy {
-  @ViewChild('messagesContainer') messagesContainer!: ElementRef;
-  @ViewChild('fileInput') fileInput!: ElementRef;
+export class LiveChatComponent implements OnInit {
+  @Input() storeId: number | null = null;
+  @Input() isCustomerView = false;
+  @Output() onChatClosed = new EventEmitter<number>();
 
-  private destroy$ = new Subject<void>();
-  
-  // Chat state
-  isOpen = false;
-  isMinimized = false;
-  isConnected = false;
-  isTyping = false;
-  
-  // Chat data
+  // State
+  currentView: 'rooms' | 'chat' = 'rooms';
+  loading = false;
+  connecting = false;
+  error: string | null = null;
+
+  // Chat rooms (for store owners)
+  chatRooms: ChatRoom[] = [];
+  selectedRoom: ChatRoom | null = null;
+
+  // Messages
   messages: ChatMessage[] = [];
-  currentMessage = '';
-  chatSession: any = null;
-  agent: ChatAgent | null = null;
+  newMessage = '';
   
-  // UI state
-  showEmojiPicker = false;
-  showQuickReplies = true;
-  unreadCount = 0;
-  
-  // Quick replies
-  quickReplies = [
-    { text: 'سلام، نیاز به کمک دارم', value: 'سلام، نیاز به کمک دارم' },
-    { text: 'پیگیری سفارش', value: 'می‌خواهم سفارشم را پیگیری کنم' },
-    { text: 'مشکل در پرداخت', value: 'در پرداخت با مشکل مواجه شدم' },
-    { text: 'استرداد کالا', value: 'نحوه استرداد کالا چیست؟' }
-  ];
-  
-  // Emoji list
-  emojis = ['😊', '😢', '😍', '🤔', '👍', '👎', '❤️', '🔥', '💯', '🎉'];
+  // Customer chat initiation
+  customerForm = {
+    name: '',
+    phone: '',
+    initial_message: ''
+  };
 
-  constructor() {}
+  // WebSocket connection
+  private ws: WebSocket | null = null;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.initializeChat();
-    this.loadChatHistory();
+    if (this.isCustomerView) {
+      this.currentView = 'chat';
+    } else {
+      this.loadChatRooms();
+    }
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-    this.disconnectChat();
+    this.closeWebSocket();
   }
 
-  initializeChat(): void {
-    // Initialize WebSocket connection for real-time chat
-    // This would connect to your Django Channels WebSocket
-    this.connectToWebSocket();
-    
-    // Add system welcome message
-    this.addSystemMessage('سلام! چطور می‌تونم کمکتون کنم؟');
+  // ===============================
+  // Chat Rooms Management
+  // ===============================
+
+  loadChatRooms(): void {
+    if (!this.storeId) return;
+
+    this.loading = true;
+    this.http.get<{success: boolean, data: any}>(`${environment.apiUrl}/api/chat/rooms/?store_id=${this.storeId}`)
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.chatRooms = response.data.rooms || [];
+          }
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('خطا در بارگذاری اتاق‌های چت:', error);
+          this.error = 'خطا در بارگذاری فهرست چت‌ها';
+          this.loading = false;
+        }
+      });
   }
 
-  connectToWebSocket(): void {
-    // WebSocket connection logic would go here
-    // For now, simulate connection
-    setTimeout(() => {
-      this.isConnected = true;
-      this.assignAgent();
-    }, 1000);
+  selectRoom(room: ChatRoom): void {
+    this.selectedRoom = room;
+    this.currentView = 'chat';
+    this.loadMessages(room.id);
+    this.connectWebSocket(room.id);
   }
 
-  disconnectChat(): void {
-    // Cleanup WebSocket connection
-    this.isConnected = false;
-  }
+  // ===============================
+  // Customer Chat Initiation
+  // ===============================
 
-  assignAgent(): void {
-    // Simulate agent assignment
-    this.agent = {
-      id: 'agent-1',
-      name: 'مریم احمدی',
-      avatar: '/assets/images/agent-avatar.jpg',
-      status: 'online',
-      department: 'پشتیبانی فروش'
-    };
-    
-    this.addSystemMessage(`${this.agent.name} از ${this.agent.department} به شما متصل شد.`);
-  }
-
-  toggleChat(): void {
-    this.isOpen = !this.isOpen;
-    this.isMinimized = false;
-    
-    if (this.isOpen) {
-      this.markMessagesAsRead();
-      setTimeout(() => this.scrollToBottom(), 100);
+  initiateCustomerChat(): void {
+    if (!this.storeId || !this.customerForm.name || !this.customerForm.initial_message) {
+      this.error = 'لطفاً تمام فیلدهای ضروری را پر کنید';
+      return;
     }
+
+    this.loading = true;
+    this.error = null;
+
+    const payload = {
+      store_id: this.storeId,
+      customer_name: this.customerForm.name,
+      customer_phone: this.customerForm.phone,
+      initial_message: this.customerForm.initial_message
+    };
+
+    this.http.post<{success: boolean, data: any}>(`${environment.apiUrl}/api/chat/initiate/`, payload)
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            const roomData = response.data;
+            this.selectedRoom = {
+              id: roomData.chat_room_id,
+              customer_name: this.customerForm.name,
+              customer_phone: this.customerForm.phone,
+              status: 'active',
+              last_activity: new Date().toISOString(),
+              unread_count: 0
+            };
+            
+            this.connectWebSocket(roomData.chat_room_id);
+            this.loadMessages(roomData.chat_room_id);
+            this.resetCustomerForm();
+          }
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('خطا در شروع چت:', error);
+          this.error = 'خطا در شروع چت. لطفاً دوباره تلاش کنید.';
+          this.loading = false;
+        }
+      });
   }
 
-  minimizeChat(): void {
-    this.isMinimized = true;
+  resetCustomerForm(): void {
+    this.customerForm = {
+      name: '',
+      phone: '',
+      initial_message: ''
+    };
   }
 
-  maximizeChat(): void {
-    this.isMinimized = false;
-    setTimeout(() => this.scrollToBottom(), 100);
-  }
+  // ===============================
+  // Messages Management
+  // ===============================
 
-  closeChat(): void {
-    this.isOpen = false;
-    this.isMinimized = false;
+  loadMessages(roomId: number): void {
+    this.http.get<{success: boolean, data: any}>(`${environment.apiUrl}/api/chat/messages/${roomId}/`)
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.messages = response.data.messages || [];
+            this.scrollToBottom();
+          }
+        },
+        error: (error) => {
+          console.error('خطا در بارگذاری پیام‌ها:', error);
+          this.error = 'خطا در بارگذاری پیام‌ها';
+        }
+      });
   }
 
   sendMessage(): void {
-    if (!this.currentMessage.trim()) return;
+    if (!this.newMessage.trim() || !this.selectedRoom) return;
+
+    const messageData = {
+      message: this.newMessage.trim(),
+      sender_type: this.isCustomerView ? 'customer' : 'store_owner',
+      sender_name: this.isCustomerView ? this.selectedRoom.customer_name : 'فروشنده',
+      message_type: 'text'
+    };
+
+    this.http.post<{success: boolean}>(`${environment.apiUrl}/api/chat/messages/${this.selectedRoom.id}/`, messageData)
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.newMessage = '';
+            // Message will be added via WebSocket
+          }
+        },
+        error: (error) => {
+          console.error('خطا در ارسال پیام:', error);
+          this.error = 'خطا در ارسال پیام';
+        }
+      });
+  }
+
+  // ===============================
+  // WebSocket Connection
+  // ===============================
+
+  connectWebSocket(roomId: number): void {
+    this.closeWebSocket();
+    this.connecting = true;
+
+    const wsUrl = `${environment.wsUrl}/ws/chat/${roomId}/`;
     
+    try {
+      this.ws = new WebSocket(wsUrl);
+
+      this.ws.onopen = () => {
+        console.log('WebSocket connected');
+        this.connecting = false;
+        this.reconnectAttempts = 0;
+      };
+
+      this.ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          this.handleWebSocketMessage(data);
+        } catch (e) {
+          console.error('Error parsing WebSocket message:', e);
+        }
+      };
+
+      this.ws.onclose = (event) => {
+        console.log('WebSocket closed:', event.code, event.reason);
+        this.connecting = false;
+        
+        if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+          setTimeout(() => {
+            this.reconnectAttempts++;
+            this.connectWebSocket(roomId);
+          }, 3000 * this.reconnectAttempts);
+        }
+      };
+
+      this.ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        this.connecting = false;
+      };
+
+    } catch (error) {
+      console.error('Error creating WebSocket:', error);
+      this.connecting = false;
+    }
+  }
+
+  closeWebSocket(): void {
+    if (this.ws) {
+      this.ws.close(1000, 'Component destroyed');
+      this.ws = null;
+    }
+  }
+
+  handleWebSocketMessage(data: any): void {
+    switch (data.type) {
+      case 'chat_message':
+        this.addMessage(data.message);
+        break;
+      case 'status_change':
+        this.updateRoomStatus(data.message);
+        break;
+      case 'user_typing':
+        this.handleTypingIndicator(data.message);
+        break;
+      default:
+        console.log('Unknown WebSocket message type:', data.type);
+    }
+  }
+
+  addMessage(messageData: any): void {
     const message: ChatMessage = {
-      id: this.generateId(),
-      sender: 'customer',
-      message: this.currentMessage.trim(),
-      timestamp: new Date(),
-      isRead: false,
-      messageType: 'text'
+      id: messageData.message_id,
+      sender_type: messageData.sender_type,
+      sender_name: messageData.sender_name,
+      message: messageData.message,
+      message_type: messageData.message_type,
+      timestamp: messageData.timestamp,
+      is_read: false
     };
-    
+
     this.messages.push(message);
-    this.currentMessage = '';
-    this.scrollToBottom();
-    
-    // Simulate agent typing and response
-    this.simulateAgentResponse();
-  }
-
-  sendQuickReply(reply: string): void {
-    this.currentMessage = reply;
-    this.sendMessage();
-    this.showQuickReplies = false;
-  }
-
-  simulateAgentResponse(): void {
-    this.isTyping = true;
-    
-    setTimeout(() => {
-      const responses = [
-        'ممنون از پیامتون. در حال بررسی هستم...',
-        'بله، در خدمت شما هستم. لطفا شرح کاملی از مشکل بدید.',
-        'حتما کمکتون می‌کنم. چند لحظه صبر کنید.',
-        'اطلاعات شما را دریافت کردم. در حال پیگیری هستم.'
-      ];
-      
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
-      const message: ChatMessage = {
-        id: this.generateId(),
-        sender: 'agent',
-        message: randomResponse,
-        timestamp: new Date(),
-        isRead: false,
-        messageType: 'text'
-      };
-      
-      this.messages.push(message);
-      this.isTyping = false;
-      
-      if (!this.isOpen) {
-        this.unreadCount++;
-      }
-      
-      this.scrollToBottom();
-    }, 1500 + Math.random() * 1000);
-  }
-
-  handleFileUpload(event: any): void {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    // Validate file size and type
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
-    
-    if (file.size > maxSize) {
-      alert('حجم فایل نباید بیشتر از 5 مگابایت باشد');
-      return;
-    }
-    
-    if (!allowedTypes.includes(file.type)) {
-      alert('فقط فایل‌های تصویری و PDF مجاز هستند');
-      return;
-    }
-    
-    // Upload file and send message
-    this.uploadFile(file);
-  }
-
-  uploadFile(file: File): void {
-    // Simulate file upload
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      const message: ChatMessage = {
-        id: this.generateId(),
-        sender: 'customer',
-        message: file.name,
-        timestamp: new Date(),
-        isRead: false,
-        messageType: file.type.startsWith('image/') ? 'image' : 'file'
-      };
-      
-      this.messages.push(message);
-      this.scrollToBottom();
-    };
-    
-    reader.readAsDataURL(file);
-  }
-
-  addEmoji(emoji: string): void {
-    this.currentMessage += emoji;
-    this.showEmojiPicker = false;
-  }
-
-  toggleEmojiPicker(): void {
-    this.showEmojiPicker = !this.showEmojiPicker;
-  }
-
-  addSystemMessage(message: string): void {
-    const systemMessage: ChatMessage = {
-      id: this.generateId(),
-      sender: 'system',
-      message: message,
-      timestamp: new Date(),
-      isRead: true,
-      messageType: 'system'
-    };
-    
-    this.messages.push(systemMessage);
     this.scrollToBottom();
   }
 
-  markMessagesAsRead(): void {
-    this.messages.forEach(msg => {
-      if (msg.sender === 'agent') {
-        msg.isRead = true;
-      }
-    });
-    this.unreadCount = 0;
+  updateRoomStatus(statusData: any): void {
+    if (this.selectedRoom) {
+      this.selectedRoom.status = statusData.new_status;
+    }
   }
+
+  handleTypingIndicator(typingData: any): void {
+    // Implement typing indicator logic
+    console.log('User typing:', typingData);
+  }
+
+  // ===============================
+  // Room Actions
+  // ===============================
+
+  closeChat(): void {
+    if (!this.selectedRoom) return;
+
+    if (confirm('آیا از بستن این چت اطمینان دارید؟')) {
+      this.http.patch(`${environment.apiUrl}/api/chat/rooms/${this.selectedRoom.id}/status/`, {
+        status: 'closed',
+        notes: 'بسته شده توسط کاربر'
+      }).subscribe({
+        next: (response: any) => {
+          if (response.success) {
+            this.selectedRoom!.status = 'closed';
+            this.onChatClosed.emit(this.selectedRoom!.id);
+            this.goBackToRooms();
+          }
+        },
+        error: (error) => {
+          console.error('خطا در بستن چت:', error);
+          this.error = 'خطا در بستن چت';
+        }
+      });
+    }
+  }
+
+  goBackToRooms(): void {
+    this.currentView = 'rooms';
+    this.selectedRoom = null;
+    this.messages = [];
+    this.closeWebSocket();
+    
+    if (!this.isCustomerView) {
+      this.loadChatRooms();
+    }
+  }
+
+  // ===============================
+  // Utility Methods
+  // ===============================
 
   scrollToBottom(): void {
     setTimeout(() => {
-      if (this.messagesContainer) {
-        const element = this.messagesContainer.nativeElement;
-        element.scrollTop = element.scrollHeight;
+      const messagesContainer = document.querySelector('.messages-container');
+      if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }
     }, 100);
   }
 
-  loadChatHistory(): void {
-    // Load previous chat messages from API
-    // This would call your Django API to get chat history
+  formatTime(timestamp: string): string {
+    return new Date(timestamp).toLocaleTimeString('fa-IR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
-  formatTimestamp(timestamp: Date): string {
-    const now = new Date();
-    const diff = now.getTime() - timestamp.getTime();
-    
-    if (diff < 60000) { // Less than 1 minute
-      return 'همین الان';
-    } else if (diff < 3600000) { // Less than 1 hour
-      const minutes = Math.floor(diff / 60000);
-      return `${minutes} دقیقه پیش`;
-    } else if (diff < 86400000) { // Less than 1 day
-      const hours = Math.floor(diff / 3600000);
-      return `${hours} ساعت پیش`;
+  isOwnMessage(message: ChatMessage): boolean {
+    if (this.isCustomerView) {
+      return message.sender_type === 'customer';
     } else {
-      return timestamp.toLocaleDateString('fa-IR');
+      return message.sender_type === 'store_owner';
     }
   }
 
-  handleKeyPress(event: KeyboardEvent): void {
+  getRoomStatusClass(status: string): string {
+    const statusClasses = {
+      'active': 'bg-green-100 text-green-800',
+      'closed': 'bg-gray-100 text-gray-800',
+      'transferred': 'bg-blue-100 text-blue-800'
+    };
+    return statusClasses[status as keyof typeof statusClasses] || 'bg-gray-100 text-gray-800';
+  }
+
+  getRoomStatusText(status: string): string {
+    const statusTexts = {
+      'active': 'فعال',
+      'closed': 'بسته شده',
+      'transferred': 'منتقل شده'
+    };
+    return statusTexts[status as keyof typeof statusTexts] || 'نامشخص';
+  }
+
+  onMessageKeyPress(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       this.sendMessage();
     }
-  }
-
-  triggerFileInput(): void {
-    this.fileInput.nativeElement.click();
-  }
-
-  getMessageClass(message: ChatMessage): string {
-    const baseClass = 'message';
-    return `${baseClass} ${baseClass}--${message.sender}`;
-  }
-
-  getAgentStatusClass(): string {
-    if (!this.agent) return 'offline';
-    return this.agent.status;
-  }
-
-  generateId(): string {
-    return Math.random().toString(36).substr(2, 9);
-  }
-
-  // Utility methods
-  isImageMessage(message: ChatMessage): boolean {
-    return message.messageType === 'image';
-  }
-
-  isFileMessage(message: ChatMessage): boolean {
-    return message.messageType === 'file';
-  }
-
-  isSystemMessage(message: ChatMessage): boolean {
-    return message.messageType === 'system';
-  }
-
-  startNewConversation(): void {
-    this.messages = [];
-    this.addSystemMessage('مکالمه جدید شروع شد. چطور می‌تونم کمکتون کنم؟');
-    this.showQuickReplies = true;
-  }
-
-  downloadChatHistory(): void {
-    // Create and download chat history as text file
-    const chatHistory = this.messages
-      .filter(msg => msg.messageType !== 'system')
-      .map(msg => {
-        const time = msg.timestamp.toLocaleTimeString('fa-IR');
-        const sender = msg.sender === 'customer' ? 'شما' : this.agent?.name || 'پشتیبان';
-        return `[${time}] ${sender}: ${msg.message}`;
-      })
-      .join('\n');
-
-    const blob = new Blob([chatHistory], { type: 'text/plain;charset=utf-8' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `chat-history-${new Date().toLocaleDateString('fa-IR')}.txt`;
-    link.click();
-    window.URL.revokeObjectURL(url);
-  }
-
-  rateChatExperience(rating: number): void {
-    // Send rating to backend
-    console.log('Chat rated:', rating);
-    this.addSystemMessage(`ممنون از امتیاز ${rating} ستاره‌ای شما!`);
-  }
-
-  requestHumanAgent(): void {
-    this.addSystemMessage('درخواست شما برای اتصال به پشتیبان انسانی ثبت شد. لطفا کمی صبر کنید...');
-    
-    // Simulate human agent assignment
-    setTimeout(() => {
-      this.agent = {
-        id: 'human-agent-1',
-        name: 'احمد رضایی',
-        avatar: '/assets/images/human-agent-avatar.jpg',
-        status: 'online',
-        department: 'پشتیبانی تخصصی'
-      };
-      
-      this.addSystemMessage(`${this.agent.name} از ${this.agent.department} به شما متصل شد.`);
-    }, 3000);
-  }
-
-  shareLocation(): void {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          
-          const message: ChatMessage = {
-            id: this.generateId(),
-            sender: 'customer',
-            message: `موقعیت مکانی: ${lat}, ${lng}`,
-            timestamp: new Date(),
-            isRead: false,
-            messageType: 'text'
-          };
-          
-          this.messages.push(message);
-          this.scrollToBottom();
-        },
-        (error) => {
-          alert('امکان دسترسی به موقعیت مکانی وجود ندارد');
-        }
-      );
-    } else {
-      alert('مرورگر شما از موقعیت‌یابی پشتیبانی نمی‌کند');
-    }
-  }
-
-  copyMessageToClipboard(message: string): void {
-    navigator.clipboard.writeText(message).then(() => {
-      // Show success toast or notification
-      console.log('Message copied to clipboard');
-    });
-  }
-
-  reportMessage(messageId: string): void {
-    // Report inappropriate message
-    console.log('Message reported:', messageId);
-    this.addSystemMessage('پیام شما گزارش شد و توسط تیم پشتیبانی بررسی خواهد شد.');
-  }
-
-  blockAgent(): void {
-    // Block current agent
-    if (this.agent) {
-      console.log('Agent blocked:', this.agent.id);
-      this.addSystemMessage('پشتیبان مسدود شد. در حال اتصال به پشتیبان جدید...');
-      
-      setTimeout(() => {
-        this.assignAgent();
-      }, 2000);
-    }
-  }
-
-  getSatisfactionEmoji(rating: number): string {
-    const emojis = ['😞', '😐', '🙂', '😊', '😍'];
-    return emojis[rating - 1] || '😐';
-  }
-
-  scheduleCallback(): void {
-    // Open callback scheduling modal
-    this.addSystemMessage('لطفا شماره تماس و زمان مناسب برای تماس را در فرم مربوطه وارد کنید.');
-  }
-
-  getEstimatedWaitTime(): string {
-    // Calculate estimated wait time based on queue
-    const waitMinutes = Math.floor(Math.random() * 10) + 1;
-    return `حدود ${waitMinutes} دقیقه`;
-  }
-
-  getAvailableAgents(): number {
-    // Get number of available agents
-    return Math.floor(Math.random() * 5) + 1;
-  }
-
-  isBusinessHours(): boolean {
-    const now = new Date();
-    const hour = now.getHours();
-    return hour >= 8 && hour <= 22; // 8 AM to 10 PM
-  }
-
-  getBusinessHoursMessage(): string {
-    return 'ساعات کاری: شنبه تا پنج‌شنبه، 8 صبح تا 10 شب';
   }
 }
