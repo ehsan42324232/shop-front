@@ -1,0 +1,93 @@
+<div class="persian-date-picker" dir="rtl">
+  
+  <!-- Input Field -->
+  <div class="date-input-container" (click)="toggleCalendar()">
+    <input type="text" 
+           [value]="displayValue" 
+           [placeholder]="placeholder"
+           [disabled]="disabled"
+           readonly
+           class="date-input">
+    <i class="feather-calendar date-icon"></i>
+  </div>
+
+  <!-- Calendar Dropdown -->
+  <div *ngIf="isOpen" class="calendar-dropdown">
+    
+    <!-- Calendar Header -->
+    <div class="calendar-header">
+      <div class="year-month-selector">
+        <button (click)="previousYear()" class="nav-btn">
+          <i class="feather-chevrons-right"></i>
+        </button>
+        <button (click)="previousMonth()" class="nav-btn">
+          <i class="feather-chevron-right"></i>
+        </button>
+        
+        <div class="current-month-year">
+          <span class="current-month">{{ persianMonths[currentMonth - 1] }}</span>
+          <span class="current-year">{{ currentYear }}</span>
+        </div>
+        
+        <button (click)="nextMonth()" class="nav-btn">
+          <i class="feather-chevron-left"></i>
+        </button>
+        <button (click)="nextYear()" class="nav-btn">
+          <i class="feather-chevrons-left"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Days of Week Header -->
+    <div class="days-header">
+      <div *ngFor="let day of persianDaysOfWeek" class="day-header">
+        {{ day }}
+      </div>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div class="calendar-grid">
+      <div *ngFor="let dayObj of getCalendarDays()" 
+           [class]="'calendar-day ' + 
+                   (dayObj.isCurrentMonth ? 'current-month' : 'other-month') + 
+                   (dayObj.isToday ? ' today' : '') + 
+                   (dayObj.isSelected ? ' selected' : '') + 
+                   (dayObj.isDisabled ? ' disabled' : '')"
+           (click)="selectDate(dayObj.day)">
+        <span *ngIf="dayObj.day > 0">{{ dayObj.day }}</span>
+      </div>
+    </div>
+
+    <!-- Time Picker (if enabled) -->
+    <div *ngIf="showTime" class="time-picker">
+      <div class="time-inputs">
+        <div class="time-input-group">
+          <label>ساعت</label>
+          <select [(ngModel)]="selectedTime.hour" (change)="updateTime()">
+            <option *ngFor="let hour of [].constructor(24); let i = index" [value]="i">
+              {{ i.toString().padStart(2, '0') }}
+            </option>
+          </select>
+        </div>
+        <div class="time-separator">:</div>
+        <div class="time-input-group">
+          <label>دقیقه</label>
+          <select [(ngModel)]="selectedTime.minute" (change)="updateTime()">
+            <option *ngFor="let minute of [].constructor(60); let i = index" [value]="i">
+              {{ i.toString().padStart(2, '0') }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar Footer -->
+    <div class="calendar-footer">
+      <button (click)="closeCalendar()" class="btn-cancel">لغو</button>
+      <button (click)="selectDate(getTodayPersian().day); closeCalendar()" class="btn-today">امروز</button>
+    </div>
+  </div>
+
+  <!-- Backdrop -->
+  <div *ngIf="isOpen" class="calendar-backdrop" (click)="closeCalendar()"></div>
+</div>
