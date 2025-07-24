@@ -259,7 +259,10 @@ export class NotificationService {
    * Show validation errors
    */
   showValidationErrors(errors: { [key: string]: string[] }): void {
-    const errorMessages = Object.values(errors).flatMap(arr => arr);
+    const errorMessages: string[] = [];
+    Object.values(errors).forEach(errorArray => {
+      errorMessages.push(...errorArray);
+    });
     const message = errorMessages.join('\n');
     this.error(message, 'خطای اعتبارسنجی');
   }
