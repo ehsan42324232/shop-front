@@ -1,0 +1,223 @@
+<div class="live-chat-widget" dir="rtl" [class.open]="isOpen" [class.minimized]="isMinimized">
+  
+  <!-- Chat Button (when closed) -->
+  <div *ngIf="!isOpen" class="chat-button" (click)="toggleChat()">
+    <div class="chat-icon">
+      <i class="feather-message-circle"></i>
+      <span *ngIf="unreadCount > 0" class="unread-badge">{{ unreadCount }}</span>
+    </div>
+    <div class="chat-text">گفتگو</div>
+  </div>
+
+  <!-- Chat Window -->
+  <div *ngIf="isOpen" class="chat-window">
+    
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <div class="agent-info" *ngIf="agent">
+        <img [src]="agent.avatar" [alt]="agent.name" class="agent-avatar">
+        <div class="agent-details">
+          <div class="agent-name">{{ agent.name }}</div>
+          <div class="agent-status" [class]="getAgentStatusClass()">
+            {{ agent.department }}
+          </div>
+        </div>
+      </div>
+      <div class="chat-controls">
+        <button (click)="minimizeChat()" class="control-btn" title="کوچک کردن">
+          <i class="feather-minus"></i>
+        </button>
+        <button (click)="closeChat()" class="control-btn" title="بستن">
+          <i class="feather-x"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div #messagesContainer class="messages-container" [class.typing]="isTyping">
+      
+      <!-- Business Hours Notice -->
+      <div *ngIf="!isBusinessHours()" class="business-hours-notice">
+        <i class="feather-clock"></i>
+        <span>{{ getBusinessHoursMessage() }}</span>
+      </div>
+
+      <!-- Messages -->
+      <div *ngFor="let message of messages" [class]="getMessageClass(message)">
+        
+        <!-- System Message -->
+        <div *ngIf="isSystemMessage(message)" class="system-message">
+          <i class="feather-info"></i>
+          <span>{{ message.message }}</span>
+        </div>
+
+        <!-- Regular Message -->
+        <div *ngIf="!isSystemMessage(message)" class="message-bubble">
+          
+          <!-- Avatar for agent messages -->
+          <div *ngIf="message.sender === 'agent'" class="message-avatar">
+            <img [src]="agent?.avatar" [alt]="agent?.name">
+          </div>
+
+          <div class="message-content">
+            
+            <!-- Text Message -->
+            <div *ngIf="message.messageType === 'text'" class="message-text">
+              {{ message.message }}
+            </div>
+
+            <!-- Image Message -->
+            <div *ngIf="isImageMessage(message)" class="message-image">
+              <img [src]="message.message" [alt]="'تصویر ارسالی'" class="uploaded-image">
+            </div>
+
+            <!-- File Message -->
+            <div *ngIf="isFileMessage(message)" class="message-file">
+              <i class="feather-file"></i>
+              <span>{{ message.message }}</span>
+            </div>
+
+            <!-- Message Info -->
+            <div class="message-info">
+              <span class="message-time">{{ formatTimestamp(message.timestamp) }}</span>
+              <i *ngIf="message.sender === 'customer' && message.isRead" 
+                 class="feather-check-circle read-indicator"></i>
+            </div>
+          </div>
+
+          <!-- Message Actions -->
+          <div class="message-actions" *ngIf="message.sender === 'agent'">
+            <button (click)="copyMessageToClipboard(message.message)" title="کپی">
+              <i class="feather-copy"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div *ngIf="isTyping" class="typing-indicator">
+        <div class="typing-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <span class="typing-text">{{ agent?.name }} در حال تایپ است...</span>
+      </div>
+    </div>
+
+    <!-- Quick Replies -->
+    <div *ngIf="showQuickReplies && quickReplies.length > 0" class="quick-replies">
+      <div class="quick-replies-title">پاسخ‌های سریع:</div>
+      <div class="quick-reply-buttons">
+        <button *ngFor="let reply of quickReplies" 
+                (click)="sendQuickReply(reply.value)"
+                class="quick-reply-btn">
+          {{ reply.text }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Emoji Picker -->
+    <div *ngIf="showEmojiPicker" class="emoji-picker">
+      <div class="emoji-grid">
+        <button *ngFor="let emoji of emojis" 
+                (click)="addEmoji(emoji)"
+                class="emoji-btn">
+          {{ emoji }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="chat-input-container">
+      
+      <!-- Connection Status -->
+      <div *ngIf="!isConnected" class="connection-status">
+        <i class="feather-wifi-off"></i>
+        <span>در حال اتصال...</span>
+      </div>
+
+      <!-- Input Area -->
+      <div class="chat-input-area">
+        <div class="input-actions">
+          <button (click)="triggerFileInput()" class="action-btn" title="ارسال فایل">
+            <i class="feather-paperclip"></i>
+          </button>
+          <button (click)="toggleEmojiPicker()" class="action-btn" title="ایموجی">
+            <i class="feather-smile"></i>
+          </button>
+        </div>
+
+        <textarea [(ngModel)]="currentMessage"
+                  (keydown)="handleKeyPress($event)"
+                  placeholder="پیام خود را بنویسید..."
+                  class="message-input"
+                  rows="1"
+                  [disabled]="!isConnected"></textarea>
+
+        <button (click)="sendMessage()" 
+                [disabled]="!currentMessage.trim() || !isConnected"
+                class="send-btn">
+          <i class="feather-send"></i>
+        </button>
+      </div>
+
+      <!-- File Input -->
+      <input #fileInput 
+             type="file" 
+             (change)="handleFileUpload($event)"
+             accept="image/*,.pdf"
+             style="display: none;">
+    </div>
+
+    <!-- Chat Footer -->
+    <div class="chat-footer">
+      
+      <!-- Agent Options -->
+      <div class="footer-actions">
+        <button (click)="requestHumanAgent()" class="footer-btn">
+          <i class="feather-user"></i>
+          <span>پشتیبان انسانی</span>
+        </button>
+        
+        <button (click)="downloadChatHistory()" class="footer-btn">
+          <i class="feather-download"></i>
+          <span>دانلود گفتگو</span>
+        </button>
+        
+        <button (click)="startNewConversation()" class="footer-btn">
+          <i class="feather-refresh-cw"></i>
+          <span>گفتگوی جدید</span>
+        </button>
+      </div>
+
+      <!-- Rating -->
+      <div *ngIf="messages.length > 5" class="chat-rating">
+        <span>از این گفتگو راضی بودید؟</span>
+        <div class="rating-buttons">
+          <button *ngFor="let i of [1,2,3,4,5]" 
+                  (click)="rateChatExperience(i)"
+                  class="rating-btn">
+            {{ getSatisfactionEmoji(i) }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Wait Time Info -->
+      <div *ngIf="!isConnected" class="wait-info">
+        <i class="feather-clock"></i>
+        <span>زمان انتظار تقریبی: {{ getEstimatedWaitTime() }}</span>
+        <span class="agents-available">{{ getAvailableAgents() }} پشتیبان آنلاین</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Minimized Chat -->
+  <div *ngIf="isMinimized" class="minimized-chat" (click)="maximizeChat()">
+    <div class="minimized-header">
+      <span>گفتگو با {{ agent?.name }}</span>
+      <span *ngIf="unreadCount > 0" class="unread-count">{{ unreadCount }}</span>
+    </div>
+  </div>
+
+</div>
