@@ -1,36 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-
-interface PlatformStats {
-  total_stores: number;
-  total_products: number;
-  total_orders: number;
-  happy_customers: number;
-}
-
-interface PlatformFeature {
-  title: string;
-  description: string;
-  icon: string;
-  image?: string;
-}
-
-interface HomepageData {
-  platform_name: string;
-  hero_title: string;
-  hero_subtitle: string;
-  hero_image?: string;
-  hero_video?: string;
-  features: PlatformFeature[];
-  statistics: PlatformStats;
-  contact: {
-    email: string;
-    phone: string;
-    telegram?: string;
-    instagram?: string;
-  };
-}
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-mall-homepage',
@@ -38,141 +7,147 @@ interface HomepageData {
   styleUrls: ['./mall-homepage.component.css']
 })
 export class MallHomepageComponent implements OnInit {
-  homepageData: HomepageData | null = null;
-  loading = true;
-  error: string | null = null;
   
-  // Contact form
-  showContactForm = false;
-  contactForm = {
-    full_name: '',
-    email: '',
-    phone: '',
-    store_name: '',
-    store_description: '',
-    business_type: '',
-    preferred_domain: '',
-    has_custom_domain: false,
-    custom_domain: '',
-    estimated_products: null,
-    has_physical_store: false
-  };
-  
-  submittingContact = false;
-  contactSuccess = false;
-  
-  // Newsletter
-  newsletterEmail = '';
-  newsletterSubmitting = false;
-  newsletterSuccess = false;
+  // Feature data for homepage sections
+  features = [
+    {
+      title: 'ساخت فروشگاه آنلاین',
+      description: 'با چند کلیک فروشگاه آنلاین خود را راه‌اندازی کنید',
+      icon: 'fa-store',
+      image: '/assets/images/feature-store.jpg'
+    },
+    {
+      title: 'مدیریت محصولات',
+      description: 'سیستم پیشرفته مدیریت محصولات با دسته‌بندی هوشمند',
+      icon: 'fa-boxes',
+      image: '/assets/images/feature-products.jpg'
+    },
+    {
+      title: 'اتصال به شبکه‌های اجتماعی',
+      description: 'واردات خودکار محتوا از تلگرام و اینستاگرام',
+      icon: 'fa-share-alt',
+      image: '/assets/images/feature-social.jpg'
+    },
+    {
+      title: 'درگاه پرداخت امن',
+      description: 'اتصال به معتبرترین درگاه‌های پرداخت ایرانی',
+      icon: 'fa-credit-card',
+      image: '/assets/images/feature-payment.jpg'
+    },
+    {
+      title: 'ارسال و لجستیک',
+      description: 'اتصال به شرکت‌های پست و باربری سراسر کشور',
+      icon: 'fa-shipping-fast',
+      image: '/assets/images/feature-shipping.jpg'
+    },
+    {
+      title: 'پشتیبانی ۲۴ ساعته',
+      description: 'تیم پشتیبانی حرفه‌ای در کنار شما',
+      icon: 'fa-headset',
+      image: '/assets/images/feature-support.jpg'
+    }
+  ];
 
-  constructor(private http: HttpClient) {}
+  // Stats for homepage
+  stats = [
+    { number: '۱۰,۰۰۰+', label: 'فروشگاه فعال' },
+    { number: '۵۰۰,۰۰۰+', label: 'محصول ثبت شده' },
+    { number: '۹۹.۹%', label: 'آپتایم سرور' },
+    { number: '۲۴/۷', label: 'پشتیبانی' }
+  ];
+
+  // Form data
+  contactForm = {
+    name: '',
+    phone: '',
+    email: '',
+    message: ''
+  };
+
+  requestForm = {
+    businessName: '',
+    ownerName: '',
+    phone: '',
+    businessType: ''
+  };
+
+  // Modal states
+  showContactModal = false;
+  showRequestModal = false;
+  showLoginModal = false;
+
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
-    this.loadHomepageData();
-  }
-
-  loadHomepageData(): void {
-    this.http.get<HomepageData>(`${environment.apiUrl}/api/platform/homepage/`)
-      .subscribe({
-        next: (data) => {
-          this.homepageData = data;
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('خطا در بارگذاری اطلاعات:', error);
-          this.error = 'خطا در بارگذاری اطلاعات';
-          this.loading = false;
-        }
+    // Initialize AOS animations if available
+    if (typeof AOS !== 'undefined') {
+      AOS.init({
+        duration: 1000,
+        easing: 'ease-in-out',
+        once: true
       });
-  }
-
-  showRequestForm(): void {
-    this.showContactForm = true;
-    // Scroll to form
-    setTimeout(() => {
-      const formElement = document.getElementById('contact-form');
-      if (formElement) {
-        formElement.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 100);
-  }
-
-  submitContactForm(): void {
-    if (this.submittingContact) return;
-    
-    this.submittingContact = true;
-    
-    this.http.post(`${environment.apiUrl}/api/platform/store-request/`, this.contactForm)
-      .subscribe({
-        next: (response: any) => {
-          this.contactSuccess = true;
-          this.showContactForm = false;
-          this.resetContactForm();
-          this.submittingContact = false;
-          
-          // Show success message
-          alert(response.message || 'درخواست شما با موفقیت ثبت شد');
-        },
-        error: (error) => {
-          console.error('خطا در ثبت درخواست:', error);
-          alert('خطا در ثبت درخواست. لطفاً دوباره تلاش کنید.');
-          this.submittingContact = false;
-        }
-      });
-  }
-
-  subscribeNewsletter(): void {
-    if (this.newsletterSubmitting || !this.newsletterEmail) return;
-    
-    this.newsletterSubmitting = true;
-    
-    this.http.post(`${environment.apiUrl}/api/platform/newsletter/`, {
-      email: this.newsletterEmail
-    }).subscribe({
-      next: (response: any) => {
-        this.newsletterSuccess = true;
-        this.newsletterEmail = '';
-        this.newsletterSubmitting = false;
-        
-        // Show success message
-        alert(response.message || 'با موفقیت در خبرنامه عضو شدید');
-      },
-      error: (error) => {
-        console.error('خطا در عضویت خبرنامه:', error);
-        alert('خطا در عضویت خبرنامه. لطفاً دوباره تلاش کنید.');
-        this.newsletterSubmitting = false;
-      }
-    });
-  }
-
-  resetContactForm(): void {
-    this.contactForm = {
-      full_name: '',
-      email: '',
-      phone: '',
-      store_name: '',
-      store_description: '',
-      business_type: '',
-      preferred_domain: '',
-      has_custom_domain: false,
-      custom_domain: '',
-      estimated_products: null,
-      has_physical_store: false
-    };
-  }
-
-  closeContactForm(): void {
-    this.showContactForm = false;
-  }
-
-  formatNumber(num: number): string {
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
-    } else if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
     }
-    return num.toString();
+  }
+
+  // Modal handlers
+  openContactModal(): void {
+    this.showContactModal = true;
+  }
+
+  closeContactModal(): void {
+    this.showContactModal = false;
+    this.resetContactForm();
+  }
+
+  openRequestModal(): void {
+    this.showRequestModal = true;
+  }
+
+  closeRequestModal(): void {
+    this.showRequestModal = false;
+    this.resetRequestForm();
+  }
+
+  openLoginModal(): void {
+    this.showLoginModal = true;
+  }
+
+  closeLoginModal(): void {
+    this.showLoginModal = false;
+  }
+
+  // Form handlers
+  submitContactForm(): void {
+    if (this.isContactFormValid()) {
+      // Send contact form data
+      console.log('Contact form submitted:', this.contactForm);
+      // TODO: Implement API call
+      this.closeContactModal();
+      this.showSuccessMessage('پیام شما با موفقیت ارسال شد');
+    }
+  }
+
+  submitRequestForm(): void {
+    if (this.isRequestFormValid()) {
+      // Send request form data
+      console.log('Request form submitted:', this.requestForm);
+      // TODO: Implement API call
+      this.closeRequestModal();
+      this.showSuccessMessage('درخواست شما ثبت شد. همکاران ما با شما تماس می‌گیرند');
+    }
+  }
+
+  // Navigation methods
+  navigateToLogin(): void {
+    this.router.navigate(['/auth/login']);
+  }
+
+  navigateToRegister(): void {
+    this.router.navigate(['/auth/register']);
+  }
+
+  navigateToDemo(): void {
+    this.router.navigate(['/demo']);
   }
 
   scrollToSection(sectionId: string): void {
@@ -180,5 +155,49 @@ export class MallHomepageComponent implements OnInit {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
+  }
+
+  // Form validation
+  private isContactFormValid(): boolean {
+    return !!(this.contactForm.name && 
+              this.contactForm.phone && 
+              this.contactForm.message);
+  }
+
+  private isRequestFormValid(): boolean {
+    return !!(this.requestForm.businessName && 
+              this.requestForm.ownerName && 
+              this.requestForm.phone);
+  }
+
+  // Form reset methods
+  private resetContactForm(): void {
+    this.contactForm = {
+      name: '',
+      phone: '',
+      email: '',
+      message: ''
+    };
+  }
+
+  private resetRequestForm(): void {
+    this.requestForm = {
+      businessName: '',
+      ownerName: '',
+      phone: '',
+      businessType: ''
+    };
+  }
+
+  // Utility methods
+  private showSuccessMessage(message: string): void {
+    // TODO: Implement toast notification
+    alert(message);
+  }
+
+  // Chat widget toggle
+  toggleChat(): void {
+    // TODO: Implement chat widget
+    console.log('Toggle chat widget');
   }
 }
