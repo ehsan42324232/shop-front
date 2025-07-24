@@ -349,6 +349,34 @@ export class ProductManagementComponent implements OnInit {
   }
 
   // ===============================
+  // Attribute Management
+  // ===============================
+
+  updateAttributeValue(attributeName: string, value: any, event: any): void {
+    if (!this.instanceForm.attribute_values) {
+      this.instanceForm.attribute_values = {};
+    }
+
+    // Handle checkbox arrays (for colors, sizes, etc.)
+    if (event.target.type === 'checkbox') {
+      let currentValues = this.instanceForm.attribute_values[attributeName] || [];
+      
+      if (event.target.checked) {
+        if (!currentValues.includes(value)) {
+          currentValues.push(value);
+        }
+      } else {
+        currentValues = currentValues.filter((v: any) => v !== value);
+      }
+      
+      this.instanceForm.attribute_values[attributeName] = currentValues;
+    } else {
+      // Handle single values
+      this.instanceForm.attribute_values[attributeName] = value;
+    }
+  }
+
+  // ===============================
   // Social Media Integration
   // ===============================
 
