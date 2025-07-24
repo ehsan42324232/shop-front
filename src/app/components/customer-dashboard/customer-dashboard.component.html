@@ -1,0 +1,317 @@
+<div class="customer-dashboard" dir="rtl">
+  <div class="container mx-auto px-4 py-6">
+    
+    <!-- Header Section -->
+    <div class="dashboard-header bg-gradient-to-r from-blue-600 to-red-600 text-white rounded-lg p-6 mb-6">
+      <div class="flex items-center justify-between">
+        <div class="user-info">
+          <h1 class="text-2xl font-bold mb-2">سلام {{ customerData.name }}!</h1>
+          <p class="text-blue-100">به پنل کاربری خود خوش آمدید</p>
+        </div>
+        <div class="user-stats grid grid-cols-2 gap-4 text-center">
+          <div class="stat-card bg-white bg-opacity-20 rounded-lg p-3">
+            <div class="text-lg font-bold">{{ formatCurrency(customerData.wallet) }}</div>
+            <div class="text-sm text-blue-100">کیف پول</div>
+          </div>
+          <div class="stat-card bg-white bg-opacity-20 rounded-lg p-3">
+            <div class="text-lg font-bold">{{ customerData.points }}</div>
+            <div class="text-sm text-blue-100">امتیاز</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="dashboard-tabs bg-white rounded-lg shadow-sm mb-6">
+      <div class="border-b">
+        <nav class="flex space-x-8 px-6">
+          <button 
+            *ngFor="let tab of [
+              {key: 'overview', label: 'نمای کلی', icon: 'home'},
+              {key: 'orders', label: 'سفارش‌ها', icon: 'shopping-bag'}, 
+              {key: 'favorites', label: 'علاقه‌مندی‌ها', icon: 'heart'},
+              {key: 'notifications', label: 'اطلاعیه‌ها', icon: 'bell'},
+              {key: 'profile', label: 'پروفایل', icon: 'user'}
+            ]"
+            (click)="setActiveTab(tab.key)"
+            [class.active]="activeTab === tab.key"
+            class="tab-button px-4 py-3 text-sm font-medium border-b-2 transition-colors duration-200">
+            <i [class]="'feather-' + tab.icon + ' ml-2'"></i>
+            {{ tab.label }}
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Overview Tab -->
+    <div *ngIf="activeTab === 'overview'" class="overview-content">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Recent Orders -->
+        <div class="lg:col-span-2">
+          <div class="card bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center">
+              <i class="feather-shopping-bag ml-2 text-blue-600"></i>
+              آخرین سفارش‌ها
+            </h3>
+            <div class="space-y-4">
+              <div *ngFor="let order of recentOrders.slice(0, 3)" 
+                   class="order-item border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start">
+                  <div class="order-details">
+                    <div class="order-id font-medium text-gray-900">{{ order.id }}</div>
+                    <div class="order-date text-sm text-gray-500">{{ order.date }}</div>
+                    <div class="order-items text-sm text-gray-600">{{ order.items }} کالا</div>
+                  </div>
+                  <div class="order-status-price text-left">
+                    <span [class]="'status-badge ' + getOrderStatusClass(order.status)">
+                      {{ order.statusText }}
+                    </span>
+                    <div class="order-total font-bold text-gray-900 mt-1">
+                      {{ formatCurrency(order.total) }}
+                    </div>
+                  </div>
+                </div>
+                <button (click)="viewOrderDetails(order.id)"
+                        class="mt-3 text-blue-600 text-sm hover:text-blue-800 transition-colors">
+                  مشاهده جزئیات
+                </button>
+              </div>
+            </div>
+            <button class="w-full mt-4 text-blue-600 font-medium py-2 hover:bg-blue-50 rounded-lg transition-colors">
+              مشاهده همه سفارش‌ها
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Actions & Stats -->
+        <div class="space-y-6">
+          <!-- Quick Actions -->
+          <div class="card bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold mb-4">دسترسی سریع</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <button class="quick-action-btn bg-blue-50 text-blue-700 p-3 rounded-lg text-center hover:bg-blue-100 transition-colors">
+                <i class="feather-plus text-xl mb-1"></i>
+                <div class="text-xs">سفارش جدید</div>
+              </button>
+              <button class="quick-action-btn bg-green-50 text-green-700 p-3 rounded-lg text-center hover:bg-green-100 transition-colors">
+                <i class="feather-repeat text-xl mb-1"></i>
+                <div class="text-xs">سفارش مجدد</div>
+              </button>
+              <button class="quick-action-btn bg-purple-50 text-purple-700 p-3 rounded-lg text-center hover:bg-purple-100 transition-colors">
+                <i class="feather-credit-card text-xl mb-1"></i>
+                <div class="text-xs">شارژ کیف پول</div>
+              </button>
+              <button class="quick-action-btn bg-orange-50 text-orange-700 p-3 rounded-lg text-center hover:bg-orange-100 transition-colors">
+                <i class="feather-headphones text-xl mb-1"></i>
+                <div class="text-xs">پشتیبانی</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Notifications -->
+          <div class="card bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center">
+              <i class="feather-bell ml-2 text-orange-600"></i>
+              اطلاعیه‌ها
+            </h3>
+            <div class="space-y-3">
+              <div *ngFor="let notification of notifications.slice(0, 3)" 
+                   (click)="markNotificationAsRead(notification)"
+                   [class.unread]="!notification.read"
+                   class="notification-item p-3 rounded-lg border cursor-pointer hover:bg-gray-50 transition-colors">
+                <div class="flex items-start">
+                  <i [class]="'feather-' + getNotificationIcon(notification.type) + ' ml-2 mt-1 text-gray-500'"></i>
+                  <div class="flex-1">
+                    <div class="text-sm font-medium text-gray-900">{{ notification.title }}</div>
+                    <div class="text-xs text-gray-500 mt-1">{{ notification.date }}</div>
+                  </div>
+                  <div *ngIf="!notification.read" class="w-2 h-2 bg-blue-600 rounded-full mr-2"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Tab -->
+    <div *ngIf="activeTab === 'orders'" class="orders-content">
+      <div class="card bg-white rounded-lg shadow-sm p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-semibold">سفارش‌های من</h3>
+          <div class="flex space-x-2">
+            <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+              <option value="">همه وضعیت‌ها</option>
+              <option value="pending">در انتظار</option>
+              <option value="processing">در حال پردازش</option>
+              <option value="shipped">ارسال شده</option>
+              <option value="delivered">تحویل داده شده</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <div *ngFor="let order of recentOrders" 
+               class="order-item border border-gray-200 rounded-lg p-4">
+            <div class="flex justify-between items-start mb-3">
+              <div class="order-details">
+                <div class="order-id font-medium text-gray-900">سفارش {{ order.id }}</div>
+                <div class="order-date text-sm text-gray-500">تاریخ: {{ order.date }}</div>
+              </div>
+              <span [class]="'status-badge ' + getOrderStatusClass(order.status)">
+                {{ order.statusText }}
+              </span>
+            </div>
+            <div class="flex justify-between items-center">
+              <div class="order-summary text-sm text-gray-600">
+                {{ order.items }} کالا • {{ formatCurrency(order.total) }}
+              </div>
+              <div class="order-actions space-x-2">
+                <button (click)="viewOrderDetails(order.id)"
+                        class="btn-secondary text-sm px-3 py-1">
+                  جزئیات
+                </button>
+                <button *ngIf="order.status === 'delivered'"
+                        class="btn-primary text-sm px-3 py-1">
+                  سفارش مجدد
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Favorites Tab -->
+    <div *ngIf="activeTab === 'favorites'" class="favorites-content">
+      <div class="card bg-white rounded-lg shadow-sm p-6">
+        <h3 class="text-lg font-semibold mb-6">محصولات مورد علاقه</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div *ngFor="let product of favoriteProducts" 
+               class="product-card border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+            <div class="product-image relative">
+              <img [src]="product.image" [alt]="product.name" 
+                   class="w-full h-48 object-cover bg-gray-200">
+              <button (click)="removeFromFavorites(product.id)"
+                      class="absolute top-2 left-2 bg-white bg-opacity-90 rounded-full p-2 hover:bg-red-50 transition-colors">
+                <i class="feather-heart text-red-500"></i>
+              </button>
+            </div>
+            <div class="product-details p-4">
+              <h4 class="font-medium text-gray-900 mb-2">{{ product.name }}</h4>
+              <div class="price-section mb-3">
+                <span *ngIf="product.discountPrice" class="current-price font-bold text-red-600">
+                  {{ formatCurrency(product.discountPrice) }}
+                </span>
+                <span [class]="product.discountPrice ? 'original-price line-through text-gray-500 text-sm mr-2' : 'current-price font-bold text-gray-900'">
+                  {{ formatCurrency(product.price) }}
+                </span>
+              </div>
+              <button (click)="addToCart(product)" 
+                      [disabled]="!product.inStock"
+                      [class]="product.inStock ? 'btn-primary w-full' : 'btn-disabled w-full'">
+                {{ product.inStock ? 'افزودن به سبد' : 'ناموجود' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Tab -->
+    <div *ngIf="activeTab === 'notifications'" class="notifications-content">
+      <div class="card bg-white rounded-lg shadow-sm p-6">
+        <h3 class="text-lg font-semibold mb-6">اطلاعیه‌ها</h3>
+        <div class="space-y-4">
+          <div *ngFor="let notification of notifications" 
+               (click)="markNotificationAsRead(notification)"
+               [class.unread]="!notification.read"
+               class="notification-item border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors">
+            <div class="flex items-start">
+              <div class="notification-icon ml-3 mt-1">
+                <i [class]="'feather-' + getNotificationIcon(notification.type) + ' text-gray-500'"></i>
+              </div>
+              <div class="flex-1">
+                <div class="notification-header flex justify-between items-start mb-2">
+                  <h4 class="font-medium text-gray-900">{{ notification.title }}</h4>
+                  <div class="flex items-center">
+                    <span class="text-xs text-gray-500">{{ notification.date }}</span>
+                    <div *ngIf="!notification.read" class="w-2 h-2 bg-blue-600 rounded-full mr-2"></div>
+                  </div>
+                </div>
+                <p class="text-sm text-gray-600">{{ notification.message }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Tab -->
+    <div *ngIf="activeTab === 'profile'" class="profile-content">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card bg-white rounded-lg shadow-sm p-6">
+          <h3 class="text-lg font-semibold mb-6">اطلاعات شخصی</h3>
+          <div class="space-y-4">
+            <div class="form-group">
+              <label class="block text-sm font-medium text-gray-700 mb-2">نام و نام خانوادگی</label>
+              <input type="text" [(ngModel)]="customerData.name" 
+                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <div class="form-group">
+              <label class="block text-sm font-medium text-gray-700 mb-2">شماره تلفن</label>
+              <input type="tel" [(ngModel)]="customerData.phone" 
+                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <div class="form-group">
+              <label class="block text-sm font-medium text-gray-700 mb-2">ایمیل</label>
+              <input type="email" [(ngModel)]="customerData.email" 
+                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <button class="btn-primary w-full mt-6">
+              ذخیره تغییرات
+            </button>
+          </div>
+        </div>
+
+        <div class="card bg-white rounded-lg shadow-sm p-6">
+          <h3 class="text-lg font-semibold mb-6">تنظیمات</h3>
+          <div class="space-y-4">
+            <div class="setting-item flex justify-between items-center">
+              <div>
+                <div class="font-medium">اطلاع‌رسانی ایمیل</div>
+                <div class="text-sm text-gray-500">دریافت اطلاعیه‌ها از طریق ایمیل</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item flex justify-between items-center">
+              <div>
+                <div class="font-medium">اطلاع‌رسانی SMS</div>
+                <div class="text-sm text-gray-500">دریافت پیامک در مورد سفارش‌ها</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="setting-item flex justify-between items-center">
+              <div>
+                <div class="font-medium">پیشنهادات شخصی</div>
+                <div class="text-sm text-gray-500">نمایش محصولات پیشنهادی</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
