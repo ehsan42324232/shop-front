@@ -325,14 +325,13 @@ export class CategoryService {
           return true;
         }
         
-        if (category.children && this.findPath(category.children, targetId, currentPath)) {
+        if (category.children && findPath(category.children, targetId, currentPath)) {
           return true;
         }
       }
       return false;
     };
     
-    this.findPath = findPath;
     findPath(categories, categoryId, []);
     return breadcrumbs;
   }
