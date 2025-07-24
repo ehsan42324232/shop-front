@@ -34,8 +34,9 @@ import { RegisterComponent } from './components/auth/register/register.component
 import { PlatformHomeComponent } from './components/platform/platform-home/platform-home.component';
 import { StoreManagementComponent } from './components/store-management/store-management.component';
 
-// New Homepage Component
+// Homepage Components
 import { HomepageComponent } from './pages/homepage/homepage.component';
+import { MallHomepageComponent } from './pages/mall-homepage/mall-homepage.component';
 
 // Interceptors
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -54,7 +55,8 @@ import { AuthGuard } from './guards/auth.guard';
     RegisterComponent,
     PlatformHomeComponent,
     StoreManagementComponent,
-    HomepageComponent
+    HomepageComponent,
+    MallHomepageComponent
   ],
   imports: [
     BrowserModule,
