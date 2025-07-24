@@ -18,6 +18,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CheckboxModule } from 'primeng/checkbox';
 import { RadioButtonModule } from 'primeng/radiobutton';
 
@@ -74,6 +75,7 @@ import { AuthGuard } from './guards/auth.guard';
     DialogModule,
     DropdownModule,
     InputTextModule,
+    InputTextareaModule,
     CheckboxModule,
     RadioButtonModule
   ],
