@@ -1,0 +1,208 @@
+<!-- Enhanced Mall Platform Homepage -->
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 rtl" dir="rtl">
+
+  <!-- Header Navigation -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+    <nav class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <div class="flex items-center space-x-reverse space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-red-500 rounded-lg flex items-center justify-center">
+            <i class="fas fa-store text-white text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-gray-800">مال</h1>
+            <p class="text-xs text-gray-500">فروشگاه‌ساز</p>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center space-x-reverse space-x-8">
+          <a href="#features" class="text-gray-600 hover:text-blue-600 transition-colors">امکانات</a>
+          <a href="#pricing" class="text-gray-600 hover:text-blue-600 transition-colors">تعرفه‌ها</a>
+          <a href="#testimonials" class="text-gray-600 hover:text-blue-600 transition-colors">نظرات</a>
+          <a href="#contact" class="text-gray-600 hover:text-blue-600 transition-colors">تماس</a>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="hidden md:flex items-center space-x-reverse space-x-4">
+          <button (click)="goToLogin()" 
+                  class="text-gray-600 hover:text-gray-800 transition-colors">
+            ورود
+          </button>
+          <button (click)="openStoreRequestModal()" 
+                  class="bg-gradient-to-r from-blue-500 to-red-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200">
+            شروع رایگان
+          </button>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button (click)="toggleMenu()" class="md:hidden text-gray-600 text-xl">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div [class]="'md:hidden transition-all duration-300 ' + (isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden')">
+        <div class="py-4 space-y-4 border-t border-gray-200 mt-4">
+          <a href="#features" class="block text-gray-600 hover:text-blue-600">امکانات</a>
+          <a href="#pricing" class="block text-gray-600 hover:text-blue-600">تعرفه‌ها</a>
+          <a href="#testimonials" class="block text-gray-600 hover:text-blue-600">نظرات</a>
+          <a href="#contact" class="block text-gray-600 hover:text-blue-600">تماس</a>
+          <div class="flex flex-col space-y-2 pt-4">
+            <button (click)="goToLogin()" class="text-left text-gray-600">ورود</button>
+            <button (click)="openStoreRequestModal()" 
+                    class="bg-gradient-to-r from-blue-500 to-red-500 text-white px-4 py-2 rounded-lg text-center">
+              شروع رایگان
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Section with Slider -->
+  <section class="relative min-h-screen flex items-center overflow-hidden pt-20">
+    <!-- Background Video -->
+    <video #heroVideo 
+           class="absolute inset-0 w-full h-full object-cover opacity-10"
+           autoplay muted loop playsinline 
+           (error)="onVideoError()">
+      <source src="/assets/videos/hero-background.mp4" type="video/mp4">
+    </video>
+
+    <!-- Hero Slider -->
+    <div class="relative z-10 container mx-auto px-4">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        
+        <!-- Content Side -->
+        <div class="space-y-8 animate-on-scroll">
+          <div class="relative">
+            <div *ngFor="let slide of heroSlides; let i = index"
+                 [class]="'transition-all duration-500 ' + (currentSlide === i ? 'opacity-100 transform translate-x-0' : 'opacity-0 transform translate-x-8 absolute inset-0')">
+              
+              <h1 class="text-5xl lg:text-6xl font-bold text-gray-800 mb-4 leading-tight">
+                {{ slide.title }}
+              </h1>
+              
+              <h2 class="text-2xl lg:text-3xl text-blue-600 mb-6 font-semibold">
+                {{ slide.subtitle }}
+              </h2>
+              
+              <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                {{ slide.description }}
+              </p>
+              
+              <div class="flex flex-col sm:flex-row gap-4">
+                <button (click)="openStoreRequestModal()" 
+                        class="bg-gradient-to-r from-blue-500 to-red-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center">
+                  <i class="fas fa-rocket ml-2"></i>
+                  {{ slide.buttonText }}
+                </button>
+                
+                <button (click)="scrollToSection('demo')" 
+                        class="border-2 border-blue-500 text-blue-500 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-50 transition-all duration-200 flex items-center justify-center">
+                  <i class="fas fa-play ml-2"></i>
+                  نمایش دمو
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slider Controls -->
+          <div class="flex items-center space-x-reverse space-x-4">
+            <div class="flex space-x-reverse space-x-2">
+              <button *ngFor="let slide of heroSlides; let i = index"
+                      (click)="goToSlide(i)"
+                      [class]="'w-3 h-3 rounded-full transition-all duration-200 ' + (currentSlide === i ? 'bg-blue-500' : 'bg-gray-300')">
+              </button>
+            </div>
+            <div class="flex space-x-reverse space-x-2">
+              <button (click)="prevSlide()" 
+                      class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg transition-all">
+                <i class="fas fa-chevron-right text-gray-600"></i>
+              </button>
+              <button (click)="nextSlide()" 
+                      class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:shadow-lg transition-all">
+                <i class="fas fa-chevron-left text-gray-600"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Side -->
+        <div class="relative animate-on-scroll">
+          <div class="relative">
+            <!-- Floating Cards Animation -->
+            <div class="absolute inset-0 overflow-hidden">
+              <div class="absolute top-0 right-0 w-20 h-20 bg-blue-500 rounded-lg opacity-20 animate-pulse"></div>
+              <div class="absolute bottom-0 left-0 w-16 h-16 bg-red-500 rounded-lg opacity-20 animate-pulse" style="animation-delay: 1s;"></div>
+              <div class="absolute top-1/2 left-1/4 w-12 h-12 bg-green-500 rounded-lg opacity-20 animate-pulse" style="animation-delay: 2s;"></div>
+            </div>
+            
+            <!-- Main Dashboard Preview -->
+            <div class="bg-white rounded-2xl shadow-2xl p-6 transform hover:scale-105 transition-all duration-300">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">داشبورد مدیریت</h3>
+                <div class="flex space-x-reverse space-x-2">
+                  <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                  <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                </div>
+              </div>
+              
+              <!-- Mock Dashboard Content -->
+              <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="bg-blue-50 p-4 rounded-lg">
+                    <p class="text-blue-600 text-sm">فروش امروز</p>
+                    <p class="text-2xl font-bold text-blue-800">۱۲,۵۰۰,۰۰۰</p>
+                  </div>
+                  <div class="bg-green-50 p-4 rounded-lg">
+                    <p class="text-green-600 text-sm">سفارشات</p>
+                    <p class="text-2xl font-bold text-green-800">۱۴۷</p>
+                  </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-600">میزان فروش</span>
+                    <span class="text-sm text-green-600">+۲۳%</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full" style="width: 75%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <button (click)="scrollToSection('statistics')" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <i class="fas fa-chevron-down text-2xl"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- Statistics Section -->
+  <section id="statistics" class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div *ngFor="let stat of statistics; let i = index" 
+             class="text-center animate-on-scroll">
+          <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i [class]="stat.icon + ' text-white text-2xl'"></i>
+          </div>
+          <div class="text-3xl lg:text-4xl font-bold text-gray-800 mb-2" [attr.data-stat]="i">
+            {{ stat.value }}
+          </div>
+          <p class="text-gray-600">{{ stat.label }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
