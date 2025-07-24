@@ -1,0 +1,209 @@
+/* OTP Authentication Component Styles */
+
+/* RTL Support */
+.direction-ltr {
+  direction: ltr;
+}
+
+/* OTP Input Styling */
+.otp-input {
+  width: 48px;
+  height: 48px;
+  text-align: center;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.otp-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.otp-input.error {
+  border-color: #ef4444;
+}
+
+.otp-input.error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Animation for success state */
+.otp-success {
+  animation: successPulse 0.6s ease-in-out;
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Phone input styling */
+.phone-input {
+  padding-left: 3rem;
+  direction: ltr;
+  text-align: left;
+}
+
+/* Modal animations */
+.modal-enter {
+  animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Loading spinner */
+.loading-spinner {
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Countdown timer styling */
+.countdown-timer {
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+}
+
+/* Button hover effects */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+/* Error shake animation */
+.error-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+/* Input focus ring */
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Backdrop blur effect */
+.backdrop-blur {
+  backdrop-filter: blur(4px);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+  .otp-input {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .modal-content {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+  .dark-mode .modal-content {
+    background-color: #1f2937;
+    color: white;
+  }
+  
+  .dark-mode .otp-input {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: white;
+  }
+  
+  .dark-mode .otp-input:focus {
+    border-color: #60a5fa;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .otp-input {
+    border-width: 3px;
+  }
+  
+  .btn-primary {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .modal-enter,
+  .otp-success,
+  .error-shake,
+  .loading-spinner {
+    animation: none;
+  }
+  
+  .btn-primary::before {
+    transition: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .otp-modal {
+    display: none !important;
+  }
+}
