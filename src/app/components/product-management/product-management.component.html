@@ -1,0 +1,199 @@
+          <!-- Submit Button -->
+          <div class="flex justify-end space-x-3 rtl:space-x-reverse pt-6 border-t">
+            <button type="button" 
+                    (click)="switchView('instances')"
+                    class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+              انصراف
+            </button>
+            <button type="submit" 
+                    [disabled]="loading"
+                    class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50">
+              <span *ngIf="!loading">{{editingInstance ? 'بروزرسانی محصول' : 'ایجاد محصول'}}</span>
+              <span *ngIf="loading">در حال ذخیره...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Social Media Import Modal -->
+<div *ngIf="showSocialImport" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <!-- Modal Header -->
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xl font-bold text-gray-900">
+          دریافت محتوا از شبکه‌های اجتماعی
+        </h3>
+        <button (click)="closeSocialImport()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+      <!-- Channel Input -->
+      <div class="mb-6">
+        <div class="grid md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              کانال تلگرام (آدرس یا نام کاربری)
+            </label>
+            <input type="text" 
+                   [(ngModel)]="socialChannels.telegram" 
+                   placeholder="@channel_name یا https://t.me/channel_name"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              اکانت اینستاگرام
+            </label>
+            <input type="text" 
+                   [(ngModel)]="socialChannels.instagram" 
+                   placeholder="@username یا https://instagram.com/username"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+        
+        <button (click)="fetchSocialContent()" 
+                [disabled]="loading"
+                class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50">
+          <span *ngIf="!loading">
+            <i class="fas fa-download ml-2"></i>
+            دریافت آخرین پست‌ها
+          </span>
+          <span *ngIf="loading">در حال دریافت...</span>
+        </button>
+      </div>
+
+      <!-- Content Display -->
+      <div *ngIf="socialContent.length > 0" class="space-y-4">
+        <h4 class="text-lg font-medium text-gray-900">
+          محتوای دریافت شده ({{socialContent.length}} مورد)
+        </h4>
+        
+        <div class="grid gap-4">
+          <div *ngFor="let content of socialContent" 
+               class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+            
+            <div class="flex items-start space-x-3 rtl:space-x-reverse mb-3">
+              <input type="checkbox" 
+                     (change)="toggleSocialContent(content)"
+                     [id]="'content_' + content.date"
+                     class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 mt-1">
+              
+              <div class="flex-1">
+                <!-- Platform & Date -->
+                <div class="flex items-center space-x-2 rtl:space-x-reverse mb-2">
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                        [class.bg-blue-100]="content.platform === 'telegram'"
+                        [class.text-blue-800]="content.platform === 'telegram'"
+                        [class.bg-pink-100]="content.platform === 'instagram'"
+                        [class.text-pink-800]="content.platform === 'instagram'">
+                    <i [class.fab]="true" 
+                       [class.fa-telegram]="content.platform === 'telegram'"
+                       [class.fa-instagram]="content.platform === 'instagram'"
+                       class="ml-1"></i>
+                    {{content.platform === 'telegram' ? 'تلگرام' : 'اینستاگرام'}}
+                  </span>
+                  
+                  <span class="text-xs text-gray-500">
+                    {{content.date | date:'yyyy/MM/dd HH:mm'}}
+                  </span>
+                  
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                        [class.bg-green-100]="content.type === 'post'"
+                        [class.text-green-800]="content.type === 'post'"
+                        [class.bg-yellow-100]="content.type === 'story'"
+                        [class.text-yellow-800]="content.type === 'story'">
+                    {{content.type === 'post' ? 'پست' : 'استوری'}}
+                  </span>
+                </div>
+                
+                <!-- Content Text -->
+                <div *ngIf="content.content" class="mb-3">
+                  <p class="text-gray-700 text-sm leading-relaxed">
+                    {{content.content}}
+                  </p>
+                </div>
+                
+                <!-- Images -->
+                <div *ngIf="content.images && content.images.length > 0" 
+                     class="mb-3">
+                  <div class="text-xs text-gray-600 mb-2">
+                    تصاویر ({{content.images.length}} مورد):
+                  </div>
+                  <div class="grid grid-cols-4 gap-2">
+                    <img *ngFor="let image of content.images" 
+                         [src]="image" 
+                         class="w-full h-16 object-cover rounded border">
+                  </div>
+                </div>
+                
+                <!-- Videos -->
+                <div *ngIf="content.videos && content.videos.length > 0" 
+                     class="mb-3">
+                  <div class="text-xs text-gray-600 mb-2">
+                    ویدیوها ({{content.videos.length}} مورد):
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <video *ngFor="let video of content.videos" 
+                           [src]="video" 
+                           class="w-full h-20 object-cover rounded border"
+                           controls>
+                    </video>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Import Button -->
+        <div class="pt-4 border-t">
+          <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-600">
+              {{selectedSocialContent.length}} مورد انتخاب شده
+            </div>
+            <button (click)="importSelectedContent()" 
+                    [disabled]="selectedSocialContent.length === 0"
+                    class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50">
+              <i class="fas fa-import ml-2"></i>
+              وارد کردن محتوای انتخاب شده
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Empty State -->
+      <div *ngIf="socialContent.length === 0 && !loading" 
+           class="text-center py-12 text-gray-500">
+        <i class="fas fa-search text-3xl mb-4"></i>
+        <p>برای مشاهده محتوا، آدرس کانال یا اکانت را وارد کرده و دکمه دریافت را بزنید</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div *ngIf="loading && currentView !== 'create-instance' && currentView !== 'create-class'" 
+     class="fixed inset-0 bg-white bg-opacity-75 z-40 flex items-center justify-center">
+  <div class="text-center">
+    <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+    <div class="text-gray-600">در حال بارگذاری...</div>
+  </div>
+</div>
+
+<!-- File Upload Loading -->
+<div *ngIf="uploadingFiles" 
+     class="fixed bottom-4 left-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+  <div class="flex items-center space-x-2 rtl:space-x-reverse">
+    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+    <span>در حال آپلود فایل...</span>
+  </div>
+</div>
