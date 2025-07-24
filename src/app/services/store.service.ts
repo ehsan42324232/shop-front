@@ -98,6 +98,7 @@ export interface ApiResponse<T> {
   message?: string;
   data?: T;
   errors?: any;
+  store?: T; // Add store property for backwards compatibility
 }
 
 @Injectable({
@@ -168,8 +169,9 @@ export class StoreService {
       this.getAuthHeaders()
     ).pipe(
       tap(response => {
-        if (response.success && response.store) {
-          this.currentStoreSubject.next(response.store);
+        if (response.success && (response.store || response.data)) {
+          const store = response.store || response.data;
+          this.currentStoreSubject.next(store as Store);
         }
       }),
       catchError(this.handleError)
