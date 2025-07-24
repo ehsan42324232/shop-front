@@ -509,7 +509,7 @@ export class ProductService {
     // Remove empty strings and set to null
     Object.keys(prepared).forEach(key => {
       if (prepared[key as keyof Product] === '') {
-        prepared[key as keyof Product] = null as any;
+        (prepared as any)[key] = null;
       }
     });
 
