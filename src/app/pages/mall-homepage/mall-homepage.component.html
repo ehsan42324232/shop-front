@@ -1,93 +1,93 @@
-<!-- Mall Platform Homepage -->
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" *ngIf="!loading && homepageData">
+<!-- Mall Homepage Template -->
+<div class="mall-homepage rtl-layout" dir="rtl">
   
-  <!-- Header -->
-  <header class="bg-white shadow-sm sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <!-- Logo -->
-        <div class="flex items-center">
-          <img src="/assets/mall-logo.svg" alt="Mall Logo" class="h-10 w-auto">
-        </div>
-        
-        <!-- Navigation -->
-        <nav class="hidden md:flex space-x-8">
-          <a (click)="scrollToSection('features')" class="text-gray-700 hover:text-blue-600 cursor-pointer transition-colors">
-            ویژگی‌ها
-          </a>
-          <a (click)="scrollToSection('statistics')" class="text-gray-700 hover:text-blue-600 cursor-pointer transition-colors">
-            آمار
-          </a>
-          <a (click)="scrollToSection('contact')" class="text-gray-700 hover:text-blue-600 cursor-pointer transition-colors">
-            تماس با ما
-          </a>
-        </nav>
-        
-        <!-- CTA Button -->
-        <div class="flex items-center space-x-4">
-          <button (click)="showRequestForm()" 
-                  class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg">
-            شروع کنید
-          </button>
+  <!-- Header Section -->
+  <header class="header-section">
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-content">
+          <!-- Logo -->
+          <div class="logo">
+            <img src="/assets/images/mall-logo.png" alt="مال - فروشگاه‌ساز" class="logo-img">
+            <span class="logo-text">مال</span>
+          </div>
+          
+          <!-- Navigation Menu -->
+          <div class="nav-menu">
+            <a href="#features" (click)="scrollToSection('features')" class="nav-link">امکانات</a>
+            <a href="#pricing" (click)="scrollToSection('pricing')" class="nav-link">تعرفه</a>
+            <a href="#about" (click)="scrollToSection('about')" class="nav-link">درباره ما</a>
+            <a href="#contact" (click)="scrollToSection('contact')" class="nav-link">تماس</a>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="nav-actions">
+            <button class="btn btn-outline" (click)="navigateToLogin()">ورود</button>
+            <button class="btn btn-primary" (click)="openRequestModal()">شروع کنید</button>
+          </div>
         </div>
       </div>
-    </div>
+    </nav>
   </header>
 
   <!-- Hero Section -->
-  <section class="relative overflow-hidden py-20 lg:py-32">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid lg:grid-cols-2 gap-12 items-center">
-        <!-- Hero Content -->
-        <div class="text-center lg:text-right">
-          <h1 class="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            <span class="bg-gradient-to-r from-red-500 to-blue-600 bg-clip-text text-transparent">
-              {{homepageData.hero_title}}
-            </span>
+  <section class="hero-section">
+    <div class="hero-background">
+      <div class="hero-overlay"></div>
+      <div class="hero-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+      </div>
+    </div>
+    
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text" data-aos="fade-up">
+          <h1 class="hero-title">
+            <span class="gradient-text">فروشگاه‌ساز مال</span>
+            <br>
+            آینده تجارت الکترونیک
           </h1>
-          
-          <p class="text-xl text-gray-600 mb-8 leading-relaxed">
-            {{homepageData.hero_subtitle}}
+          <p class="hero-description">
+            با پلتفرم پیشرفته مال، فروشگاه آنلاین خود را در کمترین زمان راه‌اندازی کنید. 
+            امکانات کامل، طراحی مدرن و پشتیبانی ۲۴ ساعته در خدمت شماست.
           </p>
           
           <!-- CTA Buttons -->
-          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <button (click)="showRequestForm()" 
-                    class="bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-xl">
-              ایجاد فروشگاه رایگان
+          <div class="hero-actions">
+            <button class="btn btn-primary btn-large" (click)="openRequestModal()">
+              <i class="fas fa-rocket"></i>
+              شروع رایگان
             </button>
-            
-            <button (click)="scrollToSection('features')" 
-                    class="bg-white text-gray-700 px-8 py-4 rounded-xl text-lg font-semibold border-2 border-gray-200 hover:border-blue-300 hover:text-blue-600 transition-all">
-              بیشتر بدانید
+            <button class="btn btn-secondary btn-large" (click)="navigateToDemo()">
+              <i class="fas fa-play"></i>
+              مشاهده دمو
             </button>
           </div>
         </div>
         
-        <!-- Hero Image/Video -->
-        <div class="relative">
-          <div class="bg-gradient-to-br from-blue-400 to-indigo-600 rounded-3xl p-8 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500">
-            <div class="bg-white rounded-2xl p-6 transform -rotate-3">
-              <div class="space-y-4">
-                <!-- Mock Store Interface -->
-                <div class="flex items-center space-x-3">
-                  <div class="w-8 h-8 bg-red-500 rounded-full"></div>
-                  <div class="flex-1 h-4 bg-gray-200 rounded"></div>
+        <div class="hero-visual" data-aos="fade-left">
+          <div class="hero-image">
+            <img src="/assets/images/hero-dashboard.png" alt="پنل مدیریت فروشگاه" class="dashboard-img">
+            <div class="floating-cards">
+              <div class="card card-stats" data-aos="zoom-in" data-aos-delay="200">
+                <div class="card-icon">
+                  <i class="fas fa-chart-line"></i>
                 </div>
-                
-                <div class="grid grid-cols-3 gap-3">
-                  <div class="aspect-square bg-gradient-to-br from-blue-200 to-blue-300 rounded-lg"></div>
-                  <div class="aspect-square bg-gradient-to-br from-red-200 to-red-300 rounded-lg"></div>
-                  <div class="aspect-square bg-gradient-to-br from-green-200 to-green-300 rounded-lg"></div>
+                <div class="card-info">
+                  <span class="card-number">۲۵۰%</span>
+                  <span class="card-label">افزایش فروش</span>
                 </div>
-                
-                <div class="space-y-2">
-                  <div class="h-3 bg-gray-200 rounded"></div>
-                  <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+              </div>
+              
+              <div class="card card-notification" data-aos="zoom-in" data-aos-delay="400">
+                <div class="card-icon">
+                  <i class="fas fa-bell"></i>
                 </div>
-                
-                <div class="bg-gradient-to-r from-red-500 to-red-600 text-white py-2 px-4 rounded-lg text-center text-sm font-semibold">
-                  خرید محصول
+                <div class="card-info">
+                  <span class="card-title">سفارش جدید!</span>
+                  <span class="card-subtitle">محصول شماره #۱۲۳۴</span>
                 </div>
               </div>
             </div>
@@ -97,377 +97,268 @@
     </div>
   </section>
 
-  <!-- Statistics Section -->
-  <section id="statistics" class="py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-          اعتماد هزاران کسب‌وکار
-        </h2>
-        <p class="text-xl text-gray-600">
-          آمار پلتفرم مال در یک نگاه
-        </p>
-      </div>
-      
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
-        <div class="text-center">
-          <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl p-6 mb-4">
-            <div class="text-4xl lg:text-5xl font-bold text-red-600 mb-2">
-              {{formatNumber(homepageData.statistics.total_stores)}}
-            </div>
-            <div class="text-gray-700 font-semibold">
-              فروشگاه فعال
-            </div>
-          </div>
-        </div>
-        
-        <div class="text-center">
-          <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 mb-4">
-            <div class="text-4xl lg:text-5xl font-bold text-blue-600 mb-2">
-              {{formatNumber(homepageData.statistics.total_products)}}
-            </div>
-            <div class="text-gray-700 font-semibold">
-              محصول
-            </div>
-          </div>
-        </div>
-        
-        <div class="text-center">
-          <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 mb-4">
-            <div class="text-4xl lg:text-5xl font-bold text-green-600 mb-2">
-              {{formatNumber(homepageData.statistics.total_orders)}}
-            </div>
-            <div class="text-gray-700 font-semibold">
-              سفارش موفق
-            </div>
-          </div>
-        </div>
-        
-        <div class="text-center">
-          <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 mb-4">
-            <div class="text-4xl lg:text-5xl font-bold text-purple-600 mb-2">
-              {{formatNumber(homepageData.statistics.happy_customers)}}
-            </div>
-            <div class="text-gray-700 font-semibold">
-              مشتری راضی
-            </div>
-          </div>
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item" *ngFor="let stat of stats" data-aos="fade-up">
+          <div class="stat-number">{{ stat.number }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Features Section -->
-  <section id="features" class="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-          همه چیز برای موفقیت فروشگاه شما
-        </h2>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-          مال با ارائه ابزارهای حرفه‌ای و قدرتمند، راه‌اندازی و مدیریت فروشگاه آنلاین را برای شما آسان می‌کند
+  <section id="features" class="features-section">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2 class="section-title">امکانات پیشرفته</h2>
+        <p class="section-description">
+          تمام ابزارهای مورد نیاز برای راه‌اندازی و مدیریت فروشگاه آنلاین موفق
         </p>
       </div>
       
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div *ngFor="let feature of homepageData.features" 
-             class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-          <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6">
-            <i class="{{feature.icon}} text-2xl text-white"></i>
+      <div class="features-grid">
+        <div class="feature-card" *ngFor="let feature of features; let i = index" 
+             data-aos="fade-up" [attr.data-aos-delay]="i * 100">
+          <div class="feature-image">
+            <img [src]="feature.image" [alt]="feature.title" class="feature-img">
+            <div class="feature-overlay">
+              <i class="fas {{ feature.icon }}"></i>
+            </div>
           </div>
-          
-          <h3 class="text-xl font-bold text-gray-900 mb-4">
-            {{feature.title}}
-          </h3>
-          
-          <p class="text-gray-600 leading-relaxed">
-            {{feature.description}}
-          </p>
+          <div class="feature-content">
+            <h3 class="feature-title">{{ feature.title }}</h3>
+            <p class="feature-description">{{ feature.description }}</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Newsletter Section -->
-  <section class="py-16 bg-gradient-to-r from-red-500 to-blue-600">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h2 class="text-3xl lg:text-4xl font-bold text-white mb-4">
-        از آخرین اخبار و بروزرسانی‌ها باخبر شوید
-      </h2>
-      
-      <p class="text-xl text-blue-100 mb-8">
-        عضو خبرنامه مال شوید و از جدیدترین ویژگی‌ها و پیشنهادات ویژه مطلع شوید
-      </p>
-      
-      <div class="max-w-md mx-auto">
-        <div class="flex gap-4">
-          <input type="email" 
-                 [(ngModel)]="newsletterEmail"
-                 placeholder="ایمیل شما"
-                 class="flex-1 px-6 py-4 rounded-xl border-0 focus:outline-none focus:ring-4 focus:ring-white/30 text-gray-900">
+  <!-- CTA Section (Middle) -->
+  <section class="cta-section cta-middle">
+    <div class="cta-background">
+      <div class="cta-overlay"></div>
+    </div>
+    <div class="container">
+      <div class="cta-content" data-aos="zoom-in">
+        <h2 class="cta-title">آماده شروع هستید؟</h2>
+        <p class="cta-description">
+          همین امروز فروشگاه آنلاین خود را راه‌اندازی کنید و از مزایای تجارت الکترونیک بهره‌مند شوید
+        </p>
+        <button class="btn btn-white btn-large" (click)="openRequestModal()">
+          <i class="fas fa-store"></i>
+          ایجاد فروشگاه
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact-section">
+    <div class="container">
+      <div class="contact-content">
+        <div class="contact-info" data-aos="fade-right">
+          <h2 class="contact-title">با ما در تماس باشید</h2>
+          <p class="contact-description">
+            تیم پشتیبانی ما آماده پاسخگویی به سوالات شماست
+          </p>
           
-          <button (click)="subscribeNewsletter()" 
-                  [disabled]="newsletterSubmitting"
-                  class="bg-white text-red-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-colors disabled:opacity-50">
-            <span *ngIf="!newsletterSubmitting">عضویت</span>
-            <span *ngIf="newsletterSubmitting">در حال ارسال...</span>
+          <div class="contact-methods">
+            <div class="contact-method">
+              <i class="fas fa-phone"></i>
+              <span>۰۲۱-۱۲۳۴۵۶۷۸</span>
+            </div>
+            <div class="contact-method">
+              <i class="fas fa-envelope"></i>
+              <span>info@mall.ir</span>
+            </div>
+            <div class="contact-method">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>تهران، خیابان ولیعصر</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="contact-form-container" data-aos="fade-left">
+          <button class="btn btn-primary btn-large btn-block" (click)="openContactModal()">
+            <i class="fas fa-comments"></i>
+            ارسال پیام
           </button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Contact Section -->
-  <section id="contact" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid lg:grid-cols-2 gap-12">
-        <!-- Contact Info -->
-        <div>
-          <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-            آماده شروع هستید؟
-          </h2>
-          
-          <p class="text-xl text-gray-600 mb-8">
-            همین حالا درخواست ایجاد فروشگاه خود را ثبت کنید و ما در کمتر از ۲۴ ساعت با شما تماس خواهیم گرفت.
-          </p>
-          
-          <div class="space-y-4">
-            <div class="flex items-center space-x-4 rtl:space-x-reverse">
-              <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-envelope text-red-600"></i>
-              </div>
-              <div>
-                <div class="font-semibold text-gray-900">ایمیل</div>
-                <div class="text-gray-600">{{homepageData.contact.email}}</div>
-              </div>
-            </div>
-            
-            <div class="flex items-center space-x-4 rtl:space-x-reverse">
-              <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <i class="fas fa-phone text-blue-600"></i>
-              </div>
-              <div>
-                <div class="font-semibold text-gray-900">تلفن</div>
-                <div class="text-gray-600">{{homepageData.contact.phone}}</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Social Links -->
-          <div class="flex space-x-4 rtl:space-x-reverse mt-8" *ngIf="homepageData.contact.telegram || homepageData.contact.instagram">
-            <a *ngIf="homepageData.contact.telegram" 
-               [href]="homepageData.contact.telegram" 
-               target="_blank"
-               class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white hover:bg-blue-600 transition-colors">
-              <i class="fab fa-telegram"></i>
-            </a>
-            
-            <a *ngIf="homepageData.contact.instagram" 
-               [href]="homepageData.contact.instagram" 
-               target="_blank"
-               class="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-white hover:bg-pink-600 transition-colors">
-              <i class="fab fa-instagram"></i>
-            </a>
-          </div>
-        </div>
-        
-        <!-- CTA -->
-        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-3xl p-8">
-          <div class="text-center">
-            <div class="w-20 h-20 bg-gradient-to-br from-red-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
-              <i class="fas fa-store text-3xl text-white"></i>
-            </div>
-            
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">
-              فروشگاه خود را رایگان بسازید
-            </h3>
-            
-            <p class="text-gray-600 mb-8">
-              کافی است فرم زیر را پر کنید و ما به زودی با شما تماس خواهیم گرفت
-            </p>
-            
-            <button (click)="showRequestForm()" 
-                    class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg">
-              درخواست ایجاد فروشگاه
-            </button>
-          </div>
+  <!-- Final CTA Section -->
+  <section class="cta-section cta-final">
+    <div class="container">
+      <div class="cta-content" data-aos="zoom-in">
+        <h2 class="cta-title">همین حالا شروع کنید</h2>
+        <p class="cta-description">
+          فرصت طلایی برای ورود به دنیای تجارت الکترونیک را از دست ندهید
+        </p>
+        <div class="cta-actions">
+          <button class="btn btn-primary btn-large" (click)="openRequestModal()">
+            <i class="fas fa-rocket"></i>
+            شروع رایگان
+          </button>
+          <button class="btn btn-outline btn-large" (click)="navigateToLogin()">
+            <i class="fas fa-sign-in-alt"></i>
+            ورود به پنل
+          </button>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="bg-gray-900 text-white py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center">
-        <img src="/assets/mall-logo.svg" alt="Mall Logo" class="h-12 w-auto mx-auto mb-4 filter brightness-0 invert">
+  <footer class="footer-section">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="logo">
+            <img src="/assets/images/mall-logo-white.png" alt="مال" class="logo-img">
+            <span class="logo-text">مال</span>
+          </div>
+          <p class="footer-description">
+            پلتفرم پیشرفته فروشگاه‌سازی برای کسب‌وکارهای ایرانی
+          </p>
+        </div>
         
-        <p class="text-gray-400 mb-4">
-          پلتفرم ایرانی ساخت فروشگاه‌های آنلاین
-        </p>
-        
-        <div class="text-sm text-gray-500">
-          © ۱۴۰۳ تمامی حقوق محفوظ است - فروشگاه‌ساز مال
+        <div class="footer-links">
+          <div class="footer-column">
+            <h4 class="footer-title">خدمات</h4>
+            <ul class="footer-list">
+              <li><a href="#" class="footer-link">ساخت فروشگاه</a></li>
+              <li><a href="#" class="footer-link">طراحی قالب</a></li>
+              <li><a href="#" class="footer-link">درگاه پرداخت</a></li>
+              <li><a href="#" class="footer-link">ارسال کالا</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer-column">
+            <h4 class="footer-title">پشتیبانی</h4>
+            <ul class="footer-list">
+              <li><a href="#" class="footer-link">راهنمای استفاده</a></li>
+              <li><a href="#" class="footer-link">سوالات متداول</a></li>
+              <li><a href="#" class="footer-link">تماس با ما</a></li>
+              <li><a href="#" class="footer-link">گزارش مشکل</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer-column">
+            <h4 class="footer-title">شرکت</h4>
+            <ul class="footer-list">
+              <li><a href="#" class="footer-link">درباره ما</a></li>
+              <li><a href="#" class="footer-link">تیم ما</a></li>
+              <li><a href="#" class="footer-link">فرصت‌های شغلی</a></li>
+              <li><a href="#" class="footer-link">اخبار</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <div class="footer-copyright">
+          <p>&copy; ۱۴۰۳ مال. تمامی حقوق محفوظ است.</p>
+        </div>
+        <div class="footer-social">
+          <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
         </div>
       </div>
     </div>
   </footer>
 </div>
 
-<!-- Contact Form Modal -->
-<div *ngIf="showContactForm" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-    <div class="p-6 border-b border-gray-200">
-      <div class="flex justify-between items-center">
-        <h3 class="text-2xl font-bold text-gray-900">
-          درخواست ایجاد فروشگاه
-        </h3>
-        <button (click)="closeContactForm()" class="text-gray-400 hover:text-gray-600">
-          <i class="fas fa-times text-xl"></i>
-        </button>
-      </div>
+<!-- Modals -->
+<!-- Contact Modal -->
+<div class="modal" [class.active]="showContactModal" (click)="closeContactModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">تماس با ما</h3>
+      <button class="modal-close" (click)="closeContactModal()">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
-    
-    <form (ngSubmit)="submitContactForm()" class="p-6 space-y-6" id="contact-form">
-      <!-- Personal Info -->
-      <div class="grid md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            نام و نام خانوادگی *
-          </label>
-          <input type="text" 
-                 [(ngModel)]="contactForm.full_name" 
-                 name="full_name"
-                 required
-                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <div class="modal-body">
+      <form (ngSubmit)="submitContactForm()">
+        <div class="form-group">
+          <label class="form-label">نام</label>
+          <input type="text" [(ngModel)]="contactForm.name" name="name" class="form-input" required>
         </div>
-        
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-2">
-            شماره تلفن *
-          </label>
-          <input type="tel" 
-                 [(ngModel)]="contactForm.phone" 
-                 name="phone"
-                 required
-                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="form-group">
+          <label class="form-label">شماره تلفن</label>
+          <input type="tel" [(ngModel)]="contactForm.phone" name="phone" class="form-input" required>
         </div>
-      </div>
-      
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-2">
-          ایمیل *
-        </label>
-        <input type="email" 
-               [(ngModel)]="contactForm.email" 
-               name="email"
-               required
-               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
-      
-      <!-- Store Info -->
-      <div class="border-t border-gray-200 pt-6">
-        <h4 class="text-lg font-semibold text-gray-900 mb-4">
-          اطلاعات فروشگاه
-        </h4>
-        
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              نام فروشگاه *
-            </label>
-            <input type="text" 
-                   [(ngModel)]="contactForm.store_name" 
-                   name="store_name"
-                   required
-                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-          </div>
-          
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              توضیحات فروشگاه
-            </label>
-            <textarea [(ngModel)]="contactForm.store_description" 
-                      name="store_description"
-                      rows="3"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-          </div>
-          
-          <div class="grid md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                نوع کسب و کار
-              </label>
-              <input type="text" 
-                     [(ngModel)]="contactForm.business_type" 
-                     name="business_type"
-                     placeholder="مثلاً پوشاک، لوازم خانگی، کتاب"
-                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                تعداد تخمینی محصولات
-              </label>
-              <input type="number" 
-                     [(ngModel)]="contactForm.estimated_products" 
-                     name="estimated_products"
-                     min="1"
-                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              دامنه مورد نظر
-            </label>
-            <input type="text" 
-                   [(ngModel)]="contactForm.preferred_domain" 
-                   name="preferred_domain"
-                   placeholder="نام دامنه مورد نظر شما"
-                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-          </div>
-          
-          <div class="flex items-center space-x-3 rtl:space-x-reverse">
-            <input type="checkbox" 
-                   [(ngModel)]="contactForm.has_physical_store" 
-                   name="has_physical_store"
-                   id="has_physical_store"
-                   class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-            <label for="has_physical_store" class="text-sm font-medium text-gray-700">
-              فروشگاه فیزیکی دارم
-            </label>
-          </div>
+        <div class="form-group">
+          <label class="form-label">ایمیل (اختیاری)</label>
+          <input type="email" [(ngModel)]="contactForm.email" name="email" class="form-input">
         </div>
-      </div>
-      
-      <!-- Submit Button -->
-      <div class="border-t border-gray-200 pt-6">
-        <button type="submit" 
-                [disabled]="submittingContact"
-                class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all disabled:opacity-50">
-          <span *ngIf="!submittingContact">ثبت درخواست</span>
-          <span *ngIf="submittingContact">در حال ثبت...</span>
-        </button>
-      </div>
-    </form>
+        <div class="form-group">
+          <label class="form-label">پیام</label>
+          <textarea [(ngModel)]="contactForm.message" name="message" class="form-textarea" rows="4" required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeContactModal()">انصراف</button>
+          <button type="submit" class="btn btn-primary">ارسال پیام</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
-<!-- Loading State -->
-<div *ngIf="loading" class="min-h-screen flex items-center justify-center">
-  <div class="text-center">
-    <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-    <div class="text-gray-600">در حال بارگذاری...</div>
+<!-- Request Modal -->
+<div class="modal" [class.active]="showRequestModal" (click)="closeRequestModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">درخواست راه‌اندازی فروشگاه</h3>
+      <button class="modal-close" (click)="closeRequestModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form (ngSubmit)="submitRequestForm()">
+        <div class="form-group">
+          <label class="form-label">نام کسب‌وکار</label>
+          <input type="text" [(ngModel)]="requestForm.businessName" name="businessName" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">نام مالک</label>
+          <input type="text" [(ngModel)]="requestForm.ownerName" name="ownerName" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">شماره تلفن</label>
+          <input type="tel" [(ngModel)]="requestForm.phone" name="phone" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">نوع کسب‌وکار</label>
+          <select [(ngModel)]="requestForm.businessType" name="businessType" class="form-select">
+            <option value="">انتخاب کنید</option>
+            <option value="clothing">پوشاک</option>
+            <option value="electronics">الکترونیک</option>
+            <option value="food">مواد غذایی</option>
+            <option value="cosmetics">آرایشی و بهداشتی</option>
+            <option value="home">خانه و آشپزخانه</option>
+            <option value="other">سایر</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeRequestModal()">انصراف</button>
+          <button type="submit" class="btn btn-primary">ارسال درخواست</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
-<!-- Error State -->
-<div *ngIf="error" class="min-h-screen flex items-center justify-center">
-  <div class="text-center">
-    <div class="text-red-600 text-xl mb-4">{{error}}</div>
-    <button (click)="loadHomepageData()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-      تلاش مجدد
-    </button>
-  </div>
+<!-- Chat Widget -->
+<div class="chat-widget">
+  <button class="chat-toggle" (click)="toggleChat()">
+    <i class="fas fa-comments"></i>
+  </button>
 </div>
