@@ -1,0 +1,337 @@
+/* Color Picker Component Styles */
+
+.color-picker-container {
+  direction: rtl;
+  font-family: 'Vazir', 'Tahoma', sans-serif;
+  margin-bottom: 1rem;
+}
+
+/* Header */
+.color-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.color-label {
+  @apply text-sm font-medium text-gray-700 flex items-center;
+  
+  .required-mark {
+    color: #dc2626;
+    margin-right: 0.25rem;
+  }
+}
+
+.selected-info {
+  .selected-count {
+    @apply text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full;
+  }
+}
+
+/* Section Titles */
+.section-title {
+  @apply text-sm font-semibold text-gray-800 mb-3;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+/* Predefined Colors */
+.predefined-colors {
+  margin-bottom: 1.5rem;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.color-option {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  &.selected {
+    border-color: #3b82f6;
+    transform: scale(1.05);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+  
+  // Special handling for white color
+  &[style*="#F9FAFB"], &[style*="#FFFFFF"] {
+    border: 3px solid #e5e7eb;
+    
+    &.selected {
+      border-color: #3b82f6;
+    }
+  }
+}
+
+.selection-indicator {
+  color: white;
+  font-size: 1rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  
+  // For light colors, use dark indicator
+  .color-option[style*="#F9FAFB"] &,
+  .color-option[style*="#FFFFFF"] &,
+  .color-option[style*="#FEF3C7"] & {
+    color: #374151;
+    text-shadow: none;
+  }
+}
+
+.color-tooltip {
+  position: absolute;
+  bottom: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+  
+  .color-option:hover & {
+    opacity: 1;
+  }
+}
+
+/* Custom Color Section */
+.custom-color-section {
+  margin-bottom: 1.5rem;
+}
+
+.custom-color-input {
+  margin-top: 1rem;
+}
+
+.color-input-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.color-input {
+  width: 60px;
+  height: 40px;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  background: none;
+  
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border: none;
+    border-radius: 0.25rem;
+  }
+  
+  &::-webkit-color-swatch {
+    border: none;
+    border-radius: 0.25rem;
+  }
+}
+
+.color-name-input {
+  @apply flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  min-width: 200px;
+}
+
+.add-color-btn {
+  @apply px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-300;
+  
+  &:disabled {
+    @apply bg-gray-400 cursor-not-allowed;
+  }
+  
+  i {
+    margin-left: 0.25rem;
+  }
+}
+
+/* Selected Colors */
+.selected-colors {
+  margin-bottom: 1rem;
+}
+
+.selected-colors-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.selected-color-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+  }
+}
+
+.color-square {
+  width: 24px;
+  height: 24px;
+  border-radius: 0.25rem;
+  border: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.color-name {
+  @apply text-sm font-medium text-gray-700;
+  white-space: nowrap;
+}
+
+.remove-color-btn {
+  @apply w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-300;
+  
+  i {
+    font-size: 0.75rem;
+  }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 0.75rem;
+  margin: 1rem 0;
+}
+
+.empty-content {
+  .empty-icon {
+    font-size: 2.5rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-message {
+    @apply text-lg font-medium text-gray-600 mb-2;
+  }
+  
+  .empty-description {
+    @apply text-sm text-gray-500;
+  }
+}
+
+/* Validation Error */
+.validation-error {
+  @apply flex items-center gap-2 text-red-600 text-sm mt-2 p-2 bg-red-50 border border-red-200 rounded-lg;
+  
+  i {
+    font-size: 0.875rem;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .color-grid {
+    grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  .color-option {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .color-input-group {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .color-input {
+      width: 100%;
+      height: 50px;
+    }
+    
+    .color-name-input {
+      min-width: unset;
+    }
+    
+    .add-color-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  .selected-colors-list {
+    gap: 0.5rem;
+  }
+  
+  .selected-color-item {
+    flex: 1;
+    min-width: 150px;
+  }
+  
+  .color-picker-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* Persian/RTL Specific */
+.color-picker-container {
+  * {
+    direction: rtl;
+  }
+  
+  .flex {
+    direction: ltr;
+    
+    * {
+      direction: rtl;
+    }
+  }
+  
+  // Fix color input direction
+  .color-input-group {
+    direction: ltr;
+    
+    .color-name-input {
+      direction: rtl;
+    }
+  }
+}
+
+/* Animation for color changes */
+@keyframes colorPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.color-option.selected {
+  animation: colorPulse 0.3s ease-in-out;
+}
