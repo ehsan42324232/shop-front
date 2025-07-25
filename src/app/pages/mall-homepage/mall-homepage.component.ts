@@ -8,6 +8,18 @@ import { Subscription } from 'rxjs';
 
 declare let AOS: any;
 
+interface Feature {
+  title: string;
+  description: string;
+  icon: string;
+  image: string;
+}
+
+interface BusinessType {
+  value: string;
+  label: string;
+}
+
 @Component({
   selector: 'app-mall-homepage',
   templateUrl: './mall-homepage.component.html',
@@ -16,7 +28,7 @@ declare let AOS: any;
 export class MallHomepageComponent implements OnInit, OnDestroy {
   
   // Feature data for homepage sections
-  features = [
+  features: Feature[] = [
     {
       title: 'ساخت فروشگاه آنلاین',
       description: 'با چند کلیک فروشگاه آنلاین خود را راه‌اندازی کنید',
@@ -99,7 +111,7 @@ export class MallHomepageComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   // Business type options
-  businessTypes = [
+  businessTypes: BusinessType[] = [
     { value: 'clothing', label: 'پوشاک' },
     { value: 'electronics', label: 'لوازم الکترونیکی' },
     { value: 'home', label: 'لوازم خانه' },
@@ -182,9 +194,11 @@ export class MallHomepageComponent implements OnInit, OnDestroy {
             this.updateStatsDisplay(response.data.stats);
           }
           if (response.data.features) {
-            this.features = response.data.features.map((feature, index) => ({
-              ...feature,
-              image: this.features[index]?.image || '/assets/images/feature-default.jpg'
+            this.features = response.data.features.map((feature: any, index: number) => ({
+              title: feature.title,
+              description: feature.description,
+              icon: feature.icon,
+              image: feature.image || this.features[index]?.image || '/assets/images/feature-default.jpg'
             }));
           }
         }

@@ -87,6 +87,15 @@ ng serve
 ng build --prod
 ```
 
+### Environment Setup
+```bash
+# Development
+cp src/environments/environment.ts.example src/environments/environment.ts
+
+# Production
+cp src/environments/environment.prod.ts.example src/environments/environment.prod.ts
+```
+
 ## 📁 Project Structure
 
 ```
@@ -145,7 +154,16 @@ ng e2e
 
 # Linting
 ng lint
+
+# Code formatting
+npm run format
 ```
+
+### Code Style
+- Follow Angular style guide
+- Use TypeScript strict mode
+- Implement responsive design
+- Ensure accessibility compliance
 
 ## 🌐 API Integration
 
@@ -170,12 +188,11 @@ GET /api/v1/store/analytics/dashboard/
 ## 📱 Features Implementation Status
 
 ### ✅ Completed
-- ✅ Repository cleanup (removed 16 irrelevant files)
-- ✅ Basic Angular project structure
-- ✅ Component architecture
-- ✅ Service layer setup
-- ✅ Routing configuration
-- ✅ Tailwind CSS integration
+- Basic Angular project structure
+- Component architecture
+- Service layer setup
+- Routing configuration
+- Tailwind CSS integration
 
 ### 🔄 In Progress
 - Homepage implementation
@@ -190,6 +207,15 @@ GET /api/v1/store/analytics/dashboard/
 - Real-time chat widget
 - Mobile-responsive design
 
+## 🐛 Known Issues
+
+**Note**: This repository has been cleaned up. The following files were irrelevant and should be removed:
+- `french_farsi_translator.py` - Python script not needed in Angular app
+- `word_document_generator.py` - Python script not needed in Angular app
+- Multiple redundant documentation files
+
+See `DELETE_IRRELEVANT_FILES.md` for complete cleanup tracking.
+
 ## 🚀 Deployment
 
 ### Docker Deployment
@@ -201,6 +227,14 @@ docker build -t mall-frontend .
 docker run -p 80:80 mall-frontend
 ```
 
+### Docker Compose
+```bash
+# Start all services
+docker-compose up -d
+
+# Frontend will be available at http://localhost:4200
+```
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -208,6 +242,10 @@ docker run -p 80:80 mall-frontend
 3. Commit changes (`git commit -m 'Add amazing feature'`)
 4. Push to branch (`git push origin feature/amazing-feature`)
 5. Open Pull Request
+
+## 📄 License
+
+This project is proprietary software for the Mall e-commerce platform.
 
 ## 📞 Support
 
@@ -222,5 +260,3 @@ For support and questions:
 **Frontend**: Angular + Tailwind CSS  
 **Backend**: Django + PostgreSQL  
 **Language**: Persian (Farsi) + RTL Support
-
-**Status**: Repository cleaned up ✅ Ready for development 🚀
