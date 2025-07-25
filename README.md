@@ -1,66 +1,77 @@
-# Mall (مال) - Online Store Builder Platform
+# Mall (مال) - E-commerce Platform Frontend
 
-🏪 **Build Your Online Store with Ease**
+## 🏪 پلتفرم فروشگاه‌ساز مال
 
-Mall is a comprehensive e-commerce platform designed specifically for the Iranian market, enabling store owners to create and manage their online stores through an intuitive platform entirely in Farsi.
+Mall is a comprehensive e-commerce platform designed specifically for the Iranian market, operating entirely in Farsi. This is the Angular frontend for the platform.
 
-## ✨ Key Features
+## 🎯 Platform Overview
 
-### 🛍️ **Complete Store Solution**
-- Modern, responsive design optimized for Persian content
-- Advanced product management with hierarchical attributes
-- Real-time inventory tracking
-- Multi-level categorization system
-- Mobile-optimized shopping experience
+Mall enables store owners to build and manage their own online stores through a user-friendly platform. Products become saleable on individual websites with comprehensive management tools.
 
-### 📱 **Social Media Integration**
-- Import content directly from Instagram and Telegram
-- Automatic product description generation
-- Image and video import from social posts
-- Latest posts and stories integration
+## ✨ Core Features
 
-### 💳 **Iranian Market Ready**
-- Integration with Iranian payment gateways
-- Connection to major Iranian logistics providers
-- SMS marketing campaigns
-- OTP authentication system
+### 🔐 Authentication & Management
+- OTP-based authentication for all platform logins
+- Store owner admin panel access
+- Django admin panel for platform management
+- User account creation and management
 
-### 🎨 **Store Customization**
-- Multiple themes and layouts
-- Real-time design changes
-- Independent domain options
-- Custom branding capabilities
+### 🛍️ Product System
+- **Object-Oriented Product Structure**: Hierarchical tree levels with inheritance
+- **Product Classes**: Root class with price, images, and videos
+- **Flexible Attributes**: Color, size, material with categorization options
+- **Product Instances**: Created only from leaf nodes
+- **Stock Management**: Low stock warnings for customers
+- **Bulk Creation**: Checkbox to create similar instances quickly
 
-### 📊 **Analytics & Insights**
-- Comprehensive sales dashboards
-- Website traffic analytics
-- Customer behavior insights
-- Revenue tracking
+### 📱 Social Media Integration
+- "Get from social media" button for content extraction
+- Retrieves latest 5 posts/stories from Telegram and Instagram
+- Separates pictures, videos, and text content
+- Users select materials for product definitions
+
+### 🎨 Customization & Themes
+- Multiple layout and theme options
+- Real-time theme changes
+- Independent domain support (subdomain or custom)
+- Red, blue, and white color scheme
+
+### 🛒 E-commerce Features
+- Shopping cart and checkout
+- Customer account management
+- Order tracking and management
+- Payment gateway integration
+- Iranian logistics provider integration
+- SMS promotion campaigns
+
+### 📊 Analytics & Insights
+- Comprehensive dashboards for store owners
+- Sales charts and analytics
+- Website view statistics
+- Customer interaction metrics
 
 ## 🏗️ Technical Stack
 
-### Frontend
-- **Angular 15+** - Modern web framework
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first styling
-- **PrimeNG** - UI component library
-- **RxJS** - Reactive programming
+### Frontend (This Repository)
+- **Framework**: Angular 16+
+- **Styling**: Tailwind CSS
+- **Language**: TypeScript
+- **Build Tool**: Angular CLI
+- **UI Components**: Custom components with RTL support
 
 ### Backend Integration
-- RESTful API architecture
-- Django REST Framework backend
-- Real-time data synchronization
-- Secure authentication
+- **API**: RESTful APIs with Django REST Framework
+- **Authentication**: JWT tokens with OTP verification
+- **Real-time**: WebSocket integration for chat
+- **File Upload**: Image and video upload support
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 16+ and npm
-- Angular CLI 15+
-- Git
+- Node.js 18+ and npm
+- Angular CLI (`npm install -g @angular/cli`)
 
 ### Installation
-
 ```bash
 # Clone the repository
 git clone https://github.com/ehsan42324232/shop-front.git
@@ -72,14 +83,56 @@ npm install
 # Start development server
 ng serve
 
-# Navigate to http://localhost:4200
+# Build for production
+ng build --prod
 ```
 
-### Development Commands
+## 📁 Project Structure
 
+```
+src/
+├── app/
+│   ├── components/          # Reusable UI components
+│   ├── pages/              # Page components
+│   │   ├── homepage/       # Platform homepage
+│   │   ├── auth/          # Authentication pages
+│   │   ├── dashboard/     # Store owner dashboard
+│   │   ├── products/      # Product management
+│   │   ├── orders/        # Order management
+│   │   └── storefront/    # Customer-facing store
+│   ├── services/          # API services
+│   ├── guards/            # Route guards
+│   ├── interceptors/      # HTTP interceptors
+│   ├── models/            # TypeScript interfaces
+│   └── modules/           # Feature modules
+├── assets/                # Static assets
+└── environments/          # Environment configurations
+```
+
+## 🎨 Design Requirements
+
+### Homepage Features
+- Unique logo in red, blue, and white colors
+- Long, fancy, and modern design
+- Feature presentations with images and videos
+- Two bold call-to-action buttons (top and middle/bottom)
+- Pop-up request forms
+- Sliders and online chat functionality
+- Login section for store owner access
+- Contact us and about us sections
+
+### RTL Support
+- Full Persian/Farsi language support
+- Right-to-left text direction
+- Proper date and number formatting
+- Persian fonts integration
+
+## 🔧 Development
+
+### Available Scripts
 ```bash
 # Development server
-ng serve
+ng serve                    # http://localhost:4200
 
 # Build for production
 ng build --prod
@@ -87,113 +140,87 @@ ng build --prod
 # Run tests
 ng test
 
-# Generate component
-ng generate component component-name
-```
-
-## 🎨 Design System
-
-### Brand Colors
-- **Primary**: Red (#DC2626)
-- **Secondary**: Blue (#2563EB)
-- **Accent**: White (#FFFFFF)
-- **Background**: Modern gradients
-
-### Persian Typography
-- **Font Family**: Vazir, Tahoma, system fonts
-- **Direction**: RTL (Right-to-Left)
-- **Headings**: Bold, gradient effects
-- **Content**: Clean, readable Persian text
-
-## 🔧 Configuration
-
-### Environment Setup
-
-```typescript
-// src/environments/environment.ts
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:8000/api',
-  platformName: 'Mall',
-  language: 'fa',
-  direction: 'rtl'
-};
-```
-
-## 📦 Deployment
-
-### Production Build
-
-```bash
-# Build for production
-ng build --prod
-
-# Deploy to hosting platform
-# Files will be in dist/ folder
-```
-
-### Supported Platforms
-- Vercel
-- Netlify
-- AWS S3 + CloudFront
-- Iranian hosting providers
-
-## 🧪 Testing
-
-```bash
-# Run unit tests
-ng test
-
 # Run e2e tests
 ng e2e
 
-# Generate coverage report
-ng test --code-coverage
+# Linting
+ng lint
+```
+
+## 🌐 API Integration
+
+### Base API Endpoints
+```typescript
+// Authentication
+POST /api/v1/mall/auth/request-otp/
+POST /api/v1/mall/auth/verify-otp/
+
+// Products
+GET /api/v1/mall/product-instances/
+POST /api/v1/mall/product-instances/
+
+// Social Integration
+POST /api/v1/mall/social/extract/
+GET /api/v1/mall/social/latest-posts/
+
+// Analytics
+GET /api/v1/store/analytics/dashboard/
+```
+
+## 📱 Features Implementation Status
+
+### ✅ Completed
+- ✅ Repository cleanup (removed 16 irrelevant files)
+- ✅ Basic Angular project structure
+- ✅ Component architecture
+- ✅ Service layer setup
+- ✅ Routing configuration
+- ✅ Tailwind CSS integration
+
+### 🔄 In Progress
+- Homepage implementation
+- Authentication pages
+- Product management interface
+- Dashboard components
+
+### 📋 Planned
+- Theme switching system
+- Social media integration UI
+- Advanced search interface
+- Real-time chat widget
+- Mobile-responsive design
+
+## 🚀 Deployment
+
+### Docker Deployment
+```bash
+# Build Docker image
+docker build -t mall-frontend .
+
+# Run container
+docker run -p 80:80 mall-frontend
 ```
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create feature branch (`git checkout -b feature/new-feature`)
-3. Commit changes (`git commit -m 'Add new feature'`)
-4. Push to branch (`git push origin feature/new-feature`)
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
 5. Open Pull Request
 
-### Code Standards
-- Follow Angular style guide
-- Use TypeScript strict mode
-- Write meaningful commit messages
-- Add tests for new features
-- Maintain Persian language consistency
+## 📞 Support
 
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🆘 Support
-
-- **Issues**: [GitHub Issues](https://github.com/ehsan42324232/shop-front/issues)
-- **Documentation**: Project Wiki
-- **Email**: support@mall.ir
-
-## 🗺️ Roadmap
-
-### Current Phase
-- [x] Core platform structure
-- [x] Store management system
-- [x] Product management
-- [ ] Social media integration
-- [ ] Payment gateway integration
-- [ ] Analytics dashboard
-
-### Future Enhancements
-- [ ] Advanced analytics
-- [ ] Mobile application
-- [ ] AI-powered recommendations
-- [ ] Multi-language support
+For support and questions:
+- Create an issue in this repository
+- Contact the development team
+- Check the backend repository: [shop-back](https://github.com/ehsan42324232/shop-back)
 
 ---
 
-**Built with ❤️ for Iranian entrepreneurs**
+**Platform**: Mall (مال) - Iranian E-commerce Solution  
+**Frontend**: Angular + Tailwind CSS  
+**Backend**: Django + PostgreSQL  
+**Language**: Persian (Farsi) + RTL Support
 
-*Mall (مال) - Where online stores come to life*
+**Status**: Repository cleaned up ✅ Ready for development 🚀
