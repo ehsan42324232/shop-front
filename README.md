@@ -1,68 +1,56 @@
-# ShopSphere - Modern E-commerce Platform
+# Mall (مال) - Online Store Builder Platform
 
-🚀 **Transform your business with our cutting-edge e-commerce platform**
+🏪 **Build Your Online Store with Ease**
 
-ShopSphere is a modern, feature-rich e-commerce platform built with Angular and designed for scalability, performance, and user experience.
+Mall is a comprehensive e-commerce platform designed specifically for the Iranian market, enabling store owners to create and manage their online stores through an intuitive platform entirely in Farsi.
 
 ## ✨ Key Features
 
-### 🏪 **Complete E-commerce Solution**
-- Modern, responsive design with dark theme
-- Advanced product management
+### 🛍️ **Complete Store Solution**
+- Modern, responsive design optimized for Persian content
+- Advanced product management with hierarchical attributes
 - Real-time inventory tracking
-- Multi-currency and multi-language support
+- Multi-level categorization system
 - Mobile-optimized shopping experience
 
-### 💳 **Flexible Payment Options**
-- Digital wallet integration
-- Bank transfer support
-- Cryptocurrency payments
-- Subscription management
-- Secure payment processing
+### 📱 **Social Media Integration**
+- Import content directly from Instagram and Telegram
+- Automatic product description generation
+- Image and video import from social posts
+- Latest posts and stories integration
 
-### 📊 **Advanced Analytics**
-- Real-time sales dashboard
+### 💳 **Iranian Market Ready**
+- Integration with Iranian payment gateways
+- Connection to major Iranian logistics providers
+- SMS marketing campaigns
+- OTP authentication system
+
+### 🎨 **Store Customization**
+- Multiple themes and layouts
+- Real-time design changes
+- Independent domain options
+- Custom branding capabilities
+
+### 📊 **Analytics & Insights**
+- Comprehensive sales dashboards
+- Website traffic analytics
 - Customer behavior insights
-- Inventory analytics
-- Revenue forecasting
-- AI-powered recommendations
+- Revenue tracking
 
-### 🔒 **Enterprise Security**
-- Bank-level encryption
-- Two-factor authentication
-- Role-based access control
-- GDPR compliance
-- Regular security audits
+## 🏗️ Technical Stack
 
-### 💬 **Customer Support**
-- Integrated live chat system
-- 24/7 customer support
-- Knowledge base integration
-- Ticket management system
-- Multi-channel communication
-
-## 🏗️ Technical Architecture
-
-### Frontend Stack
+### Frontend
 - **Angular 15+** - Modern web framework
 - **TypeScript** - Type-safe development
 - **Tailwind CSS** - Utility-first styling
+- **PrimeNG** - UI component library
 - **RxJS** - Reactive programming
-- **Angular Material** - UI components
 
 ### Backend Integration
 - RESTful API architecture
-- Real-time WebSocket connections
-- Microservices ready
-- Cloud-native deployment
-- Docker containerization
-
-### Performance Features
-- Lazy loading modules
-- Server-side rendering (SSR)
-- Progressive Web App (PWA)
-- Code splitting and optimization
-- CDN integration
+- Django REST Framework backend
+- Real-time data synchronization
+- Secure authentication
 
 ## 🚀 Quick Start
 
@@ -99,191 +87,113 @@ ng build --prod
 # Run tests
 ng test
 
-# Run end-to-end tests
-ng e2e
-
 # Generate component
 ng generate component component-name
-
-# Generate service
-ng generate service service-name
 ```
-
-## 📱 Responsive Design
-
-ShopSphere is built with mobile-first principles:
-
-- **Mobile** (320px+) - Optimized for smartphones
-- **Tablet** (768px+) - Enhanced tablet experience
-- **Desktop** (1024px+) - Full-featured desktop interface
-- **Large Screens** (1440px+) - Maximized for large displays
 
 ## 🎨 Design System
 
-### Color Palette
-- **Primary**: Cyan to Purple gradient
-- **Secondary**: Blue to Pink gradient
-- **Background**: Dark slate with purple accents
-- **Text**: High contrast white/gray
-- **Accents**: Vibrant gradients
+### Brand Colors
+- **Primary**: Red (#DC2626)
+- **Secondary**: Blue (#2563EB)
+- **Accent**: White (#FFFFFF)
+- **Background**: Modern gradients
 
-### Typography
-- **Font Family**: Inter, Segoe UI, system fonts
-- **Headings**: Bold, gradient text effects
-- **Body**: Clean, readable text
-- **Code**: Monospace fonts
-
-### Components
-- Glass morphism effects
-- Smooth animations and transitions
-- Hover states and micro-interactions
-- Consistent spacing and layouts
+### Persian Typography
+- **Font Family**: Vazir, Tahoma, system fonts
+- **Direction**: RTL (Right-to-Left)
+- **Headings**: Bold, gradient effects
+- **Content**: Clean, readable Persian text
 
 ## 🔧 Configuration
 
 ### Environment Setup
 
-Create environment files for different stages:
-
 ```typescript
 // src/environments/environment.ts
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api',
-  wsUrl: 'ws://localhost:3000',
-  // Add your configuration
-};
-```
-
-### API Integration
-
-Configure backend API endpoints:
-
-```typescript
-// src/app/services/api.service.ts
-const API_ENDPOINTS = {
-  auth: '/auth',
-  products: '/products',
-  orders: '/orders',
-  users: '/users',
-  analytics: '/analytics'
+  apiUrl: 'http://localhost:8000/api',
+  platformName: 'Mall',
+  language: 'fa',
+  direction: 'rtl'
 };
 ```
 
 ## 📦 Deployment
 
-### Docker Deployment
+### Production Build
 
 ```bash
-# Build Docker image
-docker build -t shopsphere-frontend .
+# Build for production
+ng build --prod
 
-# Run container
-docker run -p 4200:80 shopsphere-frontend
+# Deploy to hosting platform
+# Files will be in dist/ folder
 ```
 
-### Cloud Deployment
-
-Supported platforms:
-- **Vercel** - Recommended for frontend
-- **Netlify** - Static site hosting
-- **AWS S3 + CloudFront** - Enterprise solution
-- **Google Cloud Platform** - Scalable hosting
-- **Azure Static Web Apps** - Microsoft cloud
+### Supported Platforms
+- Vercel
+- Netlify
+- AWS S3 + CloudFront
+- Iranian hosting providers
 
 ## 🧪 Testing
 
-### Unit Testing
 ```bash
 # Run unit tests
 ng test
+
+# Run e2e tests
+ng e2e
 
 # Generate coverage report
 ng test --code-coverage
 ```
 
-### E2E Testing
-```bash
-# Run e2e tests
-ng e2e
-
-# Run specific test suite
-ng e2e --suite=user-flows
-```
-
-## 📈 Performance Optimization
-
-### Bundle Analysis
-```bash
-# Analyze bundle size
-npm run build:stats
-npx webpack-bundle-analyzer dist/stats.json
-```
-
-### Performance Tips
-- Use OnPush change detection
-- Implement virtual scrolling for large lists
-- Optimize images with WebP format
-- Enable gzip compression
-- Use lazy loading for routes
-
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
-
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create feature branch (`git checkout -b feature/new-feature`)
+3. Commit changes (`git commit -m 'Add new feature'`)
+4. Push to branch (`git push origin feature/new-feature`)
+5. Open Pull Request
 
-### Code Style
-- Use TypeScript strict mode
+### Code Standards
 - Follow Angular style guide
-- Use meaningful commit messages
-- Add unit tests for new features
-- Update documentation
+- Use TypeScript strict mode
+- Write meaningful commit messages
+- Add tests for new features
+- Maintain Persian language consistency
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## 🆘 Support
 
-- **Documentation**: [Wiki](https://github.com/ehsan42324232/shop-front/wiki)
 - **Issues**: [GitHub Issues](https://github.com/ehsan42324232/shop-front/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ehsan42324232/shop-front/discussions)
-- **Email**: support@shopsphere.com
+- **Documentation**: Project Wiki
+- **Email**: support@mall.ir
 
 ## 🗺️ Roadmap
 
-### Q1 2024
-- [ ] Advanced search and filtering
-- [ ] Wishlist functionality
+### Current Phase
+- [x] Core platform structure
+- [x] Store management system
+- [x] Product management
 - [ ] Social media integration
-- [ ] Enhanced mobile app
+- [ ] Payment gateway integration
+- [ ] Analytics dashboard
 
-### Q2 2024
+### Future Enhancements
+- [ ] Advanced analytics
+- [ ] Mobile application
 - [ ] AI-powered recommendations
-- [ ] Advanced analytics dashboard
-- [ ] Multi-vendor marketplace
-- [ ] Voice commerce integration
-
-### Q3 2024
-- [ ] AR/VR product visualization
-- [ ] Blockchain integration
-- [ ] Advanced personalization
-- [ ] Global expansion features
-
-## 🙏 Acknowledgments
-
-- Angular team for the amazing framework
-- Tailwind CSS for the utility-first approach
-- Open source community for inspiration
-- Contributors and testers
+- [ ] Multi-language support
 
 ---
 
-**Built with ❤️ by the ShopSphere Team**
+**Built with ❤️ for Iranian entrepreneurs**
 
-*Transform your business with ShopSphere - where innovation meets commerce.*
+*Mall (مال) - Where online stores come to life*
